@@ -1,0 +1,583 @@
+
+1.计算字符串最后一个单词的长度，单词以空格隔开。
+import java.util.*
+
+publis class Main{
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+        String[] split = sc.nextLine().split("\\s+");
+        System.out.print(split[split.length-1].length());
+    }
+
+}
+
+2.写出一个程序，接受一个由字母和数字组成的字符串，和一个字符，
+然后输出输入字符串中含有该字符的个数。不区分大小写。
+import java.util.*
+public class Main{
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+        String str = sc.nextLine().toLowerCase();
+        Character char = sc.nextLine.charAt(0);
+        char lowerCase = char.toLowerCase(char);
+        int count = 0 ;
+        for(int i=0; i<str.length();i++){
+            if(str.charAt(i) == lowerCase){
+                count++;
+            }
+        }
+        System.out.println(count);
+    }
+}
+
+3.明明想在学校中请一些同学一起做一项问卷调查，为了实验的客观性，他先用计算机生成了N个1到1000
+之间的随机整数（N≤1000），对于其中重复的数字，只保留一个，把其余相同的数去掉，
+不同的数对应着不同的学生的学号。然后再把这些数从小到大排序，按照排好的顺序去找同学做调查。
+请你协助明明完成“去重”与“排序”的工作
+import java.util.*
+public class Main(){
+    public static void main(String[] args){
+        Random random = new Random();
+        int all = random.nextInt(1000);
+        TreeSet<Integer> treeSet = new TreeSet<Integer>();
+        for(int i=0;i<all;i++){
+            treeSet.add(random.nextInt(1000));
+        }
+        for(Integer integer : treeSet){
+            System.out.println(integer);
+        }
+    }
+}
+
+4.连续输入字符串，请按长度为8拆分每个字符串后输出到新的字符串数组；
+  长度不是8整数倍的字符串请在后面补数字0，空字符串不处理。
+import java.util.*
+public class Main{
+    public static void main(String[] args){
+        Scanner scanner = new Scanner(System.in);
+        String str = scanner.nextLine();
+        split(str);
+        scanner.close();
+    }
+    private static void split(String str){
+        while(str.length()>=8){
+            System.out.println(str.substring(0,8));
+            str = str.substring(8);
+        }
+        if(str.length()>0 && str.length()<8){
+            System.out.println((str+"00000000").substring(0,8));
+        }
+    }
+}
+
+
+5.写出一个程序，接受一个十六进制的数，输出该数值的十进制表示。（多组同时输入 ）
+import java.util.*
+
+public class Main{
+    public static void main (String[] args){
+        Scanner sc = new Scanner(System.in);
+        while(sc.hasNext()){
+            String s = sc.next();
+            s = s.substring;
+            System.out.println(s);
+            System.out.println(Integer.parseInt(s,16));
+        }
+    }
+}
+
+6.功能:输入一个正整数，按照从小到大的顺序输出它的所有质因子（如180的质因子为2 2 3 3 5 ）
+最后一个数后面也要有空格
+import java.util.*
+public class Main{
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+        int a = sc.nextint();
+        if(a < 2){
+            System.out.println(a+"");
+        }else{
+            String str = getResult(a);
+            System.out.println(str);
+        }
+        sc.close();
+    }
+    private static String getResult(int a){
+        StringBuffer str = new StringBuffer();
+        int temp = 2;
+        while(temp < a){
+            if(a%temp == 0){
+                if(a == temp){
+                    str.append(temp+" ");
+                    break;
+                }else{
+                    str.append(temp+" ");
+                    a = a/temp;
+                }
+            }else{
+                temp++;
+            }
+        }
+        return str.toString();
+    }
+}
+
+7.写出一个程序，接受一个正浮点数值，输出该数值的近似整数值。如果小数点后数值大于等于5,向上取整；
+小于5，则向下取整。
+import java.util.Scanner
+public class Main(){
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+        while(sc.hasNext()){
+            float a = sc.nextFloat();
+            System.out.println(getResult(a));
+        }
+    }
+    private static int getResult(float a){
+        int b = (int)a;
+        return (a-b)>0.5?b+1:b;
+    }
+}
+
+8.数据表记录包含表索引和数值（int范围的整数），请对表索引相同的记录进行合并，
+即将相同索引的数值进行求和运算，输出按照key值升序进行输出。
+imtport java.util.*
+public class Main{
+    public static void main(String[] args){
+        SortedMap<integer,Integer> sMap = new TreeMap<Integer,Integer>();
+        Scanner sc = new Scanner(); // 1 2,1 2,2 1,2 2
+        String strs = sc.nextLine();
+        String[] split = strs.split(",");
+        add(sMap,split);
+        printResult(sMap);
+    }
+    private static void add(SortedMap sMap,String[] split){
+        for(int i=0;i<split.length;i++){
+            String str = split[i];
+            String[] split2 = str.split("\\s+");
+            int key = Integer.parseInt(split2[0]);
+            int value = Integer.parseInt(split2[1]);
+            if(!sMap.containsKey(key)){
+                sMap.put(key,value);
+            }else{
+                int a = sMap.get(key);
+                int value2 = a+value;
+                sMap.put(key,value2);
+            }
+        }
+    }
+    private static void printResult(SortedMap sMap){
+        StringBuffer sb = new StringBuffer();
+        for(Entry<Integer,Integer> e: sMap.entrySet){
+            sb.append(e.getKey()+" "+e.getValue()+",")
+        }
+    }
+}
+
+9.输入一个int型整数，按照从右向左的阅读顺序，返回一个不含重复数字的新的整数。
+import java.util.*
+public class Main{
+    public static void main(String[] qrgs){
+        Scanner sc = new Scanner(System.in);
+        String str = sc.nextLine();
+        StringBuffer sb = new StringBuffer(str);
+        sb.reverse();
+        Set set = new HashSet();
+        for(int i=0;i<sb.length;i++){
+            if(set.add(sb.substring(i,i+1))){
+                System.out.println(sb.substring(i,i+1))
+            }
+        }
+    }
+}
+
+10.编写一个函数，计算字符串中含有的不同字符的个数。字符在ACSII码范围内(0~127)，
+换行表示结束符，不算在字符里。不在范围内的不作统计。
+imtprot java.util.*
+public class main{
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+        int count = 0;
+        String pool = "";
+        while(sc.hasNext()){
+            String str = sc.nextLine();
+            char[] charArray = str.toCharArray();
+            for(int i=o;i<charArray.length;i++){
+                char c = charArray[i];
+                if(Integer.valueOf(c)>=0 && Integer.valueOf(c)<127){
+                    String valueOf = String.valueOf(c)
+                    if(!pool.contains(valueOf)){
+                        pool = pool + valueOf;
+                        count++;
+                    }
+                }
+            System.out.println("pool:"+pool);
+            System.out.println("count"+count);
+            }
+        }
+    }
+}
+
+11.输入一个整数，将这个整数以字符串的形式逆序输出 ,程序不考虑负数的情况，若数字含有0，
+则逆序形式也含有0，如输入为100，则输出为001
+imtport java.util.*
+public class Main{
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+        String str = sc.nextLine();
+        StringBuffer sb = new StringBuffer(str);
+        sb.reverse();
+        System.out.println(sb);
+        sc.close();
+    }
+}
+
+12.将一个英文语句以单词为单位逆序排放。例如“I am a boy”，
+逆序排放后为“boy a am I” 所有单词之间用一个空格隔开，语句中除了英文字母外，不再包含其他字符
+imtport java.util.*
+public class Main{
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+        String[] strs = sc.nextLine().split("\\s+");
+        StringBuffer sb = new StringBuffer(strs);
+        for(int i=strs.length-1;i>=0;i--){
+            String str = strs[i]
+            sb.append(str+" ")
+        }
+        System.out.println(sb.toString());
+    }
+}
+
+13.给定n个字符串，请对n个字符串按照字典序排列。输入第一行为一个正整数n(1≤n≤1000),
+下面n行为n个字符串(字符串长度≤100),字符串中只含有大小写字母。
+public class Main{
+    public static void main(String[] args) throws IOException{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int num = Integer.parseInt(br.readLine());
+        String[] s = new String[num];
+        for(int i=0;i<num;i++){
+            s[i] = br.readline();
+        }
+        Arrays.sort(s);
+        for(String a : s){
+            System.out.println(a);
+        }
+    }
+}
+
+14.输入一个int型的正整数，计算出该int型数据在内存中存储时1的个数。
+import java.util.*
+public class Main{
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt();
+        int count = 0;
+        while(n != 0){
+            count ++;
+            n = n&(n-1);
+        }
+        System.out.println(count);
+    }
+}
+
+15.编写一个函数，计算字符串中含有的不同字符的个数。字符在ACSII码范围内(0~127)，
+换行表示结束符，不算在字符里。不在范围内的不作统计
+import java.util.*
+public class Main{
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+        String str = sc.nextLine();
+        char[] chars = str.toCharArray();
+        String result = "";
+        for(int i=0;i<chars.length;i++){
+            if(Integer.valueOf(chars[i])>=0&&Integer.valueOf(chars[i])<=127){
+                String s = String.valueOf(chars[i]);
+                if(result.contains(s)){
+                    result = result + s;
+                }
+            }
+        }
+        System.out.println(result.length());
+    }
+}
+
+16.购物单请你帮助王强设计一个满足要求的购物单。
+17.坐标移动开发一个坐标计算工具， A表示向左移动，D表示向右移动，W表示向上移动，
+S表示向下移动。从（0,0）点开始移动，从输入字符串里面读取一些坐标，
+并将最终输入结果输出到输出文件里面。
+Scanner sc = new Scanner(System.in);
+		int x = 0;
+		int y = 0;
+		while(sc.hasNext()){
+			String nextLine = sc.nextLine();
+			if("A".equals(nextLine)){
+				x = x-1;
+			}else if("D".equals(nextLine)){
+				x = x+1;
+			}else if("W".equals(nextLine)){
+				y = y+1;
+			}else if("S".equals(nextLine)){
+				y = y-1;
+			}
+			System.out.println(x+","+y);
+		}
+
+
+18.请解析IP地址和对应的掩码，进行分类识别。要求按照A/B/C/D/E类地址归类，
+不合法的地址和掩码单独归类。
+    所有的IP地址划分为 A,B,C,D,E五类
+    A类地址1.0.0.0~126.255.255.255;
+    B类地址128.0.0.0~191.255.255.255;
+    C类地址192.0.0.0~223.255.255.255;
+    D类地址224.0.0.0~239.255.255.255；
+    E类地址240.0.0.0~255.255.255.255
+public class Main{
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+        String[] strs = sc.nextLine().split("~);
+        String ips = strs[0];
+        System.out.println(ips.indexOf("."));
+        // 格式判断 IP 和 掩码
+        if(strs[0]=="IP"){
+        }
+        //1-126 , 128-191 , 192-223, 224-239, 240-255, 240-255
+    }
+}
+
+19.开发一个简单错误记录功能小模块，能够记录出错的代码所在的文件名称和行号。
+20.密码验证合格程序，密码要求:
+    1.长度超过8位
+    2.包括大小写字母.数字.其它符号,以上四种至少三种
+    3.不能有相同长度超2的子串重复
+    说明:长度超过2的子串
+    Scanner sc = new Scanner(System.in);
+		String sct = sc.nextLine();
+		if(sct.length()<9 || sct.isEmpty()){
+			System.out.println("NG-length");
+			return;
+		}
+		int[] cha = {0,0,0,0};
+		char[] charArray = sct.toCharArray();
+		for(int i=0;i<charArray.length;i++){
+			if(charArray[i]>='0'&& charArray[i]<='9'){
+				cha[0] = 1;
+			}else if(charArray[i]>='a'&&charArray[i]<='z'){
+				cha[1] = 1;
+			}else if(charArray[i]>='A'&&charArray[i]<='Z'){
+				cha[2] = 1;
+			}else{
+				cha[3] = 1;
+			}
+		}
+		if(cha[0]+cha[1]+cha[2]+cha[3] < 3){
+			System.out.println("NG-3class");
+			return;
+		}
+		for(int i=0;i<sct.length()-3;i++){
+			String str1 = sct.substring(i, i+2);
+			// System.out.println(str1);
+			String str2 = sct.substring(i+2,sct.length());
+			// System.out.println(str2);
+			if(str2.contains(str1)){
+				System.out.println("NG-2");
+				return;
+			}
+		}
+		System.out.println("OK");
+		sc.close();
+
+21.简单密码：输入包括多个测试数据。输入是一个明文，密码长度不超过100个字符，
+输入直到文件结尾
+22.汽水瓶 有这样一道智力题：“某商店规定：三个空汽水瓶可以换一瓶汽水。
+import java.util.*
+public class main{
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+        while(sc.hasNext()){
+            int a = sc.nextInt();
+            int total = 0;
+            if(a ==0 ){
+                break;
+            }
+            while(a != 0){
+                if(a == 1){
+                    a = 0;
+                    break;
+                }
+                if(a == 2){
+                    a = 0;
+                    total +=1;
+                }
+                else{
+                    int b = a/3;
+                    total = total + b;
+                    a = a - 3*b + b;
+                }
+            }
+            System.out.println(total);
+        }
+        sc.close();
+    }
+}
+
+23.实现删除字符串中出现次数最少的字符，若多个字符出现次数一样，则都删除。
+输出删除这些单词后的字符串，字符串中其它字符保持原来的顺序。
+public static void main(String[] args){
+    Scanner sc = new Scanner(System.in);
+    while(sc.hasNext()){
+        String line = sc.nextLine();
+        if("0".equlas(line)){
+            break;
+        }
+        int[] num = new int[26];
+        for(int i=0;i<line.length();i++){
+            char ch = line.charAt(i);
+            int a = (int)ch - 'a';
+            num[a]++;
+        }
+        int min = Integer.MAX_VALUE;
+        for(int j=0;j<num.length;j++){
+            if(num[j]<min){
+                min = num[j];
+            }
+        }
+        for(int k=0;k<line.length();k++){
+            char c = line.charAt(k);
+            int a = (int)c-'a';
+            if(num[a] != min){
+                System.out.print(c);
+            }
+        }
+        System.out.println();
+
+    }
+    sc.close();
+}
+
+24.合唱队：计算最少出列多少位同学，使得剩下的同学排成合唱队形（动态规划）
+
+
+25.数据分类处理，大数据思维
+
+
+26.字符串排序 规则 1 ：英文字母从 A 到 Z 排列，不区分大小写。如，输入： Type 输出： epTy
+27.查找兄弟单词，实现一个可存储若干单词的字典。
+28.若两个正整数的和为素数，则这两个正整数称之为“素数伴侣”；
+29.字符串加解密。对输入的字符串进行加解密，并输出。
+30.字符串合并处理，将输入的两个字符串合并。
+31.单词倒排 对字符串中的所有单词进行倒排
+32.字符串应用，密码截取，Catcher是MCA国的情报员，他工作时发现敌国会用一些对称的密码进行通信，比如像这些ABBA，ABA，A，123321，
+33.整数与IP地址间的转换、原理：ip地址的每段可以看成是一个0-255的整数，把每段拆分成一个二进制形式组合起来，然后把这个二进制数转变成一个长整数。
+34.图片整理 Lily上课时使用字母数字图片教小朋友们学习英语单词，每次都需要把这些图片按照大小（ASCII码值从小到大）排列收好。请大家给Lily帮忙，通过C语言解决。
+35.蛇形矩阵：蛇形矩阵是由1开始的自然数依次排列成的一个矩阵上三角形。
+36.字符串加密：有一种技巧可以对数据进行加密，它使用一个单词作为它的密匙。下面是它的工作原理：首先，选择一个单词作为密匙，如TRAILBLAZERS。如果单词中包含有重复的字母，只保留第1个，其余几个丢弃。现在，修改过的那个单词属于字母表的下面，如下所示：
+37.统计每个月兔子的总数：有一只兔子，从出生后第3个月起每个月都生一只兔子，小兔子长到第三个月后每个月又生一只兔子，假如兔子都不死，问每个月的兔子总数为多少？
+38.求小球落地5次后所经历的路程和第5次反弹的高度：假设一个球从任意高度自由落下，每次落地后反跳回原高度的一半; 
+    再落下, 求它在第5次落地时，共经历多少米?第5次反弹多高？最后的误差判断是小数点3位
+39.判断两个IP是否属于同一子网：子网掩码是用来判断任意两台计算机的IP地址是否属于同一子网络的根据。
+    子网掩码与IP地址结构相同，是32位二进制数，其中网络号部分全为“1”和主机号部分全为“0”。利用子网掩码可以判断两台主机是否中同一子网中。
+40.输入一行字符，分别统计出包含英文字母、空格、数字和其它字符的个数    
+41.称砝码：现有一组砝码，重量互不相等，分别为m1,m2,m3…mn；每种砝码对应的数量为x1,x2,x3...xn。现在要用这些砝码去称物体的重量(放在同一侧)，问能称出多少种不同的重量。
+42.学英语Jessi初学英语，为了快速读出一串数字，编写程序将数字转换成英文：如22：twenty two，123：one hundred and twenty three
+43.迷宫问题：定义一个二维数组N*M（其中2<=N<=10;2<=M<=10），如5 × 5数组下所示： 
+int maze[5][5] = {
+        0, 1, 0, 0, 0,
+        0, 1, 0, 1, 0,
+        0, 0, 0, 0, 0,
+        0, 1, 1, 1, 0,
+        0, 0, 0, 1, 0,
+};
+44.Sudoku-Java问题描述：数独（Sudoku）是一款大众喜爱的数字逻辑游戏。玩家需要根据9X9盘面上的已知数字，推算出所有剩余空格的数字，并且满足每一行、每一列、每一个粗线宫内的数字均含1-9，并且不重复。
+45.名字的漂亮度：给出一个名字，该名字有26个字符串组成，定义这个字符串的“漂亮度”是其所有字母“漂亮度”的总和。
+每个字母都有一个“漂亮度”，范围在1到26之间。没有任何两个字母拥有相同的“漂亮度”。字母忽略大小写。
+给出多个名字，计算每个名字最大可能的“漂亮度”。
+46.按字节截取字符串 题目描述：编写一个截取字符串的函数，输入为一个字符串和字节数，输出为按字节截取的字符串。但是要保证汉字不被截半个，如"我ABC"4，应该截为"我AB"，输入"我ABC汉DEF"6，应该输出为"我ABC"而不是"我ABC+汉的半个"。 
+47.线性插值：信号测量的结果包括测量编号和测量值。存在信号测量结果丢弃及测量结果重复的情况。
+  1.测量编号不连续的情况，认为是测量结果丢弃。对应测量结果丢弃的情况，需要进行插值操作以更准确的评估信号。
+  采用简化的一阶插值方法,由丢失的测量结果两头的测量值算出两者中间的丢失值。
+48.从单向链表中删除指定值的节点：输入一个单向链表和一个节点的值，从单向链表中删除等于该值的节点，删除后如果链表中无节点则返回空指针。
+49.多线程:问题描述：有4个线程和1个公共的字符数组。线程1的功能就是向数组输出A，线程2的功能就是向字符输出B，线程3的功能就是向数组输出C，线程4的功能就是向数组输出D。要求按顺序向数组赋值ABCDABCDABCD，ABCD的个数由线程函数1的参数指定
+50.四则运算：请实现如下接口：功能：四则运算：输入：strExpression：字符串格式的算术表达式，如: "3+2*{1+2*[-4/(8-6)+7]}" 返回：算术表达式的计算结果
+51.输出单向链表中倒数第k个结点：输入一个单向链表，输出该链表中倒数第k个结点，链表的倒数第1个结点为链表的尾指针。
+52.计算字符串的距离：Levenshtein 距离，又称编辑距离，指的是两个字符串之间，由一个转换成另一个所需的最少编辑操作次数。许可的编辑操作包括将一个字符替换成另一个字符，插入一个字符，删除一个字符。
+53.iNOC产品部-杨辉三角的变形：以上三角形的数阵，第一行只有一个数1，以下每行的每个数，是恰好是它上面的数，左上角数到右上角的数，3个数之和（如果不存在某个数，认为该数就是0）。   
+    求第n行第一个偶数出现的位置。如果没有偶数，则输出-1。例如输入3,则输出2，输入4则输出3。
+54.表达式求值：给定一个字符串描述的算术表达式，计算出结果值。输入字符串长度不超过100，合法的字符包括”+, -, *, /, (, )”，”0-9”，字符串内容的合法性及表达式语法的合法性由做题者检查。本题目只涉及整型计算。
+55.挑7 输出7有关数字的个数，包括7的倍数，还有包含7的数字（如17，27，37...70，71，72，73...）的个数（一组测试用例里可能有多组数据，请注意处理）
+56.iNOC产品部--完全数计算
+完全数（Perfect number），又称完美数或完备数，是一些特殊的自然数。它所有的真因子（即除了自身以外的约数）的和（即因子函数），恰好等于它本身。
+例如：28，它有约数1、2、4、7、14、28，除去它本身28外，其余5个数相加，1+2+4+7+14=28。 给定函数count(int n),用于计算n以内(含n)完全数的个数。计算范围, 0 < n <= 500000  返回n以内完全数的个数。 异常情况返回-1
+57.无线OSS－高精度整数加法：在计算机中，由于处理器位宽限制，只能处理有限精度的十进制整数加减法，比如在32位宽处理器计算机中，参与运算的操作数和结果必须在-2^31~2^31-1之间。如果需要进行更大范围的十进制整数加法，需要使用特殊的方式实现，比如使用字符串保存操作数和结果，采取逐位运算的方式。
+58.输入n个整数，输出其中最小的k个，输入n个整数，输出其中最小的k个。
+59.找出字符串中第一个只出现一次的字符(题面已经更新)
+60.查找组成一个偶数最接近的两个素数：任意一个偶数（大于2）都可以由2个素数组成，组成偶数的2个素数有很多种情况，本题目要求输出组成指定偶数的两个素数差值最小的素数对
+61.放苹果题目描述把M个同样的苹果放在N个同样的盘子里，允许有的盘子空着不放，问共有多少种不同的分法？（用K表示）5，1，1和1，5，1 是同一种分法。
+62.查找输入整数二进制中1的个数请实现如下接口:public static int findNumberOf1( int num)
+63.DNA序列,一个DNA序列由A/C/G/T四个字母的排列组合组成。G和C的比例（定义为GC-Ratio）是序列中G和C两个字母的总的出现次数除以总的字母数目（也就是序列长度）。在基因工程中，这个比例非常重要。因为高的GC-Ratio可能是基因的起始点。
+    给定一个很长的DNA序列，以及要求的最小子序列长度，研究人员经常会需要在其中找出GC-Ratio最高的子序列。
+64.MP3光标位置:MP3 Player因为屏幕较小，显示歌曲列表的时候每屏只能显示几首歌曲，用户要通过上下键才能浏览所有的歌曲。为了简化处理，假设每屏只能显示4首歌曲，光标初始的位置为第1首歌。
+65.查找两个字符串a,b中的最长公共子串,查找两个字符串a,b中的最长公共子串。若有多个，输出在较短串中最先出现的那个
+66.配置文件恢复:有6条配置命令，它们执行的结果分别是：
+67.24点游戏算法,问题描述：给出4个1-10的数字，通过加减乘除，得到数字为24就算胜利
+68.成绩排序查找和排序,题目：输入任意（用户，成绩）序列，可以获得成绩从高到低或从低到高的排列,相同成绩.都按先录入排列在前的规则处理。
+69.矩阵乘法:如果A是个x行y列的矩阵，B是个y行z列的矩阵，把A和B相乘，其结果将是另一个x行z列的矩阵C。这个矩阵的每个元素是由下面的公式决定的
+70.矩阵乘法计算量估算:矩阵乘法的运算量与矩阵乘法的顺序强相关。
+    例如：A是一个50×10的矩阵，B是10×20的矩阵，C是20×5的矩阵
+71.字符串通配符:问题描述：在计算机中，通配符一种特殊语法，广泛应用于文件搜索、数据库、正则表达式等领域。现要求各位实现字符串通配符的算法。
+72.百钱买百鸡问题:公元前五世纪，我国古代数学家张丘建在《算经》一书中提出了“百鸡问题”：鸡翁一值钱五，鸡母一值钱三，鸡雏三值钱一。百钱买百鸡，问鸡翁、鸡母、鸡雏各几何？
+73.计算日期到天数转换根据输入的日期，计算是这一年的第几天。详细描述：输入某年某月某日，判断这一天是这一年的第几天？。
+74.参数解析:在命令行输入如下命令：
+xcopy /s c:\ d:\，
+各个参数如下： 
+参数1：命令字xcopy 
+参数2：字符串/s
+参数3：字符串c:\
+参数4: 字符串d:\
+请编写一个参数解析程序，实现将命令行各个参数解析出来。
+75.公共字串计算:计算两个字符串的最大公共字串的长度，字符不区分大小写
+76.尼科彻斯定理:验证尼科彻斯定理，即：任何一个整数m的立方都可以写成m个连续奇数之和。
+77.火车进站:给定一个正整数N代表火车数量，0<N<10，接下来输入火车入站的序列，一共N辆火车，每辆火车以数字1-9编号。要求以字典序排序输出火车出站的序列号。
+78.超长正整数相加,请设计一个算法完成两个超长正整数的加法。
+79.计算字符串的相似度,字符串距离的，而相似度等于“距离＋1”的倒数。也就是说，“abcdefg”和“abcdef”的距离为1，相似度为1/2=0.5.
+80.整形数组合并:将两个整型数组按照升序合并，并且过滤掉重复数组元素[注: 题目更新了。输出之后有换行]
+81.字符串匹配:判断短字符串中的所有字符是否在长字符串中全部出现
+82.将真分数分解为埃及分数:分子为1的分数称为埃及分数。现输入一个真分数(分子比分母小的分数，叫做真分数)，请将该分数分解为埃及分数。如：8/11 = 1/2+1/5+1/55+1/110。
+83.二维数组操作:有一个数据表格为二维数组（数组元素为int类型），行长度为ROW_LENGTH,列长度为COLUMN_LENGTH。对该表格中数据的操作可以在单个单元内，也可以对一个整行或整列进行操作，操作包括交换两个单元中的数据；插入某些行或列。
+84.统计大写字母个数:找出给定字符串中大写字符(即'A'-'Z')的个数
+85.字符串运用-密码截取 同32
+86.求最大连续bit数：功能: 求一个byte数字对应的二进制数字中1的最大连续数，例如3的二进制为00000011，最大连续2个1
+87.密码强度等级：密码按如下规则进行计分，并根据不同的得分为密码进行安全等级划分。  一、密码长度:5 分: 小于等于4 个字符，10 分: 5 到7 字符，25 分: 大于等于8 个字符
+88.扑克牌大小：扑克牌游戏大家应该都比较熟悉了，一副牌由54张组成，含3~A、2各4张，小王1张，大王1张。牌面从小到大用如下字符和字符串表示（其中，小写joker表示小王，大写JOKER表示大王）：3 4 5 6 7 8 9 10 J Q K A 2 joker JOKER输入两手牌，两手牌之间用"-"连接，每手牌的每张牌以空格分隔，"-"两边没有空格，如：4 4 4 4-joker JOKER   
+89.24点运算计算24点是一种扑克牌益智游戏，随机抽出4张扑克牌，通过加(+)，减(-)，乘(*), 除(/)四种运算法则计算得到整数24，本问题中，扑克牌通过如下字符或者字符串表示，其中，小写joker表示小王，大写JOKER表示大王： 
+90.合法IP：现在IPV4下用一个32位无符号整数来表示，一般用点分方式来显示，点将IP地址分成4个部分，每个部分为8位，表示成一个无符号整数（因此不需要用正号出现），如10.137.17.1，是我们非常熟悉的IP地址，一个IP地址串中没有空格出现（因为要表示成一个32数字）。
+    现在需要你用程序来判断IP是否合法。
+91.201301 JAVA 题目2-3级：请编写一个函数（允许增加子函数），计算n x m的棋盘格子（n为横向的格子数，m为竖向的格子数）沿着各自边缘线从左上角走到右下角，总共有多少种走法，要求不能走回头路，即：只能往右和往下走，不能往左和往上走。
+92.在字符串中找出连续最长的数字串：样例输出；输出123058789，函数返回值9；输出54761，函数返回值5
+93.201301 JAVA题目0-1级:编写一个函数，传入一个int型数组，返回该数组能否分成两组，使得两组中各元素加起来的和相等，并且，所有5的倍数必须在其中一个组中，所有3的倍数在另一个组中（不包括5的倍数），能满足以上条件，返回true；不满足时返回false。 
+94.记票统计:请实现接口：unsigned int  AddCandidate (char* pCandidateName);
+功能：设置候选人姓名
+输入： char* pCandidateName 候选人姓名
+输出：无
+返回：输入值非法返回0，已经添加过返回0 ，添加成功返回1
+95.人民币转换:考试题目和要点：
+    1、中文大写金额数字前应标明“人民币”字样。中文大写金额数字应用壹、贰、叁、肆、伍、陆、柒、捌、玖、拾、佰、仟、万、亿、元、角、分、零、整等字样填写。（30分） 
+    2、中文大写金额数字到“元”为止的，在“元”之后，应写“整字，如￥ 532.00应写成“人民币伍佰叁拾贰元整”。在”角“和”分“后面不写”整字。（30分） 
+    3、阿拉伯数字中间有“0”时，中文大写要写“零”字，阿拉伯数字中间连续有几个“0”时，中文大写金额中间只写一个“零”字，如￥6007.14，应写成“人民币陆仟零柒元壹角肆分“。（
+
+96.表示数字:将一个字符中所有出现的数字前后加上符号“*”，其他字符保持不变
+97.记负均正:首先输入要输入的整数个数n，然后输入n个整数。输出为n个整数中负数的个数，和所有正整数的平均值，结果保留一位小数。
+98.自动售货系统:1 总体说明
+考生需要模拟实现一个简单的自动售货系统，实现投币、购买商品、退币、查询库存商品及存钱盒信息的功能。
+系统初始化时自动售货机中商品为6种商品,商品的单价参见1.1规格说明，存钱盒内放置1元、2元、5元、10元钱币，商品数量和钱币张数通过初始化命令设置，参见2.1 系统初始化。
+99.自守数:自守数是指一个数的平方的尾数等于该数自身的自然数。例如：25^2 = 625，76^2 = 5776，9376^2 = 87909376。请求出n以内的自守数的个数
+100.等差数列:功能:等差数列 2，5，8，11，14。。。。
+输入:正整数N >0
+输出:求等差数列前N项和
+返回:转换成功返回 0 ,非法输入与异常返回-1
+101.输入整型数组和排序标识，对其元素按照升序或降序进行排序:
+102.字符统计:如果统计的个数相同，则按照ASCII码由小到大排序输出 。如果有其他字符，则对这些字符不用进行统计。
+103.Redraiment的走法:题目描述 Redraiment是走梅花桩的高手。Redraiment总是起点不限，从前到后，往高的桩子走，但走的步数最多，不知道为什么？你能替Redraiment研究他最多走的步数吗
+104.字符串分割:连续输入字符串(输出次数为N,字符串长度小于100)，请按长度为8拆分每个字符串后输出到新的字符串数组，长度不是8整数倍的字符串请在后面补数字0，空字符串不处理。
+105.记负均正II:从输入任意个整型数，统计其中的负数个数并求所有非负数的平均值
+106.字符逆序:将一个字符串str的内容颠倒过来，并输出。str的长度不超过100个字符。 如：输入“I am a student”，输出“tneduts a ma I”。
+107.求解立方根•计算一个数字的立方根，不使用库函数
+108.求最小公倍数:正整数A和正整数B 的最小公倍数是指 能被A和B整除的最小的正整数值，设计一个算法，求输入A和B的最小公倍数。

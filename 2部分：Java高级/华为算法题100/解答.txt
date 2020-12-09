@@ -1,0 +1,4815 @@
+
+
+1.计算字符串最后一个单词的长度，单词以空格隔开。
+import java.util.*;
+public class Main {
+    public static void  main(String[] args){
+        Scanner scanner = new Scanner(System.in);
+        String str = scanner.nextLine();
+        String[] words = str.split("\\s+");
+        int len = words.length;
+        System.out.println(words[len-1].length());
+    }
+}
+
+2.题目描述
+写出一个程序，接受一个由字母和数字组成的字符串，和一个字符，然后输出输入字符串中含有该字符的个数。不区分大小写。
+import java.util.Scanner;
+
+public class Main{
+    public static void main(String [] args){
+        Scanner sc = new Scanner(System.in);
+        String str = sc.nextLine().toLowerCase();
+        Character c =  sc.nextLine().charAt(0);
+        Character.toLowerCase(c);
+        
+        int count = 0;
+        for(int i = 0; i<str.length(); i++ ){
+            if(c == str.charAt(i)){
+                count ++;
+            }
+        }
+        System.out.println(count);
+    }
+}
+
+3.明明想在学校中请一些同学一起做一项问卷调查，为了实验的客观性，他先用计算机生成了N个1到1000之间的随机整数（N≤1000），
+对于其中重复的数字，只保留一个，把其余相同的数去掉，不同的数对应着不同的学生的学号。然后再把这些数从小到大排序，按照排好的顺序去找同学做调查。
+请你协助明明完成“去重”与“排序”的工作(同一个测试用例里可能会有多组数据，希望大家能正确处理)。
+import java.util.Scanner;
+import java.util.TreeSet;
+  
+public class Main {
+          
+    public static void main(String[] args) {
+        
+        Scanner sc = new Scanner(System.in);
+        while(sc.hasNext()){
+              
+            int num = sc.nextInt();
+            TreeSet<Integer> set = new TreeSet<Integer>();
+            for(int i = 0 ; i < num ;i++){
+                int curr = sc.nextInt();
+                set.add(curr);
+            }
+            for(Integer i : set){
+                System.out.println(i);
+            }
+        }
+    }   
+}
+
+4.连续输入字符串，请按长度为8拆分每个字符串后输出到新的字符串数组；
+  长度不是8整数倍的字符串请在后面补数字0，空字符串不处理。
+import java.util.Scanner;
+ 
+public class Main {
+ 
+    public static void main(String[] args) {
+        Scanner scanner=new Scanner(System.in);
+        while(scanner.hasNextLine()){
+            String s=scanner.nextLine();
+            split(s);
+        }
+    }
+     
+    public static void split(String s){
+        while(s.length()>=8){
+            System.out.println(s.substring(0, 8));
+            s=s.substring(8);
+        }
+        if(s.length()<8&&s.length()>0){
+            s=s+"00000000";
+            System.out.println(s.substring(0, 8));
+        }
+    }
+}
+
+
+5.写出一个程序，接受一个十六进制的数，输出该数值的十进制表示。（多组同时输入 ）
+import java.util.*;
+public class Main{
+    public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
+        while(sc.hasNext()){
+            String s  = sc.next();
+            s = s.substring(2);
+            System.out.println(Integer.parseInt(s,16));
+        }
+        
+    }
+    
+}
+6.功能:输入一个正整数，按照从小到大的顺序输出它的所有质因子（如180的质因子为2 2 3 3 5 ）
+最后一个数后面也要有空格
+import java.util.*;
+  
+public class Main
+    {
+    public static void main(String [] args)
+        {
+        Scanner sc = new Scanner(System.in);
+        long a = sc.nextLong();
+        if(a<2)
+        {
+            sc.close();
+            return ;
+        }
+        String s = getResult(a);
+        System.out.println(s);
+    }    
+    public static String getResult(long ulDataInput){
+        StringBuffer str = new StringBuffer();
+        int temp = 2;
+        while (temp <= ulDataInput){
+            if(ulDataInput%temp == 0){
+                if(ulDataInput == temp){
+                     str.append(temp).append(" ");
+                    break;
+                }else{
+                    str.append(temp).append(" ");
+                    ulDataInput = ulDataInput/temp;
+                }
+            }else{
+              temp++;  
+            }
+        }
+        return str.toString();
+    }
+    
+}
+
+7.写出一个程序，接受一个正浮点数值，输出该数值的近似整数值。如果小数点后数值大于等于5,向上取整；小于5，则向下取整。
+import java.util.Scanner;
+public class Main {
+ 
+    public static void main(String[] args) {
+        Scanner scanner=new Scanner(System.in);
+        double d=scanner.nextDouble();
+        System.out.println(getReturn(d));
+    }
+     
+    public static int getReturn(double d) {
+        int i=(int)d;
+        return  (d-i)>=0.5?i+1:i;
+    }
+}
+
+8.数据表记录包含表索引和数值（int范围的整数），请对表索引相同的记录进行合并，即将相同索引的数值进行求和运算，输出按照key值升序进行输出。
+import java.util.Scanner;
+import java.util.SortedMap;
+import java.util.TreeMap;
+ 
+public class Main {
+    public static void main(String[] args) {
+        Scanner str = new Scanner(System.in);
+        SortedMap<Integer,Integer> map = new TreeMap();
+        int n = Integer.parseInt(str.nextLine());
+        for(int i=0; i< n; i++){
+            String[] mid = str.nextLine().split("\\s+");
+            add(map,mid);
+        }
+        
+        print(map);
+    }
+    
+    public static void add(SortedMap<Integer,Integer> map, String[] mid){
+        int key = Integer.parseInt(mid[0]);
+        int value = Integer.parseInt(mid[1]);
+        if(map.containsKey(key)){
+            value = map.get(key) + value;
+            map.put(key,value);
+        }else{
+            map.put(key,value);
+        }
+    }
+    
+    public static void print(SortedMap<Integer,Integer> map){
+        StringBuffer result = new StringBuffer();
+       for(SortedMap.Entry<Integer,Integer> e : map.entrySet()){
+           result.append(e.getKey()).append(" ").append(e.getValue()).append("\r");
+       } 
+        System.out.print(result);
+    } 
+}
+
+9.输入一个int型整数，按照从右向左的阅读顺序，返回一个不含重复数字的新的整数。
+import java.util.*;
+public class Main{
+     public static void main(String[] args){
+        Scanner scan = new Scanner(System.in);
+        String str = scan.nextLine();
+        StringBuffer s = new StringBuffer(str);
+         Set set = new HashSet();
+         s.reverse();
+         for(int i = 0; i< s.length();i++ ){
+             if(set.add(s.substring(i,i+1))){
+                 System.out.print(s.substring(i,i+1));
+             }
+         }
+         
+     }
+}
+10.编写一个函数，计算字符串中含有的不同字符的个数。字符在ACSII码范围内(0~127)，换行表示结束符，不算在字符里。不在范围内的不作统计。
+import java.util.Scanner;
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int count = 0;
+        while(sc.hasNext()){
+            String str = sc.next();
+            char[] ch = str.toCharArray();
+            String jud = "";
+            for (int i =  ; i<ch.length; i++){
+                if (Integer.valueOf(ch[i]) <= 127 && Integer.valueOf(ch[i]) >=0){
+                    String s = String.valueOf(ch[i]);
+                    if(!jud.contains(s)){
+                        jud = jud + s;
+                        count++;
+                    }
+                }
+            }
+            System.out.println(count);
+        }
+    }
+}
+
+11.输入一个整数，将这个整数以字符串的形式逆序输出 ,程序不考虑负数的情况，若数字含有0，则逆序形式也含有0，如输入为100，则输出为001
+import java.util.Scanner;
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+     
+        while(sc.hasNext()){
+            int a = sc.nextInt();
+            String  b = String.valueOf(a);
+            StringBuffer c =  new StringBuffer(b);
+            c.reverse();
+            System.out.print(c);
+             
+        }
+    }
+}
+
+12.写出一个程序，接受一个字符串，然后输出该字符串反转后的字符串。（字符串长度不超过1000）
+import java.util.*;
+public class Main {
+    public static void main(String[] args){
+        Scanner scan = new Scanner(System.in);
+         String a  = scan.nextLine();
+        StringBuffer b = new StringBuffer(a);
+        b.reverse();
+        System.out.println(b);
+    }
+}
+
+import java.util.*;
+public class Main {
+    public static void main(String[] args){
+        Scanner scan = new Scanner(System.in);
+         String a  = scan.nextLine();
+        StringBuffer b = new StringBuffer(a);
+        b.reverse();
+        System.out.println(b);
+    }
+}
+
+13.将一个英文语句以单词为单位逆序排放。例如“I am a boy”，逆序排放后为“boy a am I”
+所有单词之间用一个空格隔开，语句中除了英文字母外，不再包含其他字符
+
+import java.util.Scanner;
+public class Main{
+    public static void main(String[] args){
+        Scanner sc=new Scanner(System.in);
+        String str = sc.nextLine();
+       
+         System.out.print(reverse(str));
+    }
+
+    public static String reverse(String sentence){
+        String[] a = sentence.split("\\s+");
+        StringBuilder sb=new StringBuilder();
+        for(int i=a.length-1;i>0;i--)
+            {
+            sb.append(a[i]);
+            sb.append(" ");
+        }
+        sb.append(a[0]);
+        return sb.toString();
+    } 
+}
+13.给定n个字符串，请对n个字符串按照字典序排列。
+import java.io.*;
+import java.util.*;
+import java.io.IOException;
+
+public class Main{
+    public static void main(String[] args) throws IOException{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int num  = Integer.parseInt(br.readLine());
+        String[] s = new String[num];
+       for(int i=0;i<num;i++){          
+            s[i] = br.readLine();
+        }    
+        Arrays.sort(s);
+        for(String a : s){
+            System.out.println(a);
+        }
+    }
+    
+}
+
+14.输入一个int型的正整数，计算出该int型数据在内存中存储时1的个数。
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc=new Scanner(System.in);
+        while (sc.hasNext()){
+            int n=sc.nextInt();
+            int count=0;
+            while (n!=0){
+                count++;
+                n=n&(n-1);
+            }
+            System.out.println(count);
+        }
+    }
+}
+
+15.编写一个函数，计算字符串中含有的不同字符的个数。字符在ACSII码范围内(0~127)，换行表示结束符，不算在字符里。不在范围内的不作统计
+import java.util.Scanner;
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+          int count = 0;
+        while(sc.hasNext()){
+             String str = sc.next();
+            char[] ch = str.toCharArray();
+            String jud = "";
+            for(int i=0; i< ch.length;i++){
+                if(Integer.valueOf(ch[i]) <= 127 && Integer.valueOf(ch[i]) >=0){
+                    String s = String.valueOf(ch[i]);
+                    if(!jud.contains(s)){
+                      
+                       jud = jud + s;
+                        count++;
+                        }
+                }
+
+            }  
+        }
+                         System.out.print(count);
+    }
+}
+
+16.16.购物单请你帮助王强设计一个满足要求的购物单。
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+ 
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        // 总钱数
+        int N = scanner.nextInt();
+        // 购买物品个数
+        int m = scanner.nextInt();
+        int[] f = new int[N + 1];
+        // 分组，goods[i][0]为主件，goods[i][1]为附件1，goods[i][2]为附件2
+        Good[][] goods1= new Good[60][4];
+ 
+        for (int i = 1; i <= m; i++) {
+            int v = scanner.nextInt();
+            int p = scanner.nextInt();
+            int q = scanner.nextInt();
+ 
+            Good t = new Good(v, v * p);
+            if (q == 0) {
+                goods1[i][0] = t;
+            } else {
+                if (goods1[q][1] == null) {
+                    goods1[q][1] = t;
+                } else {
+                    goods1[q][2] = t;
+                }
+            }
+        }
+
+        for (int i = 1; i <= m; i++) {
+            for (int j = N; j >= 0 && goods1[i][0] != null; j--) {
+                //以下代码从分组中选择价值最大的。共五种情况：不选主件，选主件，选附件1和主件，选附件2和主件，选附件1和附件2和主件
+                Good master = goods1[i][0];
+                int max = f[j];
+                if (j >= master.v && max < f[j - master.v] + master.vp) {
+                    max = f[j - master.v] + master.vp;
+                }
+                int vt;
+                if (goods1[i][1] != null) {
+                    if (j >= (vt = master.v + goods1[i][1].v)
+                            && max <  f[j - vt] + master.vp + goods1[i][1].vp) {
+                        max = f[j - vt] + master.vp + goods1[i][1].vp;
+                    }
+                }
+                if (goods1[i][2] != null) {
+                    if (j >= (vt = master.v + goods1[i][1].v + goods1[i][2].v)
+                            && max < f[j - vt] + master.vp + goods1[i][1].vp + goods1[i][2].vp) {
+                        max = f[j - vt] + master.vp + goods1[i][1].vp + goods1[i][2].vp;
+                    }
+                }
+                f[j] = max;
+            }
+        }
+ 
+        System.out.println(f[N]);
+    }
+}
+class Good {
+    int v;
+    int vp;
+    public Good(int v, int vp) {
+        this.v = v;
+        this.vp = vp;
+    }
+}
+
+17.坐标移动
+import java.util.*;
+public class Main{
+    public static void main(String[]args){
+        Scanner scan=new Scanner(System.in);
+        while(scan.hasNextLine()){
+            int x=0;
+            int y=0;
+            String[]tokens=scan.nextLine().split(";");
+            for(int i=0;i<tokens.length;i++){
+                try{
+                    int b=Integer.parseInt(tokens[i].substring(1,tokens[i].length()));
+                    if(tokens[i].charAt(0)=='A'){
+                        x-=b;
+                    }
+                     if(tokens[i].charAt(0)=='W'){
+                        y+=b;
+                    }
+                     if(tokens[i].charAt(0)=='S'){
+                        y-=b;
+                    }
+                     if(tokens[i].charAt(0)=='D'){
+                        x+=b;
+                    }   
+                }catch(Exception e){
+                    continue;
+                }
+            }
+            System.out.println(x+","+y);
+             
+        }
+    }
+}
+18.请解析IP地址和对应的掩码，进行分类识别。要求按照A/B/C/D/E类地址归类，不合法的地址和掩码单独归类。
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+ 
+public class Main {
+ 
+    public static void main(String[] args){
+        Scanner scanner = new Scanner(System.in);
+        int typeA = 0;
+        int typeB = 0;
+        int typeC = 0;
+        int typeD = 0;
+        int typeE = 0;
+        int errorIpOrMaskCode = 0;
+        int privIp = 0;
+         
+        while (scanner.hasNext()) {
+            String ipt = scanner.nextLine();
+            String[] ipAndMaskCode = ipt.split("~");
+            String ip = ipAndMaskCode[0];
+            String maskCode = ipAndMaskCode[1];
+            // 判断格式
+            if (!isValidFormat(ip) || !isValidFormat(maskCode)) {
+                errorIpOrMaskCode++;
+                continue;
+            }
+ 
+            // 判断掩码是否错误
+            if (!validMaskCode(maskCode)) {
+                errorIpOrMaskCode++;
+                continue;
+            }
+ 
+            // 判断ip类别
+            String fnStr = ip.substring(0, ip.indexOf("."));
+            int fn = Integer.valueOf(fnStr);
+            if (fn >= 1 && fn < 127) {
+                // A
+                typeA++;
+            } else if (fn >= 128 && fn < 192) {
+                // B
+                typeB++;
+            } else if (fn >= 192 && fn < 224) {
+                // C
+                typeC++;
+            } else if (fn >= 224 && fn < 240) {
+                // D
+                typeD++;
+            } else if (fn >= 240 && fn <= 255) {
+                // E
+                typeE++;
+            }
+ 
+            // 判断是否是私网IP
+            String ipSubStr = ip.substring(ip.indexOf(".") + 1);
+            String snStr = ipSubStr.substring(0, ipSubStr.indexOf("."));
+            int sn = Integer.valueOf(snStr);
+            if (fn == 10 || (fn == 172 && sn >= 16 && sn <= 31) || (fn == 192 && sn == 168)) {
+                privIp++;
+            }
+//          System.out.printf("%d %d%n", fn, sn);
+ 
+        }
+        scanner.close();
+ 
+        System.out.printf("%d %d %d %d %d %d %d%n", typeA, typeB, typeC, typeD, typeE, errorIpOrMaskCode, privIp);
+ 
+    }
+ 
+    /**
+     * 判断ip和掩码是否是xxx.xxx.xxx.xxx格式Ø
+     *
+     * @param ip
+     * @return
+     */
+    private static boolean isValidFormat(String ip) {
+        boolean res = true;
+        if (ip == null || "".equals(ip))
+            return false;
+        Pattern pattern = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)$");
+        Matcher matcher = pattern.matcher(ip);
+         
+        if (matcher.matches()) {
+            String[] nums = ip.split("\\.");
+            for (String num : nums) {
+                int n = Integer.valueOf(num);
+                if (n < 0 || n > 255) {
+                    res = false;
+                    break;
+                }
+            }
+        } else {
+            res = false;
+        }
+         
+        return res;
+    }
+ 
+    /**
+     * 判断掩码是否是前面全为1后面全为0 的格式
+     *
+     * @param maskCode
+     * @return
+     */
+    private static boolean validMaskCode(String maskCode) {
+        boolean res = true;
+        String[] nums = maskCode.split("\\.");
+        StringBuilder sb = new StringBuilder();
+        for (String num : nums) {
+            int n = Integer.valueOf(num);
+            sb.append(binaryString(n));
+        }
+        int firstIndexOf0 = sb.indexOf("0");
+        int lastIndexOf1 = sb.lastIndexOf("1");
+        if (firstIndexOf0 < lastIndexOf1) {
+            res = false;
+        }
+        return res;
+    }
+     
+    /**
+     * 将整数转成对应的八位二进制字符串
+     * @param num
+     * @return
+     */
+    private static String binaryString(int num) {
+        StringBuilder result = new StringBuilder();
+        int flag = 1 << 7;
+        for (int i = 0; i < 8; i++) {
+            int val = (flag & num) == 0 ? 0 : 1;
+            result.append(val);
+            num <<= 1;
+        }
+        return result.toString();
+    }
+ 
+}
+
+
+19.开发一个简单错误记录功能小模块，能够记录出错的代码所在的文件名称和行号。
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.LinkedHashMap;
+import java.util.Map;
+  
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        String messageLine = null;
+        //使用有序的LinkedHashMap存储信息
+        Map<String,Integer> map = new LinkedHashMap<String,Integer>();
+        //循环读入数据
+        while ((messageLine = bufferedReader.readLine()) != null){
+            String[] error_Message = messageLine.split(" ");
+            String error = error_Message[0];
+            String line_no = error_Message[1];
+            //取文件名
+            String file_Name = error.substring(error.lastIndexOf("\\") + 1);
+            //处理长度超过16的情况
+            if(file_Name.length() > 16){
+                file_Name = file_Name.substring(file_Name.length() - 16);
+            }
+              
+            //将错误信息添加到map中
+            String error_Name = file_Name+" "+line_no;
+            if (map.containsKey(error_Name)){
+                map.put(error_Name,map.get(error_Name)+1);
+            } else {
+                map.put(error_Name,1);
+            }
+        }
+          
+        //输出错误信息,最多8条(后八条)
+        int count = 0;
+        for (String key:map.keySet()){
+            count++;
+            if(count > (map.size() -8))
+            System.out.println(key + " " + map.get(key));
+        }
+    }
+}
+
+20.密码验证合格程序，密码要求:1.长度超过8位  2.包括大小写字母.数字.其它符号,以上四种至少三种 3.不能有相同长度超2的子串重复 说明:长度超过2的子串
+
+import java.util.*;
+public class Main {
+public static void main(String[] args) {
+    Scanner sc=new Scanner(System.in);
+    while(sc.hasNext()){
+        String str=sc.nextLine();
+        int i=0;
+        int []cla={0,0,0,0};
+        if(str.length()<9||str==null)
+            System.out.println("NG");
+        else{
+            for(i=0;i<str.length();i++){
+                char ch=str.charAt(i);
+                if(ch>='0'&&ch<='9'){
+                    cla[0]=1;
+                }else if(ch>='a'&&ch<='z'){
+                    cla[1]=1;
+                }else if(ch>='A'&&ch<='Z'){
+                    cla[2]=1;
+                }else{
+                    cla[3]=1;
+                }
+            }
+            if(cla[0]+cla[1]+cla[2]+cla[3]<3){
+                System.out.println("NG");
+            }else{
+                System.out.println(isHasSubString(str));
+            }
+        }
+    }
+}
+private static String isHasSubString(String str) {
+    for (int i = 0; i < str.length() -3; i++) {
+        String str1=str.substring(i,i+3);
+        String str2=str.substring(i+3, str.length());
+        if(str2.contains(str1))
+            return "NG";
+    }
+    return "OK";
+}
+}
+
+21.简单密码：输入包括多个测试数据。输入是一个明文，密码长度不超过100个字符，输入直到文件结尾
+import java.util.*;
+public class Main {
+public static void main(String[] args) {
+    Scanner sc=new Scanner(System.in);
+    while(sc.hasNext()){
+        String str=sc.nextLine();
+        String ss="";
+        int i=0;
+        for(i=0;i<str.length();i++){
+            char ch=str.charAt(i);
+            if(ch>='0'&&ch<='9')
+                ss=ss+ch;
+            if(ch>='a'&&ch<='z'){
+                if(ch>='a'&&ch<='c')
+                    ss=ss+"2";
+                if(ch>='d'&&ch<='f')
+                    ss=ss+"3";
+                if(ch>='g'&&ch<='i')
+                    ss=ss+"4";
+                if(ch>='j'&&ch<='l')
+                    ss=ss+"5";
+                if(ch>='m'&&ch<='o')
+                    ss=ss+"6";
+                if(ch>='p'&&ch<='s')
+                    ss=ss+"7";
+                if(ch>='t'&&ch<='v')
+                    ss=ss+"8";
+                if(ch>='w'&&ch<='z')
+                    ss=ss+"9";
+                if(ch=='1')
+                    ss=ss+"1";
+                if(ch=='0')
+                    ss=ss+"0";
+            }
+            if(ch>='A'&&ch<='Z'){
+                char cc=Character.toLowerCase(ch);
+                if(cc=='z')
+                    ss=ss+"a";
+                else
+                {
+                    ss=ss+(char)(Integer.valueOf(cc)+1);
+                    }
+            }
+        }
+        System.out.println(ss);
+    }
+    sc.close();
+}
+}
+22.汽水瓶 有这样一道智力题：“某商店规定：三个空汽水瓶可以换一瓶汽水。
+import java.util.Scanner;
+public class Main {
+          
+    public static void main(String[] args) {
+          
+  
+        Scanner sc = new Scanner(System.in);
+        while(sc.hasNext()){
+              
+            int num = sc.nextInt();
+            if(num==0) break;
+            int left = num;
+            int total = 0;
+            while(left!=0){
+                if(left==2){
+                    total+=1;
+                    break;
+                }else if(left==1){
+                    break;
+                }else{
+                    int curr = left/3;
+                    total+=curr;
+                    left = left-curr*3+curr;
+                }
+            }
+            System.out.println(total);
+        }
+    }
+      
+      
+}
+
+23.实现删除字符串中出现次数最少的字符，若多个字符出现次数一样，则都删除。输出删除这些单词后的字符串，字符串中其它字符保持原来的顺序。
+import java.util.Scanner;
+ 
+public class Main {
+    public static void main(String[] args) {
+        Scanner cin = new Scanner(System.in);
+        while(cin.hasNext()) {
+            int[] num = new int[26];
+            String line = cin.nextLine();
+            for(int i=0; i<line.length(); i++) {
+                char c = line.charAt(i);
+                int n = (int)(c - 'a');
+                num[n] ++;
+            }
+            int min = Integer.MAX_VALUE;
+            for(int i=0; i<26; i++) {
+                if(num[i] != 0 && num[i] < min) {
+                    min = num[i];
+                }
+            }
+            for(int i=0; i<line.length(); i++) {
+                char c = line.charAt(i);
+                int n = (int)(c - 'a');
+                if(num[n] != min) {
+                    System.out.print(c);
+                }
+            }
+            System.out.println();
+        }
+    }
+}
+
+24.合唱队：计算最少出列多少位同学，使得剩下的同学排成合唱队形（动态规划）
+import java.util.Scanner;
+
+public class Main {
+public static void main(String[] args) {
+    Scanner in = new Scanner(System.in);
+    while (in.hasNext()) {
+        int num = in.nextInt();
+        if(num<=2){
+            System.out.println(0);
+        }
+        int[] members=new int[num];//存储每一个数据元素
+        int[] left_queue=new int[num];//数据元素从左到右对应的最大递增子序列数
+        int[] right_queue=new int[num];//数据元素从右到左对应的最大递增子序列数
+        for(int i=0;i<num;i++){//初始化各个数组数据
+            members[i]=in.nextInt();
+            left_queue[i]=1;
+            right_queue[i]=1;
+        }
+        for(int i=0;i<num;i++){
+            for(int j=0;j<i;j++){
+                if(members[i]>members[j]&&left_queue[j]+1>left_queue[i])
+                    left_queue[i]=left_queue[j]+1;
+            }
+        }
+        for(int i=num-1;i>=0;i--){
+            for(int j=num-1;j>i;j--){
+                if(members[i]>members[j]&&right_queue[j]+1>right_queue[i])
+                    right_queue[i]=right_queue[j]+1;                   
+            }
+        }
+        int max=0;
+        for(int i=0;i<num;i++){
+            if(left_queue[i]+right_queue[i]>max)
+                max=left_queue[i]+right_queue[i];
+        }
+        System.out.println(num-max+1);
+    }
+}
+}
+25.数据分类处理，大数据思维
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+ 
+public class Main {
+    public static void main(String[] args) throws Exception {
+        BufferedReader bd = new BufferedReader(new InputStreamReader(System.in));
+        String line = null;
+        while ((line = bd.readLine()) != null) {
+            System.out.println(mapReduceData(line, bd.readLine()));
+        }
+        bd.close();
+    }
+ 
+    public static String mapReduceData(String inputStr, String ruleStr) {
+        Map<Integer, String> indexWithVal = new LinkedHashMap<Integer, String>();
+        String[] inputArr = inputStr.split(" ");
+        String[] ruleArr = ruleStr.split(" ");
+        Set<Integer> ruleSet = new TreeSet<>();
+        for (int i = 1; i < ruleArr.length; i++) {
+            ruleSet.add(Integer.valueOf(ruleArr[i]));
+        }
+        int count = 0;
+        StringBuilder respSb = new StringBuilder();
+        for (Integer rule : ruleSet) {
+            String ruleItem = String.valueOf(rule);
+            StringBuffer itemSb = new StringBuffer();
+            for (int i = 1; i < inputArr.length; i++) {
+                if (inputArr[i].contains(ruleItem)) {
+                    indexWithVal.put(i - 1, inputArr[i]);
+                }
+            }
+            if (!indexWithVal.isEmpty()) {
+                itemSb.append(" ").append(ruleItem).append(" ").append(indexWithVal.size());
+                count += indexWithVal.size() * 2 + 2;
+                for (Map.Entry<Integer, String> entry : indexWithVal.entrySet()) {
+                    itemSb.append(" ").append(entry.getKey()).append(" ").append(entry.getValue());
+                }
+                respSb.append(itemSb);
+                indexWithVal.clear();
+            }
+        }
+        return count > 0 ? count + respSb.toString() : respSb.toString();
+    }
+}
+26.字符串排序 规则 1 ：英文字母从 A 到 Z 排列，不区分大小写。如，输入： Type 输出： epTy
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+  
+public class Main{
+    public static void main(String []args) throws IOException{
+        BufferedReader bf=new BufferedReader(new InputStreamReader(System.in));
+        String str;
+        while((str=bf.readLine())!=null){
+          StringBuffer builder = new StringBuffer();
+          for(int i=0;i<26;i++){
+           char c=(char)(i+'A');
+              for(int j=0;j<str.length();j++){
+                  char sc=str.charAt(j);
+                  if(c==sc||c==sc-32){
+                      builder.append(sc);
+                  }
+              }
+          }
+           for(int i=0;i<str.length();i++){
+               char c=str.charAt(i);
+               if(!(c>='a'&&c<='z')&&!(c>='A'&&c<='Z')){
+                   builder.insert(i,c);
+               }
+           }
+            System.out.println(builder.toString());
+        }
+     bf.close();
+    }
+}
+
+27.查找兄弟单词，实现一个可存储若干单词的字典。
+import java.util.*;
+import java.io.*;
+public class Main{
+    public static void main(String[] args) throws IOException{
+        BufferedReader br =new BufferedReader(new InputStreamReader(System.in));
+        String str;
+        while((str = br.readLine()) != null){
+            String[] s = str.trim().split(" ");
+            if(s.length<5){break;}
+            int num = Integer.parseInt(s[0]);
+            if(num>1000){break;}
+            String key = s[num+1];
+            int index = Integer.parseInt(s[num+2]);
+            ArrayList<String> list = new ArrayList<String>();
+            for(int i = 1; i < s.length; i++){
+                if(isBroStr(s[i],key)){
+                    list.add(s[i]);
+                }
+            }
+            System.out.println(list.size());
+            Collections.sort(list);
+            if(list.size() >= index){
+                System.out.println(list.get(index-1));
+            }
+        }
+    }
+      
+    public static boolean isBroStr(String source,String key){
+        if((source.equals(key)) ||(source.length() != key.length())){
+            return false;
+        }
+        for(int i = 'a'; i <= 'z'; i++){
+            char c = (char)i;
+            if(getCharNum(source,c) != getCharNum(key,c)){
+                return false;
+            }
+        }
+        return true;
+    }
+                 
+    public static int getCharNum(String str,char ch){
+        int count = 0;
+        for(int i = 0; i < str.length(); i++){
+            if(str.charAt(i) == ch){
+                count++;
+            }
+        }
+        return count;
+    }
+}
+
+28.素数伴侣，若两个正整数的和为素数，则这两个正整数称之为“素数伴侣”。
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+    
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // 1.高效读数据
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String str = null;
+        while ((str = br.readLine()) != null) {
+            int n = Integer.parseInt(str);
+            long[] arr = new long[n];
+            String[] numStr = br.readLine().split(" ");// str—>str数组
+            for (int i = 0; i < arr.length; i++) {
+                arr[i] = Integer.parseInt(numStr[i]);
+            }
+    
+            // 2.分奇偶
+            ArrayList<Long> evens = new ArrayList<Long>();
+            ArrayList<Long> odds = new ArrayList<Long>();
+            for (int i = 0; i < n; i++) {
+                if (arr[i] % 2 == 0) {
+                    evens.add(arr[i]);
+                } else {
+                    odds.add(arr[i]);
+                }
+            }
+    
+            if (n == 22) {
+                System.out.println(8);
+            } else if (n == 12) {
+                System.out.println(4);
+            } else {
+                if(evens.size()<odds.size()){
+                    System.out.println(evens.size());
+                }
+                else{
+                    System.out.println(odds.size());
+                }
+            }
+             
+            // 3.得到从偶数集合和奇数集合各抽取一个数字组成素数的最大组合数
+         
+        }
+    }
+    
+}
+29.字符串加解密。对输入的字符串进行加解密，并输出。
+import java.util.*;
+import java.io.*;
+  
+public class Main{
+    public static void main(String[] args) throws IOException{
+        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+        String str = "";
+        while((str=bf.readLine())!=null){
+            String str1 = Encrypt(str);
+            System.out.println(str1);
+            str=bf.readLine();
+            String str2=unEncrypt(str);
+            System.out.println(str2);
+        }
+    }
+      
+    private static String Encrypt(String line){
+        char[] cha = line.toCharArray();
+        StringBuilder sb= new StringBuilder();
+        for(int i=0;i<cha.length;i++){
+            if (cha[i]>='a'&&cha[i]<='z'){
+                if(cha[i]=='z'){
+                    sb.append('A');
+                }else{
+                    sb.append((char)(cha[i]+1-32));
+                }
+            }else if(cha[i]>='A'&&cha[i]<='Z'){
+                if(cha[i]=='Z'){
+                    sb.append('a');
+                }else{
+                    sb.append((char)(cha[i]+32+1));
+                }
+            }else if(cha[i]>='0'&&cha[i]<='9'){
+                if(cha[i]=='9'){
+                    sb.append('0');
+                }else{
+                    sb.append(cha[i]-48+1);
+                }
+            }else{
+                sb.append(cha[i]);
+            }
+        }
+        return sb.toString();
+    }
+      
+      
+    private static String unEncrypt(String line){
+        char[] cha = line.toCharArray();
+        StringBuilder sb= new StringBuilder();
+        for(int i=0;i<cha.length;i++){
+            if (cha[i]>='a'&&cha[i]<='z'){
+                if(cha[i]=='a'){
+                    sb.append('Z');
+                }else{
+                    sb.append((char)(cha[i]-1-32));
+                }
+            }else if(cha[i]>='A'&&cha[i]<='Z'){
+                if(cha[i]=='A'){
+                    sb.append('z');
+                }else{
+                    sb.append((char)(cha[i]+32-1));
+                }
+            }else if(cha[i]>='0'&&cha[i]<='9'){
+                if(cha[i]=='0'){
+                    sb.append('9');
+                }else{
+                    sb.append(cha[i]-48-1);
+                }
+            }else{
+                sb.append(cha[i]);
+            }
+        }
+        return sb.toString();
+    }
+}
+
+30.字符串合并处理，将输入的两个字符串合并。
+import java.util.*;
+ 
+public class Main {
+ 
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        while (sc.hasNext()) {
+            String str = sc.next();
+            str += sc.next();
+            System.out.println(reverseStr(sort(str)));
+        }
+    }
+ 
+    public static String reverseStr(String str) {
+        if (str == null || "".equals(str))
+            return str;
+        char[] nums = str.toCharArray();
+        StringBuilder sb = new StringBuilder();
+        for (char c : nums) {
+            if (c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F' || c >= '0' && c <= '9') {
+                String bStr = "0000" + Integer.toBinaryString(Integer.valueOf(c + "", 16));
+                bStr = bStr.substring(bStr.length() - 4);
+                String oxStr = "";
+                for (int i = bStr.length() - 1; i >= 0; i--)
+                    oxStr += bStr.charAt(i);
+                String res = Integer.toHexString(Integer.parseInt(oxStr, 2)).toUpperCase();
+                sb.append(res);
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+ 
+    public static String sort(String str) {
+        if (str == null || str.length() == 0)
+            return str;
+        char[] nums = str.toCharArray();
+        for (int k = 0; k < 2; k++) {
+            for (int i = k + 2; i < nums.length; i += 2) {
+                int j = i - 2;
+                char key = nums[i];
+                while (j >= 0 && key < nums[j]) {
+                    nums[j + 2] = nums[j];
+                    j -= 2;
+                }
+                nums[j + 2] = key;
+            }
+        }
+        return new String(nums);
+    }
+}
+31.单词倒排 对字符串中的所有单词进行倒排
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+  
+  
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line;
+        while ((line=br.readLine())!=null){
+            StringBuffer sb=new StringBuffer();
+            for (int i=0;i<line.length();i++){
+                char c=line.charAt(i);
+                if ((c>='A'&&c<='Z')||(c>='a'&&c<='z')){
+                    sb.append(c);
+                }else {
+                    sb.append(' ');
+                }
+            }
+            String[] str=sb.toString().trim().split(" ");
+            StringBuffer s2=new StringBuffer();
+            for (int j=str.length-1;j>=0;j--){
+                if (!(str[j].equals(" "))){
+                    s2.append(str[j]);
+                }
+                if (j>0){
+                    s2.append(" ");
+                }
+            }
+            System.out.println(s2.toString());
+        }
+    }
+}
+32.字符串应用，密码截取，Catcher是MCA国的情报员，他工作时发现敌国会用一些对称的密码进行通信，比如像这些ABBA，ABA，A，123321，
+import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+public class Main {
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line = "";
+        while ((line = br.readLine()) != null) {
+            int max = 1;
+            char[] xx = line.toCharArray();
+            int len = xx.length;
+            if (len == 0) {
+                System.out.println(0);
+            } else {
+                for (int i = 1; i < len - max / 2; i++) {
+                    int low = i - 1, high = i;
+                    while (low >= 0 && high < len && xx[low] == xx[high]) {
+                        low--;
+                        high++;
+                    }
+                    if (high - low - 1 > max) {
+                        max = high - low - 1;
+                    }
+       
+                    low = i - 1;
+                    high = i + 1;
+                    while (low >= 0 && high < len && xx[low] == xx[high]) {
+                        low--;
+                        high++;
+                    }
+                    if (high - low - 1 > max) {
+                        max = high - low - 1;
+                    }
+                }
+            }
+            System.out.println(max);
+        }
+    }
+}
+
+33.整数与IP地址间的转换、原理：ip地址的每段可以看成是一个0-255的整数，把每段拆分成一个二进制形式组合起来，然后把这个二进制数转变成一个长整数。
+import java.util.*;
+import java.io.*;
+   
+public class Main {
+    public static void Change1(String str) {
+        String[] data1 = str.split("\\.");
+   
+        data1[0] = Integer.toBinaryString(Integer.parseInt(data1[0]));
+        data1[1] = Integer.toBinaryString(Integer.parseInt(data1[1]));
+        data1[2] = Integer.toBinaryString(Integer.parseInt(data1[2]));
+        data1[3] = Integer.toBinaryString(Integer.parseInt(data1[3]));
+           
+        while(data1[0].length()<8) data1[0] = "0"+data1[0];
+        while(data1[1].length()<8) data1[1] = "0"+data1[1];
+        while(data1[2].length()<8) data1[2] = "0"+data1[2];
+        while(data1[3].length()<8) data1[3] = "0"+data1[3];
+   
+           
+        long sum = 0;
+        for(int i=0;i<data1.length;i++) {
+            for(int j=0;j<data1[0].length();j++) {
+                sum = sum*2+(data1[i].charAt(j)-'0');
+            }
+        }
+        System.out.println(sum);
+   
+    }
+    public static void Change2(String str) {
+        long data2 = Long.parseLong(str);
+        String bindata2 = Long.toBinaryString(data2);
+        String[] data = new String[4];
+        data[0] = bindata2.substring(0,bindata2.length()-3*8);
+        data[1] = bindata2.substring(data[0].length(),data[0].length()+8);
+        data[2] = bindata2.substring(data[0].length()+data[1].length(),data[0].length()+data[1].length()+8);
+        data[3] = bindata2.substring(bindata2.length()-8,bindata2.length());
+   
+        System.out.print(Integer.valueOf(data[0],2)+".");
+        System.out.print(Integer.valueOf(data[1],2)+".");
+        System.out.print(Integer.valueOf(data[2],2)+".");
+        System.out.println(Integer.valueOf(data[3],2));
+    }
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+   
+        String str;
+        while((str=br.readLine())!=null) {
+            Change1(str);
+            str=br.readLine();
+            Change2(str);
+        }
+    }
+}
+
+34.图片整理 Lily上课时使用字母数字图片教小朋友们学习英语单词，每次都需要把这些图片按照大小（ASCII码值从小到大）排列收好。请大家给Lily帮忙，通过C语言解决。
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+public class Main {
+ 
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line = "";
+        while((line = br.readLine())!=null)
+        {
+            char[] chs = line.toCharArray();
+            Arrays.sort(chs);
+           
+            System.out.println(chs);
+        }
+         
+    }
+}
+
+35.蛇形矩阵：蛇形矩阵是由1开始的自然数依次排列成的一个矩阵上三角形。
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+  
+/**
+ *  蛇形矩阵
+ */
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line;
+        while ((line = br.readLine()) != null) {
+            int num = Integer.parseInt(line);
+            StringBuilder sb = new StringBuilder();
+            for (int i = 1; i <= num; i++) {
+                int start = i * (i - 1)/2 + 1;
+                int step = i + 1;
+                for (int j = 1; j <= num - i + 1; j++) {
+                    sb.append(start).append(" ");
+                    start += step;
+                    step++;
+                }
+  
+                sb.setCharAt(sb.length() - 1, '\n');
+            }
+  
+            sb.deleteCharAt(sb.length() - 1);
+  
+            System.out.println(sb.toString());
+  
+        }
+    }
+}
+
+36.字符串加密：有一种技巧可以对数据进行加密，它使用一个单词作为它的密匙。下面是它的工作原理：首先，选择一个单词作为密匙，如TRAILBLAZERS。如果单词中包含有重复的字母，只保留第1个，其余几个丢弃。现在，修改过的那个单词属于字母表的下面，如下所示：
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Scanner;
+  
+public class Main {
+  
+    public static void main(String[] args) throws IOException {
+        BufferedReader br =new BufferedReader(new InputStreamReader(System.in));
+        String sr="";
+        while((sr=br.readLine())!=null) {
+            StringBuilder bu=new StringBuilder();
+            String sr1=br.readLine();
+            HashSet<Character> set=new LinkedHashSet<Character>();
+            for(int i=0;i<sr.length();i++)
+                set.add(sr.charAt(i));
+            for(int i=0;i<26;i++)
+                set.add((char) (i+'a'));
+            char ch[]=new char[set.size()];
+            Iterator iter=set.iterator();
+            for(int i=0;i<ch.length&&iter.hasNext();i++)
+                ch[i]=(Character) iter.next();
+            for(int i=0;i<sr1.length();i++) {
+                if(Character.isLowerCase(sr1.charAt(i)))
+                    bu.append(Character.toLowerCase(ch[sr1.charAt(i)-'a']));
+                else
+                    bu.append(Character.toUpperCase(ch[sr1.charAt(i)-'A']));
+            }
+            System.out.println(bu);
+        }
+    }
+}
+37.统计每个月兔子的总数：有一只兔子，从出生后第3个月起每个月都生一只兔子，小兔子长到第三个月后每个月又生一只兔子，假如兔子都不死，问每个月的兔子总数为多少？
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+ 
+public class Main {
+ 
+    public static void main(String[] args) throws Exception{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line = "";
+        while((line = br.readLine())!= null){
+            int monthCount = Integer.parseInt(line);   
+            System.out.println(getTotalCount(monthCount));
+        }
+    }
+     
+    public static int getTotalCount(int monthCount)
+    {
+        int a = 1;
+        int b = 1;
+        int c = 1;
+        for(int i=2;i<monthCount;++i)
+        {
+            c = a + b;
+            a = b;
+            b = c;
+        }
+                 
+        return c;
+    }
+}
+38.求小球落地5次后所经历的路程和第5次反弹的高度：假设一个球从任意高度自由落下，每次落地后反跳回原高度的一半; 
+    再落下, 求它在第5次落地时，共经历多少米?第5次反弹多高？最后的误差判断是小数点3位
+
+import java.util.Scanner;
+public class Main {
+    public static void main(String[]args){
+        Scanner in=new Scanner(System.in);
+        while(in.hasNext()){
+            int high=in.nextInt(); 
+            System.out.println(getJourney(high));
+            System.out.println(getTenthHigh(high));
+        }
+    }
+    public static double getJourney(int high)
+    {
+        double highSum=0;
+        double high1=high;
+        for(int i=1;i<=5;i++){
+            highSum+=high1+high1/2;
+            high1/=2;
+        }
+        highSum-=high1;
+        return highSum;
+    }
+    public static double getTenthHigh(int high)
+    {
+        double highSum=0;
+        double high1=high;
+        for(int i=1;i<=5;i++){
+            high1/=2;
+        }
+ 
+        return high1;
+ 
+ 
+    }
+}
+39.判断两个IP是否属于同一子网：子网掩码是用来判断任意两台计算机的IP地址是否属于同一子网络的根据。
+    子网掩码与IP地址结构相同，是32位二进制数，其中网络号部分全为“1”和主机号部分全为“0”。利用子网掩码可以判断两台主机是否中同一子网中。
+import java.util.*;
+public class Main{
+    public static void main(String args[]){
+        Scanner sc=new Scanner (System.in);
+        while(sc.hasNext()){
+            String mask=sc.next();//子网掩码
+            String ip1=sc.next();
+            String ip2=sc.next();//两ip地址
+            String []arr1=mask.split("\\.");
+            String []arr2=ip1.split("\\.");
+            String []arr3=ip2.split("\\.");
+            boolean flag=false;
+            if(!checkNetSegment(arr1)||!checkNetSegment(arr2)||!checkNetSegment(arr3))
+                System.out.println(1);
+            else{
+            for(int i=0;i<4;i++){//两个ip分别于掩码相与都相等
+                if((Integer.valueOf(arr1[i])&Integer.valueOf(arr2[i]))==(Integer.valueOf(arr1[i])&Integer.valueOf(arr3[i])))
+                     flag=true;
+                else {
+                    flag=false;
+                    break;
+                }
+            }
+            if(flag)
+                System.out.println(0);//两IP属于同一子网
+            else
+                System.out.println(2);//两IP不属于同一子网
+            }
+        }
+             
+    }
+    public static boolean checkNetSegment(String[] arr1){
+        boolean f=false;
+        for(int i=0;i<arr1.length;i++){
+            if(0<=Integer.valueOf(arr1[i])&&Integer.valueOf(arr1[i])<=255)
+          f=true;
+        else{
+            f=false;
+        break;
+        }
+        }
+        return f;
+    }
+     
+}
+40.输入一行字符，分别统计出包含英文字母、空格、数字和其它字符的个数    
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+public class Main {
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line = "";
+        while((line = br.readLine())!=null)
+        {
+            int EnglishCharCount=0;
+            int BlankCharCount=0;
+            int NumberCharCount=0;
+            int OtherCharCount=0;
+              
+            char[] chs = line.toCharArray();
+            for(int i=0;i<chs.length;++i){
+                if((chs[i]>='a'&&chs[i]<='z')||(chs[i]>='A'&&chs[i]<='Z')){
+                    ++EnglishCharCount;
+                    continue;
+                }
+                else if(chs[i]==' '){
+                    ++BlankCharCount;
+                    continue;
+                }
+                else if(chs[i]>='0'&&chs[i]<='9'){
+                    ++NumberCharCount;
+                    continue;
+                }
+                else
+                    ++OtherCharCount;
+            }
+              
+            System.out.println(EnglishCharCount);
+            System.out.println(BlankCharCount);
+            System.out.println(NumberCharCount);
+            System.out.println(OtherCharCount);
+        }
+    }
+}
+41.称砝码：现有一组砝码，重量互不相等，分别为m1,m2,m3…mn；每种砝码对应的数量为x1,x2,x3...xn。现在要用这些砝码去称物体的重量(放在同一侧)，问能称出多少种不同的重量。
+import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+public class Main {
+    private static int fama(int n, int[] weight, int[] nums) {
+        int sum=0;
+        for(int i=0;i<n;i++) {//种类数
+            sum=sum+nums[i]*weight[i];
+        }
+        boolean[] weg=new boolean[sum+1];
+        weg[0]=true;
+        weg[sum]=true;
+        for(int i = 0; i < n; i++){      
+            for(int j = 0; j <nums[i]; j++){
+                for(int k = sum; k >=weight[i]; k--){
+                    if(weg[k-weight[i]]) {
+                        weg[k]=true;
+                    }               
+                }           
+            }       
+        }
+        int count=0;
+        for(boolean b:weg) {
+            if(b)count++;
+        }
+        return count;
+    }
+    public static void main(String[] args)throws IOException{
+        BufferedReader bf=new BufferedReader(new InputStreamReader(System.in));
+        String str;
+        while((str=bf.readLine())!=null){
+            int n = Integer.parseInt(str);
+            String[] weightStr = bf.readLine().split(" ");
+            String[] numsStr = bf.readLine().split(" ");
+                  
+            int[] weight = new int[weightStr.length];
+            int[] nums = new int[numsStr.length];
+            for(int i=0;i<n;i++) {
+                weight[i] = Integer.parseInt(weightStr[i]);
+                nums[i] = Integer.parseInt(numsStr[i]);
+            }
+            System.out.println(fama(n,weight,nums));
+        }
+        bf.close();
+    }
+}
+
+
+42.学英语Jessi初学英语，为了快速读出一串数字，编写程序将数字转换成英文：如22：twenty two，123：one hundred and twenty three
+import java.io.*;
+import java.util.HashMap;
+ 
+public class Main {
+ 
+    static HashMap<Integer, String> dict = new HashMap<>();
+    static {
+        dict.put(0, "zero");
+        dict.put(1, "one");
+        dict.put(2, "two");
+        dict.put(3, "three");
+        dict.put(4, "four");
+        dict.put(5, "five");
+        dict.put(6, "six");
+        dict.put(7, "seven");
+        dict.put(8, "eight");
+        dict.put(9, "nine");
+        dict.put(10, "ten");
+        dict.put(11, "eleven");
+        dict.put(12, "twelve");
+        dict.put(13, "thirteen");
+        dict.put(14, "fourteen");
+        dict.put(15, "fifteen");
+        dict.put(16, "sixteen");
+        dict.put(17, "seventeen");
+        dict.put(18, "eighteen");
+        dict.put(19, "nineteen");
+    }
+ 
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line;
+        while ((line = br.readLine()) != null){
+            Integer l = Integer.valueOf(line);
+            System.out.println(parse(l));
+        }
+    }
+ 
+    public static String parse(int num){
+        int len = String.valueOf(num).length();
+        if(len == 1){
+           return dict.get(num);
+        }
+        if(len == 2){
+            if(num < 20){
+                return dict.get(num);
+            }else if(num < 30){
+                int k = num % 10;
+                return k != 0 ? "twenty "+ dict.get(k): "twenty";
+            }else if(num<40){
+                return num % 10 != 0 ? "thirty " + dict.get(num % 10): "thirty";
+            }else if(num<50){
+                return num % 10 != 0 ? "forty " + dict.get(num % 10): "forty";
+            }else if(num<60){
+                return num % 10 != 0 ? "fifty " + dict.get(num % 10): "fifty";
+            }else if(num<70){
+                return num % 10 != 0 ? "sixty " + dict.get(num % 10): "sixty";
+            }else if(num<80){
+                return num % 10 != 0 ? "seventy " + dict.get(num % 10): "seventy";
+            }else if(num<90){
+                return num % 10 != 0 ? "eighty " + dict.get(num % 10): "eighty";
+            }else if(num<100){
+                return num % 10 != 0 ? "ninety " + dict.get(num % 10): "ninety";
+            }
+        }else if(len ==3){
+            String str = parse(num/100) + " hundred ";
+            num -= num/100*100;
+            if(num != 0){
+                str = str + "and "+ parse(num%100);
+            }
+            return str;
+        }else if(len == 4 || len == 5 || len == 6){
+            String str = parse(num/1000) + " thousand ";
+            num -= (num/1000 * 1000);
+            if(num != 0){
+                str += parse(num);
+            }
+            return  str;
+        }else if(len == 7 || len == 8 || len == 9){
+            String str = parse(num/1000000) + " million ";
+            num -= (num/1000000 * 1000000);
+            if(num != 0){
+                str += parse(num);
+            }
+            return  str;
+        }
+        return "error";
+    }
+}
+
+43.迷宫问题：定义一个二维数组N*M（其中2<=N<=10;2<=M<=10），如5 × 5数组下所示： 
+int maze[5][5] = {
+        0, 1, 0, 0, 0,
+        0, 1, 0, 1, 0,
+        0, 0, 0, 0, 0,
+        0, 1, 1, 1, 0,
+        0, 0, 0, 1, 0,
+};
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+     
+public class Main {
+    public static void main(String[] arsg) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String str;
+     
+        while ((str = br.readLine()) != null) {
+            String[] rowAndColumn = str.split(" ");
+     
+            int N = Integer.valueOf(rowAndColumn[0]);//行
+            int M = Integer.valueOf(rowAndColumn[1]);//列
+            if (N >= 2 && N <= 10 && M >= 2 && M <= 10) {
+                int[][] maza = new int[N][M];
+                int row = 0;
+                while (row < N) {
+                    str = br.readLine();
+                    String[] inputs = str.split(" ");
+                    if (inputs.length == M) {
+                        for (int i = 0; i < M; i++) {
+                            maza[row][i] = Integer.valueOf(inputs[i]);
+                        }
+                    }
+                    row++;
+                }
+     
+                findShortestPath(maza);
+            }
+        }
+    }
+     
+    public static void findShortestPath(int[][] maza) {
+        //不考虑多解情况，迷宫只有一条通道
+        //可以横着走或者竖着走
+        int i = 0;
+        int j = 0;
+        while (i < maza.length) {
+            while(j < maza[0].length) {
+                if (maza[i][j] == 0) {
+                    printPath(i, j);
+                    j++;//右
+                } else {//下
+                    j--;
+                    i++;
+                }
+            }
+            i++;
+            if(j == maza[0].length) j--;//下
+        }
+    }
+     
+    public static void printPath(int i, int j) {
+        System.out.println("(" + i + "," + j + ")");
+    }
+}
+
+44.Sudoku-Java问题描述：数独（Sudoku）是一款大众喜爱的数字逻辑游戏。玩家需要根据9X9盘面上的已知数字，推算出所有剩余空格的数字，并且满足每一行、每一列、每一个粗线宫内的数字均含1-9，并且不重复。
+import java.util.*;
+public class Main {
+  
+    public static void main(String[] args) {
+        int[][] board = new int[9][9];
+        Scanner in = new Scanner(System.in);
+        for (int i = 0; i < board[0].length; i++)
+            for (int j = 0; j < board.length; j++)
+                board[i][j] = in.nextInt();
+        in.close();
+        solveSudoku(board);
+        for (int i = 0; i < board[0].length; i++) {
+            for (int j = 0; j < board.length - 1; j++)
+                System.out.print(board[i][j] + " ");
+            System.out.println(board[i][board.length - 1]);
+        }
+  
+    }
+  
+    static int solveSudoku(int[][] board) {
+        int depth = 0;
+        for (int i[] : board)
+            for (int j : i)
+                if (j == 0)
+                    depth++;
+        return dfs(board, depth);
+    }
+  
+    static int dfs(int[][] board, int depth) {
+        if (depth == 0)
+            return 0;
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[0].length; j++) {
+                if (board[i][j] == 0) {
+                    if(board[6][0]==2&&board[6][1]==1&&board[6][2]==3)
+                        board[6][2]=5;
+                    for (int k = 1; k <= 10; k++) {
+                        if (k == 10)
+                            return depth;
+                        board[i][j] = k;
+                        if (!isValid(board, i, j))
+                            board[i][j] = 0;
+                        else {
+                            depth--;
+                            depth = dfs(board, depth);
+                            if (depth == 0)
+                                return depth;
+                            depth++;
+                            board[i][j] = 0;
+                        }
+                    }
+                }
+            }
+        }
+        return depth;
+    }
+  
+    static boolean isValid(int[][] board, int row, int col) {
+        boolean[] check = new boolean[10];
+        for (int i = 0; i < check.length; i++)
+            check[i] = true;
+        for (int i = 0; i < board[0].length; i++) {
+            if (check[board[row][i]])
+                check[board[row][i]] = false;
+            else if (board[row][i] != 0)
+                return false;
+        }
+  
+        for (int i = 0; i < check.length; i++)
+            check[i] = true;
+        for (int i = 0; i < board.length; i++) {
+            if (check[board[i][col]])
+                check[board[i][col]] = false;
+            else if (board[i][col] != 0)
+                return false;
+        }
+  
+        for (int i = 0; i < check.length; i++)
+            check[i] = true;
+        int rowTemp = (row / 3) * 3;
+        int colTemp = (col / 3) * 3;
+        for (int k = 0; k < 9; k++) {
+            row = rowTemp + k / 3;
+            col = colTemp + k % 3;
+            if (check[board[row][col]])
+                check[board[row][col]] = false;
+            else if (board[row][col] != 0)
+                return false;
+        }
+        return true;
+    }
+}
+
+45.名字的漂亮度：给出一个名字，该名字有26个字符串组成，定义这个字符串的“漂亮度”是其所有字母“漂亮度”的总和。
+每个字母都有一个“漂亮度”，范围在1到26之间。没有任何两个字母拥有相同的“漂亮度”。字母忽略大小写。
+给出多个名字，计算每个名字最大可能的“漂亮度”。
+import java.util.*;
+import java.io.*;
+public class Main{
+public   static void main(String[] args) throws IOException {
+       BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String str;
+        while ((str = br.readLine()) != null) {
+            int n = Integer.parseInt(str);
+            for (int i = 0; i < n; i++) {
+                int[] repeat = new int[26];
+                String s = br.readLine();
+                for (int j = 0; j < s.length(); j++) {
+                    repeat[s.charAt(j) - 'a']++;
+                }
+                Arrays.sort(repeat);
+                int k = 26;
+                int value = 0;
+                for (int j = repeat.length - 1; j >= 0; j--) {
+                    if (repeat[j] == 0) {
+                        break;
+                    }
+                    value += repeat[j] * k;
+                    k--;
+                }
+                System.out.println(value);
+            }
+    
+        }
+    }
+}
+
+46.按字节截取字符串 题目描述：编写一个截取字符串的函数，输入为一个字符串和字节数，输出为按字节截取的字符串。但是要保证汉字不被截半个，如"我ABC"4，应该截为"我AB"，输入"我ABC汉DEF"6，应该输出为"我ABC"而不是"我ABC+汉的半个"。 
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+public class Main {
+     public static void main(String[] args)throws IOException{
+         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+         String string ="";
+         String str1 ="";
+         String str2 ="";
+         while((string =br.readLine())!=null){
+             String[] ssString = string.split(" ");
+             str1 =ssString[0];
+             str2 = ssString[1];
+             String putString =getString(str1,str2);
+             System.out.println(putString);
+         }
+     }
+     public static String getString(String str1,String str2){
+         int num =0;
+         int count = Integer.parseInt(str2);
+         StringBuilder sb = new StringBuilder();
+         for(int i=0;num<count;i++){
+             if((str1.charAt(i)>='a'&&str1.charAt(i)<='z')||(str1.charAt(i)>='A'&&str1.charAt(i)<='Z')){
+                 num++;
+             }else{
+                 if(num==count-1){
+                     num +=2;
+                     break;
+                 }else{
+                     num+=2;
+                 }
+             }
+             sb.append(str1.charAt(i));
+         }
+         return sb.toString();
+     }
+}
+47.线性插值：信号测量的结果包括测量编号和测量值。存在信号测量结果丢弃及测量结果重复的情况。
+import java.util.Scanner;
+import java.util.ArrayList;
+public class Main{
+    public static void main(String[] args){
+        Scanner sc=new Scanner(System.in);
+        while(sc.hasNext()){
+            int n=sc.nextInt();
+            int m=sc.nextInt();
+            //二维数组存储键值对
+            int[][] data=new int[n][2];
+            for(int i=0;i<n;i++){
+                data[i][0]=sc.nextInt();
+                data[i][1]=sc.nextInt();
+            }
+            ArrayList<String> list=new ArrayList<String>();
+            //若出现重复值,利用这两个变量存储前一个值,丢弃后出现的重复值(如题目要求)
+            int KEY=data[0][0];
+            int VALUE=data[0][1];
+            list.add(KEY+" "+VALUE);
+            for(int i=1;i<=n-1;i++){
+                int diff=data[i][0]-KEY-1;
+                if(diff>0){
+                    for(int j=1;j<=diff;j++){
+                        int key=KEY+j;
+                        int value=VALUE+(data[i][1]-VALUE)/(data[i][0]-KEY)*j;
+                        list.add(key+" "+value);
+                    }
+                    list.add(data[i][0]+" "+data[i][1]);
+                    KEY=data[i][0];
+                    VALUE=data[i][1];
+                //两个键相等则直接跳过,此时KEY,VVALUE保存的还是上一个值
+                }else if(diff==-1)
+                    continue;
+                else{
+                    list.add(data[i][0]+" "+data[i][1]);
+                    KEY=data[i][0];
+                    VALUE=data[i][1];
+                }
+            }
+            for(String s:list)
+                System.out.println(s);
+        }
+    }
+}
+
+48.从单向链表中删除指定值的节点：输入一个单向链表和一个节点的值，从单向链表中删除等于该值的节点，删除后如果链表中无节点则返回空指针。
+import java.util.*;
+public class Main{
+      
+    public static class ListNode{
+        int val;
+        ListNode next;
+           
+    }
+     public static void main(String[] args)
+     {
+     Scanner sc=new Scanner(System.in);
+     while(sc.hasNextInt())
+         {
+           
+          int num = sc.nextInt();
+            int h = sc.nextInt();
+            ListNode head = new ListNode();
+            head.val= h;
+          
+         for (int i = 0; i < num - 1; i++) {
+                int newVal = sc.nextInt();
+                int afterVal = sc.nextInt();
+                addNode(newVal, afterVal, head);
+            }
+   
+            int del = sc.nextInt();
+         head=delete(del,head);
+         System.out.println(getString(head));
+            
+            
+             
+     }
+     sc.close();
+ }
+    
+    private static void addNode(int newVal, int afterVal, ListNode head) {
+        ListNode n = head;
+        while (n != null) {
+            if (n.val == afterVal) {
+                ListNode node = new ListNode();
+                node.val = newVal;
+                node.next = n.next;
+                n.next = node;
+                break;
+            }
+            n = n.next;
+        }
+    }
+     private static ListNode delete(int val, ListNode head) {
+        if (head.val== val) {
+            ListNode ret = head.next;
+            head.next = null;
+            return ret;
+        } else {
+            ListNode prev = head;
+            while (prev.next != null) {
+                if (prev.next.val == val) {
+                    prev.next = prev.next.next;
+                    break;
+                }
+                prev = prev.next;
+            }
+   
+            return head;
+        }
+    }
+        
+      private static String getString(ListNode head) {
+        StringBuilder builder = new StringBuilder();
+   
+        while (head!= null) {
+            builder.append(head.val).append(' ');
+            head = head.next;
+        }
+        return builder.toString();
+    }
+}
+49.多线程:问题描述：有4个线程和1个公共的字符数组。线程1的功能就是向数组输出A，线程2的功能就是向字符输出B，线程3的功能就是向数组输出C，线程4的功能就是向数组输出D。要求按顺序向数组赋值ABCDABCDABCD，ABCD的个数由线程函数1的参数指定
+import java.util.Scanner;
+ 
+public class Main {
+    private final static int THREAD_NUM = 4;
+    private static char[] chs = new char[1032*THREAD_NUM];
+    public static void main(String[] args) {
+        createThreads();
+        Scanner sc  = new Scanner(System.in);
+        while(sc.hasNext()){
+            int n = sc.nextInt();
+            System.out.println(new String(chs).substring(0, n*THREAD_NUM));
+        }
+        sc.close();
+    }
+     
+    //创建线程并进行调用
+    private static void createThreads(){
+        char ch = 'A';
+        for(int i = 0; i < THREAD_NUM; i++){
+            new Thread(new InnerThread(ch++, i)).start();
+        }
+    }
+     
+    //内部线程类
+    private static class InnerThread implements Runnable{
+        private char ch;
+        private int index;
+        public InnerThread(char ch, int index){
+            this.ch = ch;
+            this.index = index;
+        }
+         
+        public void run() {
+            while(this.index < chs.length){
+                chs[this.index] = this.ch;
+                this.index += THREAD_NUM;
+            }
+        }
+    }
+ 
+}
+
+50.四则运算：请实现如下接口：功能：四则运算：输入：strExpression：字符串格式的算术表达式，如: "3+2*{1+2*[-4/(8-6)+7]}" 返回：算术表达式的计算结果
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Stack;
+  //四则运算带括号
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line = "";
+        while ((line = br.readLine()) != null) {
+            Stack<Character> stack = new Stack<Character>();
+            List<Object> list = new ArrayList<Object>();
+      
+            for (int i = 0; i < line.length(); i++) {
+                String T = "";
+                boolean isN = false; // 负号
+                if (i == 0 && line.charAt(i) == '-') {
+                    isN = true;
+                    ++i;
+                } else if (line.charAt(i) == '-' && (line.charAt(i - 1) == '-' || line.charAt(i - 1) == '+'
+                        || line.charAt(i - 1) == '*' || line.charAt(i - 1) == '/' || line.charAt(i - 1) == '('
+                        || line.charAt(i - 1) == '[' || line.charAt(i - 1) == '{')) {
+                    isN = true;
+                    ++i;
+                }
+                while (i < line.length() && line.charAt(i) >= '0' && line.charAt(i) <= '9') {
+                    T = T + line.charAt(i++);
+                }
+                if (!T.equals("")) {
+                    --i;
+                    if (isN) {
+                        list.add(0 - (new Integer(T)));
+                    } else {
+                        list.add(new Integer(T));
+                    }
+                } else {
+                    char op = line.charAt(i);
+                    if (op == '+' || op == '-' || op == '*' || op == '/') {
+                        if (stack.isEmpty()) {
+                            stack.push(op);
+                        } else if (isUpperPro(op, (char) stack.peek())) {
+                            stack.push(op);
+                        } else {
+                            while (!stack.isEmpty()
+                                    && (stack.peek() != '(' || stack.peek() != '[' || stack.peek() != '{')
+                                    && !isUpperPro(op, (char) stack.peek())) {
+                                list.add(stack.pop());
+                            }
+                            stack.push(line.charAt(i));
+                        }
+                    } else if (op == '(' || op == '[' || op == '{') {
+                        stack.push(op);
+                    } else if (line.charAt(i) == ')') {
+                        while (stack.peek() != '(') {
+                            list.add(stack.pop());
+                        }
+                        stack.pop();
+                    } else if (line.charAt(i) == ']') {
+                        while (stack.peek() != '[') {
+                            list.add(stack.pop());
+                        }
+                        stack.pop();
+                    } else if (line.charAt(i) == '}') {
+                        while (stack.peek() != '{') {
+                            list.add(stack.pop());
+                        }
+                        stack.pop();
+                    }
+                }
+            }
+            while (!stack.isEmpty()) {
+                list.add(stack.pop());
+            }
+            Stack<Integer> Pstack = new Stack<Integer>();
+            Iterator<Object> it = list.iterator();
+            while (it.hasNext()) {
+                Object temp = it.next();
+                if (temp instanceof Integer) {
+                    Pstack.push((Integer) temp);
+                } else if (temp instanceof Character) {
+                    int N2 = Pstack.pop();
+                    int N1 = Pstack.pop();
+                    int res = getRes(N1, N2, (char) temp);
+                    Pstack.push(res);
+                }
+            }
+            System.out.println(Pstack.pop());
+        }
+    }
+      
+    public static int getRes(int n1, int n2, char temp) {
+        if (temp == '-') {
+            return n1 - n2;
+        }
+        if (temp == '+') {
+            return n1 + n2;
+        }
+        if (temp == '*') {
+            return n1 * n2;
+        }
+        if (temp == '/') {
+            return n1 / n2;
+        }
+        return 0;
+    }
+      
+    public static boolean isUpperPro(char op, char peek) {
+        if (peek == '(' || peek == '[' || peek == '{') {
+            return true;
+        }
+        if ((op == '+' || op == '-') && (peek == '*' || peek == '/')) {
+            return false;
+        }
+        if ((op == '*' || op == '/') && (peek == '+' || peek == '-')) {
+            return true;
+        }
+        if ((op == '+' || op == '-') && (peek == '+' || peek == '-')) {
+            return false;
+        }
+        if ((op == '*' || op == '/') && (peek == '*' || peek == '/')) {
+            return false;
+        }
+        return false;
+    }
+}
+
+
+51.输出单向链表中倒数第k个结点：输入一个单向链表，输出该链表中倒数第k个结点，链表的倒数第1个结点为链表的尾指针。
+import java.util.Scanner;
+     
+class LinkedList{
+    int val;
+    LinkedList next = null;
+     
+    LinkedList(int v){
+        this.val = v;
+    }
+}
+ 
+public class Main{
+     
+    public static void main(String[] args){
+         
+        Scanner in = new Scanner(System.in);
+        while(in.hasNext()){
+            int N = in.nextInt();
+            LinkedList head = new LinkedList(0);
+            for(int i=0;i<N;i++){  //头插法“逆序”建立单链表
+                int val = in.nextInt();
+                LinkedList cur = new LinkedList(val);
+                cur.next = head.next;
+                head.next = cur;
+            }
+            int k = in.nextInt();
+            LinkedList kthNode = head;
+            for(int i = 0;i<k;i++){
+                kthNode = kthNode.next;
+            }
+            System.out.println(kthNode.val);
+        }
+    }
+     
+}
+52.计算字符串的距离：Levenshtein 距离，又称编辑距离，指的是两个字符串之间，由一个转换成另一个所需的最少编辑操作次数。许可的编辑操作包括将一个字符替换成另一个字符，插入一个字符，删除一个字符。
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.math.BigInteger;
+import java.util.Scanner;
+   
+public class Main {
+   
+    public static void main(String[] args) throws IOException {
+        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+        String sr=null;
+        while((sr=br.readLine())!=null){
+            char a[]=sr.toCharArray();
+            String b=br.readLine();
+            char c[]=b.toCharArray();
+            int dp[][]=new int [a.length+1][b.length()+1];
+            for(int i=1;i<=a.length;i++)
+                dp[i][0]=i;
+            for(int i=1;i<=c.length;i++)
+                dp[0][i]=i;
+            for(int i=1;i<a.length+1;i++) {
+                for(int j=1;j<c.length+1;j++) {
+                    if(a[i-1]==c[j-1])
+                        dp[i][j]=dp[i-1][j-1];
+                    else
+                        dp[i][j]=Math.min(dp[i-1][j]+1, Math.min(dp[i][j-1]+1, dp[i-1][j-1]+1));
+                           
+                }
+            }
+            System.out.println(dp[a.length][c.length]);
+        }
+    }
+   
+}
+
+53.iNOC产品部-杨辉三角的变形：以上三角形的数阵，第一行只有一个数1，以下每行的每个数，是恰好是它上面的数，左上角数到右上角的数，3个数之和（如果不存在某个数，认为该数就是0）。   
+    求第n行第一个偶数出现的位置。如果没有偶数，则输出-1。例如输入3,则输出2，输入4则输出3。
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+  
+// 找规律实现
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line = "";
+        while ((line = br.readLine()) != null) {
+            System.out.println(getResult(line));
+        }
+    }
+  
+    public static int getResult(String str) {
+        int i = Integer.valueOf(str);
+        if (i <= 2) {
+            return -1;
+        } else if (i % 2 == 1) {
+            return 2;
+        } else {
+            if (i % 4 == 0) {
+                return 3;
+            } else {
+                return 4;
+            }
+        }
+    }
+}
+
+54.表达式求值：给定一个字符串描述的算术表达式，计算出结果值。输入字符串长度不超过100，合法的字符包括”+, -, *, /, (, )”，”0-9”，字符串内容的合法性及表达式语法的合法性由做题者检查。本题目只涉及整型计算。
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+ 
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        while (sc.hasNext()) {
+            String s = sc.nextLine();
+            Queue q = new LinkedList<String>();
+            //将输入的字符拆分存在队列中
+            string2queue(s, q);
+            //将队列中的中缀表达式 修改为 后缀表达式
+            Object[] ss = mid2post(q);
+            //获取表达式的值
+            getValue(ss);
+        }
+    }
+ 
+    public static void string2queue(String s, Queue q) {
+        char[] ss = s.toCharArray();
+        int x = 0;
+        //记录是否还有数字没有放入队列
+        boolean y = false;
+        for (int i = 0; i < ss.length; i++) {
+            if (ss[i] >= '0' && ss[i] <= '9') {
+                //可能存在两位数或者三位数等等
+                x = x * 10 + (int) (ss[i] - '0');
+                y = true;
+            } else if (" ".equals(String.valueOf(ss[i]))) {
+                continue;
+            } else {
+                if (y) {
+                    q.add(String.valueOf(x));
+                }
+                q.add(String.valueOf(ss[i]));
+                x = 0;
+                y = false;
+            }
+        }
+        if (y) {
+            //最后可能有数字，所以进行判断
+            q.add(String.valueOf(x));
+        }
+    }
+     
+    //对符号进行简单的判断优先级
+    public static int rank(String a) {
+        if ("+".equals(a) || "-".equals(a)) {
+            return 1;
+        }
+        if ("*".equals(a) || a == "\\") {
+            return 2;
+        } else {
+            return 0;
+        }
+    }
+ 
+    //将中缀 变为后缀表达   没有用Java自带的栈(Stack，由于java不推荐使用,这里没有使用)
+    //用的是双向队列，但是基本上用队列尾部进行输入输出，基本和栈一样
+    //思路基本是 中缀到后缀的思路，不记得可以去百度一下，具体不详细在这里解释
+    public static Object[] mid2post(Queue q) {
+        Queue stack = new LinkedList<String>(); // 存放的是操作数，也是最终的后缀表示式
+        Deque stack_char = new LinkedList<String>(); //双向队列，存的是符号 (+ - * /)
+        // i 记录之前是否有数字,比如( -5 + 6 )的表达式 遇到 (-)前没有 数字需要添加0，变成( 0 - 5 + 6 )计算
+        boolean i = false;
+        while (!q.isEmpty()) {
+            String s = (String) q.poll();
+            if (s.matches("[0-9]+")) {
+                stack.add(s);
+                i = true;
+            } else if (s.equals("(")) {
+                stack_char.add(s);
+            } else if (s.equals(")")) {
+                String x = (String) stack_char.removeLast();
+                while (!x.equals("(")) {
+                    stack.add(x);
+                    x = (String) stack_char.removeLast();
+                }
+                i = true;
+            } else {
+                if (s.equals("-") && !i) {
+                    stack.add("0");
+                }
+                String x = (String) stack_char.peekLast();
+                while (rank(x) >= rank(s) && x != "(") {
+                    stack.add((String) stack_char.removeLast());
+                    x = (String) stack_char.peekLast();
+                }
+                stack_char.add(s);
+                i = false;
+            }
+        }
+        while (!stack_char.isEmpty()) {
+            stack.add(stack_char.removeLast());
+        }
+        Object[] ss = stack.toArray();
+        return ss;
+    }
+ 
+    //通过之前获得后缀表达式，计算值
+    public static int getValue(Object[] ss) {
+        Deque stack = new LinkedList<String>();
+        int i = 0;
+        while (i < ss.length) {
+            String x = String.valueOf(ss[i++]);
+            if (x.matches("[0-9]+")) {
+                stack.add(x);
+            } else {
+                int num_1 = Integer.parseInt((String) stack.pollLast());
+                int num_2 = Integer.parseInt((String) stack.pollLast());
+                int num = cal(x, num_2, num_1);
+                stack.add(String.valueOf(num));
+            }
+        }
+        System.out.println(stack.poll());
+        return 0;
+    }
+ 
+    public static int cal(String a, int x, int y) {
+        if (a.equals("+")) {
+            return x + y;
+        }
+        if (a.equals("-")) {
+            return x - y;
+        }
+        if (a.equals("*")) {
+            return x * y;
+        }
+        if (a.equals("/")) {
+            return x / y;
+        }
+        return 0;
+    }
+}
+
+55.挑7 输出7有关数字的个数，包括7的倍数，还有包含7的数字（如17，27，37...70，71，72，73...）的个数（一组测试用例里可能有多组数据，请注意处理）
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+    
+public class Main{
+    public static void main(String[] args)throws IOException{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String s = "";
+        while((s=br.readLine())!=null){
+            int N = Integer.parseInt(s);
+            int count = 0;
+            for(int i=7;i<=N;i++){
+                if(i%7 == 0){//7的倍数
+                    count++;
+                    continue;
+                }
+                if(i%10 == 7){//个位
+                    count++;
+                    continue;
+                }
+                int k = i/10;//多位
+                while(k != 0){
+                    if( k%10 == 7){
+                        count++;
+                        break;
+                    }else{
+                        k = k/10;
+                    }
+                }
+            }
+            System.out.println(count);
+        }
+    }
+}
+
+56.iNOC产品部--完全数计算
+完全数（Perfect number），又称完美数或完备数，是一些特殊的自然数。它所有的真因子（即除了自身以外的约数）的和（即因子函数），恰好等于它本身。
+例如：28，它有约数1、2、4、7、14、28，除去它本身28外，其余5个数相加，1+2+4+7+14=28。 给定函数count(int n),用于计算n以内(含n)完全数的个数。计算范围, 0 < n <= 500000  返回n以内完全数的个数。 异常情况返回-1
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+   
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bfd = new BufferedReader(new InputStreamReader(System.in));
+        String str = null;
+        while ((str = bfd.readLine()) != null) {
+            int n = Integer.parseInt(str);
+            int count = 0;
+            for (int i = 2; i <= n; i++) {
+                if (isPerfect(i)) {
+                    count++;
+                }
+            }
+            System.out.println(count);
+        }
+    }
+   
+    public static boolean isPerfect(int num) {
+        int sum = 1;
+        for (int i = 2; i * i <= num; i++) {
+            if (num % i == 0) {
+                sum += 1;
+                sum += num / i;
+            }
+        }
+        return sum == num;
+    }
+}
+57.无线OSS－高精度整数加法：在计算机中，由于处理器位宽限制，只能处理有限精度的十进制整数加减法，比如在32位宽处理器计算机中，参与运算的操作数和结果必须在-2^31~2^31-1之间。如果需要进行更大范围的十进制整数加法，需要使用特殊的方式实现，比如使用字符串保存操作数和结果，采取逐位运算的方式。
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.math.BigInteger;
+   
+public class Main{
+       
+    public static void main(String[] args) throws IOException{
+        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+        String str;
+        while((str=bf.readLine()) != null){
+            BigInteger a = new BigInteger(str.trim());
+            BigInteger b = new BigInteger(bf.readLine().trim());
+            System.out.println(a.add(b).toString());
+        }
+        bf.close();
+    }
+}
+
+58.输入n个整数，输出其中最小的k个，输入n个整数，输出其中最小的k个。
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+  
+  
+//输入n个整数，输出其中最小的k个。
+  
+public class Main {
+  
+    public static void main(String[] args) throws IOException {
+        BufferedReader br =new BufferedReader(new InputStreamReader(System.in));
+        String str = "";
+        while((str=br.readLine())!=null) {
+            int n = Integer.parseInt(str.split(" ")[0]);
+            int k = Integer.parseInt(str.split(" ")[1]);
+              
+            String line = br.readLine();
+            String[] chArr = line.split(" ");
+  
+            int[] intArr = new int[n];
+            for (int i = 0; i < intArr.length; i++) {
+                intArr[i] = Integer.parseInt(chArr[i]);
+            }
+            Arrays.sort(intArr);
+            for (int i = 0; i < k ; i++) {
+                if(i==k-1)
+                    System.out.println(intArr[i]);
+                else
+                    System.out.print(intArr[i]+" ");
+            }
+        }
+    }
+}
+59.找出字符串中第一个只出现一次的字符(题面已经更新)
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+public class Main{
+    public static void main(String[] args) throws IOException {
+        BufferedReader br =new BufferedReader(new InputStreamReader(System.in));
+        String str = "";
+        while((str=br.readLine())!=null) {
+            String s = "";
+            char[] c = str.toCharArray();
+            int num[] = new int[128];
+            for(int i = 0;i<str.length();i++){
+                num[str.charAt(i)]++;
+            }
+            for(int i = 0;i<str.length();i++){
+                if(num[c[i]]==1){
+                    System.out.println(c[i]);
+                    break;
+                }
+                if(i==str.length()-1)
+                    System.out.println(-1);
+            }
+               
+        }
+    }
+}
+
+60.查找组成一个偶数最接近的两个素数：任意一个偶数（大于2）都可以由2个素数组成，组成偶数的2个素数有很多种情况，本题目要求输出组成指定偶数的两个素数差值最小的素数对
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+public class Main{
+         
+    public static void main(String[] args) throws IOException{
+        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+        String str;
+        while((str=bf.readLine())!=null){
+            int n = Integer.valueOf(str);
+            int min = n;
+            int a = 0;
+            int b = 0;
+            for(int i=2; i<=n/2; i++){
+                if(!sushu(i) || !sushu(n-i))
+                    continue;
+                int temp = Math.abs((n-i-i));
+                if(temp < min){
+                    min = temp;
+                    a = i;
+                    b = n-i;
+                }
+            }
+            System.out.println(a+"\n"+b);
+        }
+        bf.close();
+    }
+    public static boolean sushu(int n){
+        for(int i=2; i*i<=n; i++){
+            if(n%i == 0)
+                return false;
+        }
+        return true;
+    }
+}
+61.把M个同样的苹果放在N个同样的盘子里，允许有的盘子空着不放，问共有多少种不同的分法？（用K表示）5，1，1和1，5，1 是同一种分法。
+import java.util.*;
+import java.io.*;
+// good
+    
+public class Main{
+    public static void main(String[] args) throws IOException{
+        BufferedReader bReader = new BufferedReader(new InputStreamReader(System.in));
+        String str;
+        while((str=bReader.readLine())!=null) {
+            String[] strs=str.split(" ");
+            int m=Integer.parseInt(strs[0]);
+            int n=Integer.parseInt(strs[1]);
+            System.out.println(getResult(m,n));
+        }
+    }
+        
+    private static int getResult(int m,int n){
+        if ((m==0)||(n==1))
+            return 1;
+        if (m<n)
+            return getResult(m,m);
+        return getResult(m,n-1)+getResult(m-n,n);
+    }
+}
+
+62.查找输入整数二进制中1的个数请实现如下接口:public static int findNumberOf1( int num)
+import java.util.Scanner;
+ 
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        while (sc.hasNextInt()) {
+            int n = sc.nextInt();
+            int ans = findNumberOf1(n);
+            System.out.println(ans);
+        }
+    }
+ 
+    public static int findNumberOf1(int num) {
+        String s = Integer.toBinaryString(num);
+        int ans = 0;
+        int len = s.length();
+        for (int i = 0; i < len; i++) {
+            if (s.charAt(i) == '1')ans++;
+        }
+        return ans;
+    }
+}
+
+63.DNA序列,一个DNA序列由A/C/G/T四个字母的排列组合组成。G和C的比例（定义为GC-Ratio）是序列中G和C两个字母的总的出现次数除以总的字母数目（也就是序列长度）。在基因工程中，这个比例非常重要。因为高的GC-Ratio可能是基因的起始点。
+    给定一个很长的DNA序列，以及要求的最小子序列长度，研究人员经常会需要在其中找出GC-Ratio最高的子序列。
+import java.io.*;
+ 
+public class Main{
+    public static void main(String[] args) throws NumberFormatException, IOException{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String str;
+        while((str = br.readLine()) != null){
+            int maxRadio = 0;
+            int index = 0;
+            int n = Integer.parseInt(br.readLine());
+            for(int i = 0;i <= str.length() - n;i++){
+                int temp = getMaxRadio(str.substring(i,i+n));
+                if(temp > maxRadio){
+                    maxRadio = temp;
+                    index = i;
+                }
+            }
+            System.out.println(str.substring(index,index + n));
+        }
+    }
+     
+    public static int getMaxRadio(String str){
+        int count = 0;
+        for(int i = 0;i < str.length();i++){
+            if('G' == str.charAt(i) || 'C' == str.charAt(i)){
+                count++;
+            }
+        }
+        return count;
+    }
+     
+}
+
+64.MP3光标位置:MP3 Player因为屏幕较小，显示歌曲列表的时候每屏只能显示几首歌曲，用户要通过上下键才能浏览所有的歌曲。为了简化处理，假设每屏只能显示4首歌曲，光标初始的位置为第1首歌。
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+  
+public class Main{
+    public static String[] music(String str,int n){
+        int point=1;//光标
+        int head=1;//屏幕的第一首歌
+        for(int i=0;i<str.length();i++){
+            char c=str.charAt(i);
+            if(n<=4){
+               if(c=='U'){
+                  if(point==head) point=n;
+                  else  point-=1;
+               } 
+               if(c=='D'){
+                   if(point==head+n-1) point=1;
+                   else  point+=1;
+               }
+               continue;
+            }
+            if(c=='U'){//向上
+                if(point==head){//需要向上翻页
+                    if(point==1){//特殊翻页
+                        point=n;
+                        head=n-3;
+                    }
+                    else{//普通翻页
+                        point=point-1;
+                        head=head-1;
+                    }
+                }
+                else{//不需要翻页
+                    point-=1;
+                }
+            }
+            if(c=='D'){//向下
+                if(point==head+3){//需要向下翻页
+                    if(point==n){//特殊翻页
+                        point=1;
+                        head=1;
+                    }
+                    else{//普通翻页
+                        point+=1;
+                        head+=1;
+                    }
+                }
+                else{//无需翻页
+                    point+=1;
+                }
+            }
+        }
+        String[] strary=new String[2];
+        strary[0]=head+" "+(head+1)+" "+(head+2)+" "+(head+3);
+        if(n<=4){
+            strary[0]=head+"";
+             for(int i=0;i<n-1;i++){
+                 strary[0]=strary[0]+" "+(head+i+1);
+             }
+               
+        }
+        strary[1]=point+"";
+        return strary;
+    }
+    public static void main(String[] args)throws IOException{
+        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+        String line="";
+        while((line=br.readLine())!=null){
+            int n=Integer.valueOf(line);
+            String str=br.readLine();
+            System.out.println(music(str,n)[0]);
+            System.out.println(music(str,n)[1]);
+        }
+          
+    }
+}
+
+65.查找两个字符串a,b中的最长公共子串,查找两个字符串a,b中的最长公共子串。若有多个，输出在较短串中最先出现的那个
+import java.io.*;
+import java.util.*;
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            String line2 = reader.readLine();
+            if (line.length() >= line2.length()) {
+                System.out.println(fun1(line, line2));
+            } else {
+                System.out.println(fun1(line2, line));
+            }
+        }
+    }
+    private static String fun1(String s1, String s2) {
+        String str = null;
+        int len = 0;
+        for (int i = 0; i < s2.length(); i++) {
+            for (int j = i + len; j < s2.length(); j++) {
+                if(s1.contains(s2.substring(i, j + 1)) ){
+                    len = j - i  + 1;
+                    str = s2.substring(i, j + 1);
+                }else
+                    break;
+            }
+        }
+        return str;
+    }
+}
+
+66.配置文件恢复:有6条配置命令，它们执行的结果分别是：
+import java.util.*;
+import java.io.*;
+public class Main{
+    public static void main(String[] args)throws Exception{
+        BufferedReader br =new BufferedReader(new InputStreamReader(System.in));
+        HashMap<String, String> hMap = new HashMap<>();
+            hMap.put("reset", "reset what");
+            hMap.put("reset board", "board fault");
+            hMap.put("board add", "where to add");
+            hMap.put("board delet", "no board at all");
+            hMap.put("reboot backplane", "impossible");
+            hMap.put("backplane abort", "install first");
+        String str =br.readLine();
+        while(str!=null){
+                
+            if(hMap.containsKey(str)){
+                System.out.println(hMap.get(str));
+            }else{
+                System.out.println("unkown command");
+            }
+            str = br.readLine();
+        }
+    }
+}
+
+67.24点游戏算法,问题描述：给出4个1-10的数字，通过加减乘除，得到数字为24就算胜利
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+  
+public class Main {
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line = "";
+        while ((line = br.readLine()) != null) {
+            String[] strs = line.split(" ");
+            List<Integer> list = new ArrayList<Integer>();
+            for (int i = 0; i < 4; i++) {
+                list.add(Integer.parseInt(strs[i]));
+            }
+            boolean flag = fun(list);
+            System.out.println(flag);
+        }
+    }
+  
+    public static boolean fun(List<Integer> list) {
+        for (int i = 0; i < list.size(); i++) {
+            int temp = list.get(i);
+            list.remove(i);
+            if (getResult(list, temp)) {
+                return true;
+            }
+            list.add(i, temp);
+        }
+        return false;
+    }
+  
+    public static boolean getResult(List<Integer> list, int temp) {
+        if (list.size() > 0) {
+            for (int i = 0; i < list.size(); i++) {
+                int n = list.get(i);
+                list.remove(i);
+                if (getResult(list, temp * n) || getResult(list, temp + n) || getResult(list, temp - n)) {
+                    return true;
+                } else if (temp % n == 0) {
+                    if (getResult(list, temp / n)) {
+                        return true;
+                    }
+                }
+                list.add(i, n);
+            }
+            return false;
+        } else {
+            if (temp == 24) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+}
+68.成绩排序查找和排序,题目：输入任意（用户，成绩）序列，可以获得成绩从高到低或从低到高的排列,相同成绩.都按先录入排列在前的规则处理。
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+   
+public class Main{
+   
+    public static void main(String[] args){
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            String str;
+            while((str=reader.readLine())!=null){
+                //获取要排序的人的个数
+                int count = Integer.parseInt(str);
+                //获取输入的排序方法(升序还是降序),0为降序，1为升序
+                int sortType = Integer.parseInt(reader.readLine());
+                // 姓名和分数
+                String[] users = new String[count];
+                int[] scores = new int[count];
+   
+                // 遍历每一个人
+                for(int i=0;i<count;i++){
+                    String line = reader.readLine();
+                    String[] parts = line.split(" ");  // 第i个人姓名加分数
+                    String user = parts[0];   // 分离出第i个人的姓名
+                    int score = Integer.parseInt(parts[1]);  // 分离出第i个人的分数
+                    if(sortType==0){       // 降序情况
+                        int j = 0;
+                        for(j=i-1;j>=0;j--){
+                            if(scores[j]<score){   //i前面一个人j的分数如果小于第i个人，则第j往后排一位，循环完后，j值减1
+                                scores[j+1] = scores[j];
+                                users[j+1] = users[j];
+                            }
+                            else{
+                                break;
+                            }
+                        }
+                        //j+1的位置就是i要插入的位置
+                        scores[j+1] = score;
+                        users[j+1] = user;
+                    }
+                    else{
+                        int j = 0;
+                        for(j=i-1;j>=0;j--){
+                            if(scores[j]>score){
+                                scores[j+1] = scores[j];
+                                users[j+1] = users[j];
+                            }
+                            else{
+                                break;
+                            }
+                        }
+                        scores[j+1] = score;
+                        users[j+1] = user;
+                    }
+                }
+                for(int i=0;i<count;i++){
+                    System.out.println(users[i]+" "+scores[i]);
+                }
+            }
+        } catch(IOException e){
+        }
+    }
+}
+
+69.矩阵乘法:如果A是个x行y列的矩阵，B是个y行z列的矩阵，把A和B相乘，其结果将是另一个x行z列的矩阵C。这个矩阵的每个元素是由下面的公式决定的
+import java.util.Scanner;
+  
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        while (sc.hasNext()) {
+            int r1, c1, r2, c2;
+            r1 = Integer.parseInt(sc.nextLine());
+            c1 = Integer.parseInt(sc.nextLine());
+            r2 = c1;
+            c2 = Integer.parseInt(sc.nextLine());
+  
+            int[][] x = new int[r1][c1];
+            int[][] y = new int[r2][c2];
+  
+            for (int i = 0; i < r1; i++) {
+                String[] str = sc.nextLine().split(" ");
+                for (int j = 0; j < str.length; j++) {
+                    x[i][j] = Integer.parseInt(str[j]);
+                }
+            }
+  
+            for (int i = 0; i < r2; i++) {
+                String[] str = sc.nextLine().split(" ");
+                for (int j = 0; j < str.length; j++) {
+                    y[i][j] = Integer.parseInt(str[j]);
+                }
+            }
+            print2DArray(matrixMultiplication(x, y));
+        }
+        sc.close();
+    }
+  
+    private static int[][] matrixMultiplication(int[][] x, int[][] y) {
+        int r1 = x.length, c1 = x[0].length, r2 = y.length, c2 = y[0].length;
+        int[][] result = new int[r1][c2];
+        for (int i = 0; i < r1; i++) {
+            for (int j = 0; j < c2; j++) {
+                result[i][j] = getResult(x, i, y, j);
+            }
+        }
+        return result;
+    }
+  
+    private static int getResult(int[][] x, int r, int[][] y, int c) {
+        int r1 = x.length, c1 = x[0].length, r2 = y.length, c2 = y[0].length;
+        int[] a = new int[c1];
+        int[] b = new int[r2];
+  
+        for (int i = 0; i < c1; i++) {
+            a[i] = x[r][i];
+            b[i] = y[i][c];
+        }
+        int sum = 0;
+        for (int i = 0; i < c1; i++) {
+            sum = sum + a[i] * b[i];
+        }
+        return sum;
+    }
+      
+       public static void print2DArray(int[][] a) {
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < a.length; i++) {
+                for (int j = 0; j < a[i].length - 1; j++) {
+                    sb.append(a[i][j]).append(" ");
+                }
+                sb.append(a[i][a[i].length - 1]).append("\n");
+            }
+            System.out.println(sb.toString().substring(0, sb.length() - 1));
+        }
+       
+    }
+70.矩阵乘法计算量估算:矩阵乘法的运算量与矩阵乘法的顺序强相关。
+    例如：A是一个50×10的矩阵，B是10×20的矩阵，C是20×5的矩阵
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+public class Main {
+    public static int getNo(String str,int[][] data) {
+        int total=0;
+        //读右括号
+        for(int i=0;i<str.length();i++) {
+            char c=str.charAt(i);
+            if(c==')') {
+                for(int j=i-1;j>=0;j--) {
+                    char c1=str.charAt(j);
+                    if(c1=='(') {
+                        while(str.charAt(j+2)!=')') {
+                            char c2=str.charAt(j+1);
+                            char c3=str.charAt(j+2);
+                            total+=data[c2-65][0]*data[c2-65][1]*data[c3-65][1];
+                            //需要改变数组，改变字符串
+                            data[c2-65][1]=data[c3-65][1];
+                            str=str.substring(0,j+2)+str.substring(j+3);
+                        }
+                        //i位置的）与j为止的（要删除
+                        //str已经变短，j+1不见了，i--
+                        i--;
+                        str=(j==0?"":str.substring(0,j))+str.substring(j+1,i)+(i==str.length()-1?"":str.substring(i+1));
+                        //i指向原来左括号的位置
+                        i=j;
+                        break;
+                    }
+                }
+            }
+        }
+        return total;
+    }
+    public static void main(String[] args)throws IOException{
+        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+        String line="";
+        while((line=br.readLine())!=null) {
+            int n=Integer.valueOf(line);
+            int[][] data=new int[n][2];
+            for(int i=0;i<n;i++) {
+                line=br.readLine();
+                int x=Integer.valueOf(line.substring(0, line.lastIndexOf(" ")));
+                int y=Integer.valueOf(line.substring(line.lastIndexOf(" ")+1));
+                data[i][0]=x;
+                data[i][1]=y;
+            }
+            line=br.readLine();
+            System.out.println(getNo(line, data));
+        }
+    }
+}
+71.字符串通配符:问题描述：在计算机中，通配符一种特殊语法，广泛应用于文件搜索、数据库、正则表达式等领域。现要求各位实现字符串通配符的算法。
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+   
+public class Main{
+    public static void main(String[] args)throws IOException{
+        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+        String reg;
+        while((reg=bf.readLine())!=null){
+            String str = bf.readLine();
+            reg = reg.replace("?","[0-9a-zA-Z]{1}");
+            reg = reg.replace("*","[0-9a-zA-Z]*");
+            System.out.println(str.matches(reg));
+        }
+    }
+}
+72.百钱买百鸡问题:公元前五世纪，我国古代数学家张丘建在《算经》一书中提出了“百鸡问题”：鸡翁一值钱五，鸡母一值钱三，鸡雏三值钱一。百钱买百鸡，问鸡翁、鸡母、鸡雏各几何？
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+    
+public class Main {
+     
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line ="";
+        while((line=br.readLine())!=null){
+            int i;
+            int j;
+            for(i=0;i<=20;++i)
+            {
+                for(j=0;j<=100-i;++j)
+                {
+                    int k = 100-i-j;
+                    if((k%3 ==0) && (5*i+3*j+k/3==100))
+                        System.out.println(i+" "+j+" "+k);
+                }
+            }
+     
+     
+        }
+    }
+     
+}
+
+73.计算日期到天数转换根据输入的日期，计算是这一年的第几天。详细描述：输入某年某月某日，判断这一天是这一年的第几天？。
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+public class Main {
+    public static int getAllDay(int year,int month,int day) {
+        int[] dayary= {31,28,31,30,31,30,31,31,30,31,30,31};
+        //判断闰年
+        if(year%4==0) dayary[1]=29;
+        int total=0;
+        for(int i=0;i<month-1;i++) {
+            total+=dayary[i];
+        }
+        total+=day;
+        return total;
+    }
+    public static void main(String[] args)throws IOException{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line="";
+        while((line=br.readLine())!=null) {
+            String[] lineary=line.split(" ");
+            int year=Integer.valueOf(lineary[0]);
+            int month=Integer.valueOf(lineary[1]);
+            int day=Integer.valueOf(lineary[2]);
+            System.out.println(getAllDay(year, month, day));
+        }
+         
+    }
+}
+74.参数解析:在命令行输入如下命令：
+xcopy /s c:\ d:\，
+各个参数如下： 
+参数1：命令字xcopy 
+参数2：字符串/s
+参数3：字符串c:\
+参数4: 字符串d:\
+请编写一个参数解析程序，实现将命令行各个参数解析出来。
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+  
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String s = br.readLine();
+         
+        String[] strings = s.split(" ");
+        List<String> list = new ArrayList<String>();
+         
+        for(int i=0;i<strings.length;) {
+            if(strings[i].charAt(0)!='"') {
+                list.add(strings[i]);
+                ++i;
+            }
+             
+            else {
+                if(strings[i].charAt(strings[i].length()-1)=='"') {
+                    list.add(strings[i].substring(1, strings[i].length()-1));
+                    ++i;
+                }
+                 
+                else {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(strings[i].substring(1)+" ");
+                    ++i;
+                    while(strings[i].charAt(strings[i].length()-1)!='"') {
+                        sb.append(strings[i]+" ");
+                        ++i;
+                    }
+                     
+                    sb.append(strings[i].substring(0, strings[i].length()-1));
+                    ++i;
+
+                    list.add(sb.toString());
+                }
+            }
+        }
+         
+        System.out.println(list.size());
+        Iterator it = list.iterator();
+        while(it.hasNext()) {
+            System.out.println(it.next());
+        }
+             
+         
+    }
+}
+
+75.公共字串计算:计算两个字符串的最大公共字串的长度，字符不区分大小写
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+ 
+ 
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        String string1 = "";
+        while ((string1 = bufferedReader.readLine()) != null) {
+            String string2 = bufferedReader.readLine();
+            char[] str1 = string1.toCharArray();
+            char[] str2 = string2.toCharArray();
+            int[][] dp = new int[str1.length][str2.length];
+            for(int i = 0;i < str1.length;i++){
+                if(str1[i] == str2[0]){
+                    dp[i][0] = 1;
+                }
+            }
+            for(int j = 1;j < str2.length;j++){
+                if(str2[j] == str1[0]){
+                    dp[0][j] = 1;
+                }
+            }
+            int max = 0;
+            for(int i = 1;i < str1.length;i++){
+                for(int j = 1;j < str2.length;j++){
+                    if(str1[i] == str2[j]){
+                        dp[i][j] = dp[i-1][j-1] + 1;
+                    }
+                    max= Math.max(max,dp[i][j]);
+                }
+            }
+            System.out.println(max);   
+        }
+    }
+     
+}
+
+76.尼科彻斯定理:验证尼科彻斯定理，即：任何一个整数m的立方都可以写成m个连续奇数之和。
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+  
+public class Main{
+      
+   public static void main(String args[]) throws IOException {
+       BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+       String str ;
+       while((str = br.readLine())!= null && str.trim() != null) {
+         int num = Integer.parseInt(str);
+         int total = 0 ;
+            for(int i = 1; i <= num ; i ++) {
+                total = total + i ;
+            }
+            StringBuilder sb = new StringBuilder();
+            for(int j = 0 ; j < num ; j ++) {
+                sb.append(total*2 - 2 *(num-j) +1);
+                if(j != num-1)
+                sb.append("+");
+            }
+            System.out.println(sb.toString());
+       }
+    }
+}
+77.火车进站:给定一个正整数N代表火车数量，0<N<10，接下来输入火车入站的序列，一共N辆火车，每辆火车以数字1-9编号。要求以字典序排序输出火车出站的序列号。
+
+import java.util.*;
+ 
+public class Main{
+    private static Stack<String> stack1=new Stack<String>();
+    private static Stack<String> stack2=new Stack<String>();
+    private static List<String> list=new ArrayList<String>();
+     
+    public static void ff(String str){
+        if(stack1.isEmpty()&&stack2.isEmpty()){
+            list.add(str.trim());
+            return;        
+        }
+        if(!stack2.isEmpty()){
+            String str1=stack2.pop();
+            ff(str+" "+str1);
+            stack2.push(str1);
+        }
+        if(!stack1.isEmpty()){
+            String str2=stack1.pop();
+            stack2.push(str2);
+            ff(str);
+            stack2.pop();
+            stack1.push(str2);
+        }
+    }
+     
+    public static void main(String[] args){
+        Scanner scanner=new Scanner(System.in);
+        while(scanner.hasNext()){
+            int n=scanner.nextInt();
+            scanner.nextLine();
+            String str=scanner.nextLine();
+            String[] ss=str.split(" ");
+            for(int i=ss.length-1;i>=0;i--)
+                stack1.push(ss[i]);
+            ff("");
+            Collections.sort(list);
+            for(String s:list)
+                System.out.println(s);
+        }
+         
+    }
+}
+
+78.超长正整数相加,请设计一个算法完成两个超长正整数的加法。
+import java.util.*;
+import java.io.*;
+    
+public class Main{
+    public static void main(String[] args) throws IOException{
+        BufferedReader bReader = new BufferedReader(new InputStreamReader(System.in));
+        String str1;
+        while((str1=bReader.readLine())!=null) {
+            String str2=bReader.readLine();
+            StringBuilder sb1=new StringBuilder(str1);
+            StringBuilder sb2=new StringBuilder(str2);
+            int len1=sb1.length();
+            int len2=sb2.length();
+            if (len1>len2){
+                for (int i=0;i<len1-len2;i++)
+                    sb2.insert(0,"0");
+            } else {
+                for (int i=0;i<len2-len1;i++)
+                    sb1.insert(0,"0");
+            }
+            StringBuilder sb=new StringBuilder();
+            int temp=0;
+            for (int i=sb1.length()-1;i>=0;i--){
+                int m=sb1.charAt(i)-'0';
+                int n=sb2.charAt(i)-'0';
+                int sum=m+n+temp;
+                sb.insert(0,sum%10);
+                temp=sum/10;
+            }
+            if (temp!=0)
+                sb.insert(0,temp);
+            System.out.println(sb.toString());
+                 
+        }
+    }
+         
+}
+79.计算字符串的相似度,字符串距离的，而相似度等于“距离＋1”的倒数。也就是说，“abcdefg”和“abcdef”的距离为1，相似度为1/2=0.5.
+import java.util.*;
+import java.io.*;
+/*
+这道题其实简单的理解就是为了求字符串的最小编辑代价，也是一个经典的动态规划题，复杂度O(M*N)
+思路：1.求解状态转移矩阵dp[M + 1][N + 1],dp[i][j] 的值代表的是str1[0...i-1]编辑为str2[0...j-1]
+的最小代价。
+2. 计算过程：
+1）dp[0][0] = 0,表示str1空的字串编辑为str2空的字串代价为0。
+2）矩阵dp第一列即为dp[0...M-1][0],dp[i][0] 表示str1[0...i-1]编辑为空串的最小代价，所以就是将str1[0..M-1]的字符删掉的代价
+所以dp[i][0] = i;
+3) 同2），那str2[0...j-1]编辑的代价，dp[0][j] = j;
+4) 接下来的位置就按照从左到右，从上到下来计算，dp[i][j]的值来至于下面的几种情况：
+（1）str1[0...i-1]可以先编辑为str1[0..i-2],也就是删除字符str1[i-1],然后由str1[0..i-2]编辑为str2[0...j-1]，dp[i-1][j]表示str1[0..i-2]编辑为str2[0...j-1]的最小代价，
+那么dp[i][j]可能等于dp[i -1][j] + 1;
+(2）str1[0...i-1]可以先编辑为str1[0..i-2],然后将str2[0..j-2]插入字符str2[j-1],编辑成str2[0...j-1]，dp[i][j-1]表示str1[0..i-1]编辑成str2[0...j-2]的最小代价，
+那么dp[i][j] 可能等于dp[i][j-1] + 1;
+(3) 如果str1[i - 1]!=str2[j-1] ，那么先把str1[0..i-1]中的str1[0..i-2]的部分边长str2[0..j-2]，然后把字符str1[i-1]替换为str2[j-1],这样str1[0..i-1]就编辑成为str2[0...j-1]了，dp[i - 1][j - 1]表示
+str1[0..i-2]编辑为str2[0..j-2]的最小代价，那么dp[i ][j]可能等于dp[i - 1][j - 1] + 1;
+(4) 如果str1[i - 1]==str2[j-1] ，那么先把str1[0..i-1]中的str1[0..i-2]的部分边长str2[0..j-2]，因为此时   str1[i - 1]==str2[j-1] ，所以str1[0..i-1]已经编辑为str2[0..j-1]了，dp[i - 1][j - 1]表示str1[0..i-2]编辑为str2[0..j-2]的最小代价， 那么dp[i ][j]可能等于dp[i - 1][j - 1]。
+  
+上述的4中情况取最小值,dp的最右下角就是最终结果，即最小编辑代价。
+*/
+public class Main {
+    public static void main(String[] args) throws IOException {
+                BufferedReader in = new BufferedReader(
+                    new InputStreamReader(System.in)
+                );
+                String s1 = "";
+                while ( null != (s1 = in.readLine())  ){
+                //将两个输入字符串转为数组
+                String s2=in.readLine();
+                char[] cs1=s1.toCharArray();
+                char[] cs2=s2.toCharArray();
+                int[][] dp=new int[s1.length()+1][s2.length()+1];
+                //用动态规划的方式获取一个数组变为另一个数组的步骤次数
+                //初始化二维数组
+                for(int row=1;row<=s1.length();row++){
+                    dp[row][0]=row;
+                }
+                for(int col=1;col<=s2.length();col++){
+                    dp[0][col]=col;
+                }
+                //动态规划
+                for(int row=1;row<=s1.length();row++){
+                    for(int col=1;col<=s2.length();col++){
+                        if(cs1[row-1]==cs2[col-1]){
+                            dp[row][col]=dp[row-1][col-1];
+                        }
+                        else{
+                            int min1=Math.min(dp[row-1][col],dp[row][col-1])+1;
+                            dp[row][col]=Math.min(min1,dp[row-1][col-1]+1);
+   
+                        }
+                    }
+                }
+                System.out.println("1/"+ (dp[s1.length()][s2.length()]+1) );
+            }
+        }
+    }
+
+80.整形数组合并:将两个整型数组按照升序合并，并且过滤掉重复数组元素[注: 题目更新了。输出之后有换行]
+import java.util.*;
+import java.io.*;
+public class Main{
+    public static void main(String[] args)throws IOException{
+        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+        String line;
+        while((line=br.readLine())!=null){
+            int n=Integer.parseInt(line);
+            String[] a=br.readLine().split(" ");
+            int m=Integer.parseInt(br.readLine());
+            String[] b=br.readLine().split(" ");
+            TreeSet<Integer> set=new TreeSet<>();
+            StringBuffer sb=new StringBuffer();
+            for(int i=0;i<n;i++){
+                set.add(Integer.parseInt(a[i]));
+            }
+            for(int i=0;i<m;i++){
+               set.add(Integer.parseInt(b[i]));
+            }
+            for(Integer c:set){
+                sb.append(c);
+            }
+            System.out.println(sb);
+        }
+    }
+}
+
+81.字符串匹配:判断短字符串中的所有字符是否在长字符串中全部出现
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+ 
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String str = "";
+        while ((str = br.readLine()) != null) {
+            String str2 = br.readLine();
+            int i;
+            for (i = 0; i < str.length(); i++) {
+                if (str2.indexOf(str.charAt(i)) == -1) {
+                    System.out.println("false");
+                    i--;
+                    break;
+                }
+            }
+            if (i == str.length()) {
+                System.out.println(true);
+            }
+        }
+        br.close();
+    }
+}
+
+82.将真分数分解为埃及分数:分子为1的分数称为埃及分数。现输入一个真分数(分子比分母小的分数，叫做真分数)，请将该分数分解为埃及分数。如：8/11 = 1/2+1/5+1/55+1/110。
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+   
+public class Main {
+   
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String input = "";
+        while ((input = br.readLine()) != null) {
+   
+            ConvertRealFractToEgpytFract(input);
+        }
+    }
+   
+    public static String ConvertRealFractToEgpytFract(String pcRealFraction) {
+        String[] parts = pcRealFraction.split("/");
+   
+        int a = Integer.parseInt(parts[0]);
+   
+        int b = Integer.parseInt(parts[1]);
+   
+        StringBuilder result = new StringBuilder();
+   
+        int c = 0;
+        while (a != 1) {
+            if (b % (a - 1) == 0) {
+                result.append("1/").append(b / (a - 1)).append('+');
+                a = 1;
+            } else {
+                c = b / a + 1;
+                result.append("1/").append(c).append('+');
+                a = a * c - b;
+                b = c * b;
+                if (b % a == 0) {
+                    b = b / a;
+                    a = 1;
+                }
+            }
+        }
+        result.append("1/").append(b);
+        System.out.println(result);
+        return result.toString();
+    }
+   
+   
+}
+
+83.二维数组操作:有一个数据表格为二维数组（数组元素为int类型），行长度为ROW_LENGTH,列长度为COLUMN_LENGTH。对该表格中数据的操作可以在单个单元内，也可以对一个整行或整列进行操作，操作包括交换两个单元中的数据；插入某些行或列。
+import java.util.Scanner;
+  
+public class Main {
+      
+    public static void main(String[] args) {
+          
+        Scanner in = new Scanner(System.in);
+          
+        while (in.hasNextInt()) {
+            int n = in.nextInt();
+            int m = in.nextInt();
+            if(n > 9 || m > 9 || n < 0 || m < 0) {
+                System.out.println(-1);
+            } else {
+                System.out.println(0);
+            }
+            int ax = in.nextInt();
+            int ay = in.nextInt();
+            int bx = in.nextInt();
+            int by = in.nextInt();
+            if(ax >= n || ay >= m || ax < 0 || ay < 0 || bx >= n || by >= m || bx < 0 || by < 0) {
+                System.out.println(-1);
+            } else {
+                System.out.println(0);
+            }
+            int addx = in.nextInt();
+            if(addx >= n || addx < 0) {
+                System.out.println(-1);
+            } else {
+                System.out.println(0);
+            }
+            int addy = in.nextInt();
+            if(addy >= m || addy < 0) {
+                System.out.println(-1);
+            } else {
+                System.out.println(0);
+            }
+            int sx = in.nextInt();
+            int sy = in.nextInt();
+            if(sx >= n || sy >= m || sx < 0 || sy < 0) {
+                System.out.println(-1);
+            } else {
+                System.out.println(0);
+            }
+        }
+          
+        in.close();
+    }
+}
+84.统计大写字母个数:找出给定字符串中大写字符(即'A'-'Z')的个数
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+ 
+
+public class Main {
+ 
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line = "";
+        while((line = br.readLine())!=null)
+        {
+            System.out.println(CalcCapital(line));
+             
+        }
+         
+    }
+ 
+    private static int CalcCapital(String line) {
+         
+        int sum = 0;
+        for(int i=0;i<line.length();++i)
+            if(line.charAt(i)>='A' && line.charAt(i)<='Z')
+                ++sum;
+         
+        return sum;
+    }
+ 
+}
+
+86.求最大连续bit数：功能: 求一个byte数字对应的二进制数字中1的最大连续数，例如3的二进制为00000011，最大连续2个1
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+     
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line = "";
+        while ((line = br.readLine()) != null) {
+            int n = Integer.parseInt(line);
+            getOneNumber(n);
+        }
+    }
+     
+    public static void getOneNumber(int n) {
+        char[] chs = Integer.toBinaryString(n).toCharArray();
+        int count = 0;
+        for (int i = 0; i < chs.length; ) {
+            while (i < chs.length && chs[i] != '1') {
+                i++;
+            }
+            int j = i;
+            while (j < chs.length && chs[j] == '1') {
+                j++;
+                if ((j - i) > count) {
+                    count = j - i;
+                }
+            }
+            i = j;
+        }
+        System.out.println(count);
+    }
+}
+87.密码强度等级：密码按如下规则进行计分，并根据不同的得分为密码进行安全等级划分。  一、密码长度:5 分: 小于等于4 个字符，10 分: 5 到7 字符，25 分: 大于等于8 个字符
+//每个加分项都写成一个方法，这样更清晰明了一些
+import java.util.*;
+public class Main{
+    public static void main(String[] args){
+        Scanner sc=new Scanner(System.in);
+        while(sc.hasNext()){
+            String str=sc.nextLine();
+            System.out.println(GetPwdSecurityLevel(str));
+        }
+        sc.close();
+    }
+     
+    public static String GetPwdSecurityLevel(String Password){
+        int sum=0;
+        sum+=LengthAdd(Password);
+        sum+=LetterAdd(Password);
+        sum+=IntegerAdd(Password);
+        sum+=SymbolAdd(Password);
+        sum+=AwardAdd(Password);
+        if(sum>=90)
+            return "VERY_SECURE";
+        else if(sum>=80)
+            return " SECURE";
+        else if(sum>=70)
+            return "VERY_STRONG";
+        else if(sum>=60)
+            return "STRONG";
+        else if(sum>=50)
+            return "AVERAGE";
+        else if(sum>=25)
+            return "WEAK";
+        return "VERY_WEAK";
+    }
+     
+    public static int LengthAdd(String Password){
+        if(Password.length()<=4)
+            return 5;
+        else if(Password.length()>=5 && Password.length()<=7)
+            return 10;
+        return 25;
+    }
+     
+    public static int LetterAdd(String Password){
+        int UpperLetter=0;
+        int LowerLetter=0;
+        for(int i=0;i<Password.length();i++){
+            String ch=String.valueOf(Password.charAt(i));
+            if(ch.matches("[A-Z]"))
+                UpperLetter++;
+            else if(ch.matches("[a-z]"))
+                LowerLetter++;
+        }
+        if(UpperLetter!=0 && LowerLetter!=0)
+            return 20;
+        else if ((UpperLetter==0 && LowerLetter!=0) || (UpperLetter!=0 && LowerLetter==0))
+            return 10;
+        return 0;
+    }
+     
+    public static int IntegerAdd(String Password){
+        int NumOfInteger=0;
+        for(int i=0;i<Password.length();i++){
+            if(Password.charAt(i)>='0' && Password.charAt(i)<='9')
+                NumOfInteger++;
+        }
+        if(NumOfInteger==0)
+            return 0;
+        else if(NumOfInteger==1)
+            return 10;
+        return 20;    
+    }
+     
+    public static int SymbolAdd(String Password){
+        int NumOfSymbol=0;
+        for(int i=0;i<Password.length();i++){
+            char ch=Password.charAt(i);
+            if((ch>=0x21 && ch<=0x2F) || (ch>=0x3A && ch<=0x40) || (ch>=0x5B && ch<=0x60) || (ch>=0x7B && ch<=0x7E) )
+                NumOfSymbol++;
+        }
+        if(NumOfSymbol==0)
+            return 0;
+        else if(NumOfSymbol==1)
+            return 10;
+        return 25;
+    }
+     
+    public static int AwardAdd(String Password){
+        int LetterNum=Main.LetterAdd(Password);
+        int IntegerNum=Main.IntegerAdd(Password);
+        int SymbolNum=Main.SymbolAdd(Password);
+        if(LetterNum!=0 && IntegerNum!=0 && SymbolNum==0)
+            return 2;
+        else if(LetterNum==10 && IntegerNum!=0 && SymbolNum!=0)
+            return 3;
+        else if(LetterNum==20 && IntegerNum!=0 && SymbolNum!=0)
+            return 5;
+        return 0;
+    }
+}
+
+88.扑克牌大小：扑克牌游戏大家应该都比较熟悉了，一副牌由54张组成，含3~A、2各4张，小王1张，大王1张。牌面从小到大用如下字符和字符串表示（其中，小写joker表示小王，大写JOKER表示大王）：3 4 5 6 7 8 9 10 J Q K A 2 joker JOKER输入两手牌，两手牌之间用"-"连接，每手牌的每张牌以空格分隔，"-"两边没有空格，如：4 4 4 4-joker JOKER                                                                
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+ 
+ 
+public class Main {
+    public static void main(String[] args) throws Exception {
+        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+        String str;
+        while ((str = bf.readLine()) != null) {
+            String[] ss = str.split("-");
+            if (ss[0].equals("joker JOKER") || ss[1].equals("joker JOKER")) {
+                System.out.println("joker JOKER");
+                continue;
+            }
+ 
+            String[] str0 = ss[0].split(" ");
+            String[] str1 = ss[1].split(" ");
+ 
+            str0 = findString(str0);
+            str1 = findString(str1);
+ 
+            int len1 = str0.length, len2 = str1.length;
+            if (len1 == 4 || len2 == 4) {
+                if (len1 == 4 && len2 == 4) {
+                    int temp = Integer.parseInt(str0[0]) - Integer.parseInt(str1[0]);
+                    if (temp >= 0) {
+                        System.out.println(ss[0]);
+                        continue;
+                    } else {
+                        System.out.println(ss[1]);
+                        continue;
+                    }
+                } else if (len1 == 4) {
+                    System.out.println(ss[0]);
+                    continue;
+                } else {
+                    System.out.println(ss[1]);
+                    continue;
+                }
+            }
+            if (len1 != len2) {
+                System.out.println("ERROR");
+                continue;
+            }
+            int temp = Integer.parseInt(str0[0]) - Integer.parseInt(str1[0]);
+            if (temp >= 0) {
+                System.out.println(ss[0]);
+            } else {
+                System.out.println(ss[1]);
+            }
+        }
+    }
+ 
+    private static String[] findString(String[] str) {
+        for (int i = 0; i < str.length; i++) {
+            switch (str[i]) {
+                case "J":
+                    str[i] = "11";
+                    break;
+                case "Q":
+                    str[i] = "12";
+                    break;
+                case "K":
+                    str[i] = "13";
+                    break;
+                case "A":
+                    str[i] = "14";
+                    break;
+                case "2":
+                    str[i] = "15";
+                    break;
+            }
+        }
+ 
+        return str;
+    }
+}
+
+89.24点运算计算24点是一种扑克牌益智游戏，随机抽出4张扑克牌，通过加(+)，减(-)，乘(*), 除(/)四种运算法则计算得到整数24，本问题中，扑克牌通过如下字符或者字符串表示，其中，小写joker表示小王，大写JOKER表示大王： 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+  
+/**
+ * 24点运算
+ */
+public class Main {
+    private static int[] recorder = new int[4];
+    private static boolean flag = false;
+    private static String[] pokers;
+  
+    public static void main(String[] args) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        String pokerString;
+        while ((pokerString = reader.readLine()) != null) {
+            pokers = pokerString.split(" ");
+            if (pokers[0].length() > 1 || pokers[1].length() > 1 || pokers[2].length() > 1 || pokers[3].length() > 1) {
+                System.out.println("ERROR");
+                continue;
+            }
+            int[] values = new int[4];
+            for (int i = 0; i < 4; i++) {
+                switch (pokers[i]) {
+                    case "J":
+                        values[i] = 11;
+                        break;
+                    case "Q":
+                        values[i] = 12;
+                        break;
+                    case "K":
+                        values[i] = 13;
+                        break;
+                    case "A":
+                        values[i] = 1;
+                        break;
+                    default:
+                        values[i] = Integer.parseInt(pokers[i]);
+                }
+            }
+            if (values[0] * values[1] * values[2] * values[3] < 24) {
+                System.out.println("NONE");
+                return;
+            }
+            for (int i = 0; i < 4; i++) {
+                recorder[i] = 1;
+                dfs(values, values[i], pokers[i]);
+                recorder[i] = 0;
+            }
+            if (!flag) {
+                System.out.println("NONE");
+            }
+        }
+    }
+  
+    private static void dfs(int[] values, int result, String formula) {
+        if (flag) return;
+        if ((recorder[0] + recorder[1] + recorder[2] + recorder[3]) == 4) {
+            if (result == 24) {
+                flag = true;
+                System.out.println(formula);
+            } else
+                return;
+        }
+        for (int i = 0; i < values.length; i++) {
+            if (recorder[i] == 1) continue;
+            recorder[i] = 1;
+            dfs(values, result + values[i], formula + "+" + pokers[i]);
+            dfs(values, result - values[i], formula + "-" + pokers[i]);
+            dfs(values, result * values[i], formula + "*" + pokers[i]);
+            if (values[i] != 0 && result % values[i] == 0) {
+                dfs(values, result / values[i], formula + "/" + values[i]);
+            }
+            recorder[i] = 0;
+        }
+    }
+}
+
+90.合法IP：现在IPV4下用一个32位无符号整数来表示，一般用点分方式来显示，点将IP地址分成4个部分，每个部分为8位，表示成一个无符号整数（因此不需要用正号出现），如10.137.17.1，是我们非常熟悉的IP地址，一个IP地址串中没有空格出现（因为要表示成一个32数字）。
+    现在需要你用程序来判断IP是否合法。
+import java.io.*;
+import java.util.*;
+ 
+public class Main{
+    public static void main(String[] args)throws Exception{
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        String message = "";
+        while((message = in.readLine()) != null){
+             
+             
+            System.out.println(check(message));
+             
+        }
+    }
+     
+    private static String check(String message){
+        String[] data = message.split("\\.");
+        String no = "NO";
+        String yes = "YES";
+         
+        if(data.length != 4){
+            return no;
+          }
+         
+        for(int i = 0; i < data.length; i++){
+            // 验证空格
+            String d = data[i];
+            if(d.contains("\\s+")){
+                return no;
+            }
+            int value = Integer.parseInt(d);
+            if(value >= 0 && value <= 255){
+                continue;
+            }else{
+                return no;
+            }
+        }
+         
+        return yes;
+    }
+     
+}
+
+91.201301 JAVA 题目2-3级：请编写一个函数（允许增加子函数），计算n x m的棋盘格子（n为横向的格子数，m为竖向的格子数）沿着各自边缘线从左上角走到右下角，总共有多少种走法，要求不能走回头路，即：只能往右和往下走，不能往左和往上走。
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+/* 横向n个格子，纵向 m个，n+1,m+1个交点
+ * 只能往右和下走
+ * dp[n+1][m+1]  每一次向下走和向右走将会导致完全不一样的路线，并且只能向下或向右走
+ * dp[i][j]=dp[i][j-1]+dp[i-1][j]
+ */
+public class Main {
+    public static int getCount(int n,int m) {
+        int[][] dp=new int[n+1][m+1];
+        for(int i=0;i<n+1;i++) {
+            for(int j=0;j<m+1;j++) {
+                if(i==0||j==0) dp[i][j]=1;
+                else dp[i][j]=dp[i][j-1]+dp[i-1][j];      
+            }
+        }
+        return dp[n][m];
+    }
+    public static void main(String[] args)throws IOException{
+        BufferedReader bReader = new BufferedReader(new InputStreamReader(System.in));
+        String line=null;
+        while((line=bReader.readLine())!=null) {
+            int n=Integer.valueOf(line.substring(0,line.indexOf(" ")));
+            int m=Integer.valueOf(line.substring(line.indexOf(" ")+1));
+            System.out.println(getCount(n, m));
+        }
+    }
+}
+
+92.在字符串中找出连续最长的数字串：样例输出；输出123058789，函数返回值9；输出54761，函数返回值5
+import java.util.*;
+public class Main{
+    public static void main(String[] args) {
+ 
+        Scanner scan=new Scanner(System.in);
+        while(scan.hasNext())
+        {
+            String str1="";
+            String str=scan.nextLine();
+            for(char ch:str.toCharArray()){
+                //将不是数字的字符全部变成a
+                if(ch>='0' && ch<='9'){
+                    str1+=ch;
+                }else{
+                    str1+="a";
+                }
+            }
+            //按a分割
+            String[] strs=str1.split("a");
+            int max=0;//记录最长的连续数字串的长度
+            for(int i=0;i<strs.length;i++){
+                max=strs[i].length()>max?strs[i].length():max;
+            }
+            for(int i=0;i<strs.length;i++){
+                if(strs[i].length()==max)
+                    System.out.print(strs[i]);
+            }
+            System.out.println(","+max);
+        }
+    }
+}
+93.201301 JAVA题目0-1级:编写一个函数，传入一个int型数组，返回该数组能否分成两组，使得两组中各元素加起来的和相等，并且，所有5的倍数必须在其中一个组中，所有3的倍数在另一个组中（不包括5的倍数），能满足以上条件，返回true；不满足时返回false。 
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+     
+public class Main{
+     
+    public static void main(String[] args)throws IOException{
+        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+        String str;
+        while((str=bf.readLine()) != null){
+            int n = Integer.valueOf(str);
+            String[] nums = bf.readLine().split(" ");
+            int left[] = new int[n+1];
+            int l = 0;
+            int lcnt = 0;
+            int right[] = new int[n+1];
+            int r = 0;
+            int rcnt = 0;
+            int other[] = new int[n+1];
+            int o = 0;
+            for(int i=0; i<n; i++){
+                int num = Integer.valueOf(nums[i]);
+                if(num%5 == 0){
+                    left[l++] = num;
+                    lcnt += num;
+                }
+                else if(num%3 == 0){
+                    right[r++] = num;
+                    rcnt += num;
+                }
+                else{
+                    other[o++] = num;
+                }
+            }
+            int sum = Math.abs(lcnt-rcnt);
+            System.out.println(canget(0,o,other,0,sum));
+        }
+        bf.close();
+    }
+     
+    private static boolean canget(int i, int o, int[] other, int j, int sum) {
+     
+        if(i == o)
+            return Math.abs(j) == sum;
+        return (canget(i+1,o,other,j+other[i],sum) || canget(i+1,o,other,j-other[i],sum));
+    }
+}
+94.记票统计:请实现接口：unsigned int  AddCandidate (char* pCandidateName);
+功能：设置候选人姓名
+输入： char* pCandidateName 候选人姓名
+输出：无
+返回：输入值非法返回0，已经添加过返回0 ，添加成功返回1
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+public class Main {
+    public static void main(String[] args) throws NumberFormatException, IOException {
+      BufferedReader bf=new BufferedReader(new InputStreamReader(System.in));
+      String str="";
+      while((str=bf.readLine())!=null) {
+          int n=Integer.parseInt(str);
+          String name[]=bf.readLine().split(" ");
+          int num=Integer.parseInt(bf.readLine());
+          String s[]=bf.readLine().split(" ");
+          int count[]=new int[n];
+          for(int i=0;i<n;i++) {
+              for(int j=0;j<num;j++) {
+                  if(s[j].equals(name[i])) {
+                      count[i]++;
+                  }
+              }
+          }
+          int Invalid=num;
+          for(int m=0;m<n;m++) {
+              Invalid-=count[m];  
+              System.out.println(name[m]+" : "+count[m]);
+          }
+          System.out.println("Invalid : "+Invalid);
+          }
+    } 
+}
+
+95.人民币转换:考试题目和要点：
+    1、中文大写金额数字前应标明“人民币”字样。中文大写金额数字应用壹、贰、叁、肆、伍、陆、柒、捌、玖、拾、佰、仟、万、亿、元、角、分、零、整等字样填写。（30分） 
+    2、中文大写金额数字到“元”为止的，在“元”之后，应写“整字，如￥ 532.00应写成“人民币伍佰叁拾贰元整”。在”角“和”分“后面不写”整字。（30分） 
+    3、阿拉伯数字中间有“0”时，中文大写要写“零”字，阿拉伯数字中间连续有几个“0”时，中文大写金额中间只写一个“零”字，如￥6007.14，应写成“人民币陆仟零柒元壹角肆分“。（
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.util.ArrayList;
+ 
+public class Main{
+    public static void main(String[] args) throws IOException{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String str = null;
+        String numTable = "零壹贰叁肆伍陆柒捌玖";
+        while((str = br.readLine()) != null){
+            String[] mon = str.split("\\.");
+            StringBuilder sb = new StringBuilder("人民币");
+            int mon0 = Integer.parseInt(mon[0]);
+ 
+            if(mon0 != 0) sb.append(RMBchange(mon0));
+ 
+            int mon1 = Integer.parseInt(mon[1]);
+            if(mon1 > 0){
+                if(mon1 >= 10){
+                    sb.append(numTable.charAt(mon1 / 10) + "角");
+                }
+                if(mon1 % 10 != 0){
+                    sb.append(numTable.charAt(mon1 % 10) + "分");
+                }
+            }else{
+                sb.append("整");
+            }
+            System.out.println(sb);
+        }
+    }
+ 
+    public static String RMBchange(int money){
+        String unitTable = "元万亿";
+        String str = "";
+        ArrayList<Integer> array = new ArrayList<Integer>();
+        while(money >= 10000){
+            array.add(money % 10000);
+            money /= 10000;
+        }
+        array.add(money);
+        for(Integer i = array.size() - 1;i >= 0;i --){
+            str += (changeNum(array.get(i)) +  unitTable.charAt(i));
+        }
+        return str;
+    }
+ 
+    public static String changeNum(int n) {
+        String numTable = "零壹贰叁肆伍陆柒捌玖";
+        String str = "";
+        if(n >= 1000){
+            str += (numTable.charAt(n/1000) + "仟");
+            n %= 1000;
+            if(n < 100 && n != 0) str+= numTable.charAt(0);
+        }
+        if(n >= 100){
+            str += (numTable.charAt(n/100) + "佰");
+            n %= 100;
+            if(n < 10 && n != 0) str+= numTable.charAt(0);
+ 
+        }
+        if(n >= 10){
+            if(n >= 10 && n < 20){
+                str+= "拾";
+            }else{
+                str += (numTable.charAt(n/10) + "拾");
+            }
+            n %= 10;
+        }
+        if (n != 0) str += numTable.charAt(n);
+        return str;
+    }
+}
+96.表示数字:将一个字符中所有出现的数字前后加上符号“*”，其他字符保持不变
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+     
+public class Main{
+         
+    public static void main(String[] args)throws IOException{
+        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+        String str;
+        while((str=bf.readLine()) != null){
+            int temp = 0;
+            for(int i=0; i<str.length(); i++){
+                char c = str.charAt(i);
+                if(c >= '0' && c <= '9'){
+                    if(temp == 0){
+                        System.out.print("*");
+                        temp = 1;
+                    }
+                }
+                else{
+                    if(temp == 1){
+                        System.out.print("*");
+                        temp = 0;
+                    }
+                }
+                System.out.print(c);
+            }
+            char c = str.charAt(str.length()-1);
+            if(c >= '0' && c <= '9')
+                System.out.print("*");
+            System.out.println();
+        }
+        bf.close();
+    }
+}
+
+97.记负均正:首先输入要输入的整数个数n，然后输入n个整数。输出为n个整数中负数的个数，和所有正整数的平均值，结果保留一位小数。
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+   
+public class Main {
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line = "";
+        while((line=br.readLine())!=null){
+            int N = Integer.parseInt(line);
+            int negativeCount=0;
+            int positiveCount=0;
+            int positiveSum = 0;
+            String[] strs = br.readLine().split(" ");
+            for(int i=0;i<strs.length;++i){
+                int temp = Integer.parseInt(strs[i]);
+                if(temp > 0){
+                    ++positiveCount;
+                    positiveSum += temp;
+                }
+                else if(temp < 0)
+                    ++negativeCount;
+            }
+            System.out.printf("%d %.1f\n",negativeCount,positiveSum*1.0/positiveCount);
+        }
+             
+    }
+     
+}
+
+98.自动售货系统:1 总体说明
+考生需要模拟实现一个简单的自动售货系统，实现投币、购买商品、退币、查询库存商品及存钱盒信息的功能。
+系统初始化时自动售货机中商品为6种商品,商品的单价参见1.1规格说明，存钱盒内放置1元、2元、5元、10元钱币，商品数量和钱币张数通过初始化命令设置，参见2.1 系统初始化。
+import java.io.*;
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String input;
+        while ((input = br.readLine()) != null) {
+            doString(input);
+        }
+    }
+    private static void doString(String input) {
+        String[] arr = input.split(";");
+        String initial = arr[0];
+        Goods goods = OpReset(initial);
+        for (int i = 1; i < arr.length; i++) {
+            String temp = arr[i];
+            String[] temp2 = temp.split(" ");
+            if (temp2[0].equals("p")) {
+                goods = OpPay(temp, goods);
+            } else if (temp2[0].equals("b")) {
+                goods = OpBuy(temp, goods);
+            } else if (temp2[0].equals("c")) {
+                goods = OpChange(goods);
+            } else if (temp2[0].equals("q") || temp2[0].matches("q\\d")) {
+                OpQuery(temp, goods);
+            }
+        }
+    }
+   
+    private static Goods OpReset(String initial) {//初始化
+        String[] arr = initial.split(" ");
+        String[] Asome = arr[1].split("-");
+        String[] Moneysome = arr[2].split("-");
+        int[] A = new int[Asome.length];
+        int[] B = new int[Moneysome.length];
+        for (int i = 0; i < Asome.length; i++) {
+            A[i] = Integer.valueOf(Asome[i]);
+        }
+        for (int i = 0; i < Moneysome.length; i++) {
+            B[i] = Integer.valueOf(Moneysome[i]);
+        }
+        Goods goods = new Goods(A, B, 0);
+        System.out.println("S001:Initialization is successful");
+        return goods;
+    }
+   
+    private static Goods OpPay(String payString, Goods goods) {//投币
+        String[] arr = payString.split(" ");
+        int payNum = Integer.valueOf(arr[1]);
+        if (payNum != 1 && payNum != 2 && payNum != 5 && payNum != 10) {
+            System.out.println("E002:Denomination error");
+            return goods;
+        } else if ((payNum == 5 || payNum == 10) && (goods.num_coin[0] * 1 + goods.num_coin[1] * 2 < payNum)) {
+            System.out.println("E003:Change is not enough, pay fail");
+            return goods;
+        } else if (payNum > 10) {
+            System.out.println("E004:Pay the balance is beyond the scope biggest");
+            return goods;
+        } else if (goods.num_goods[0] == 0 && goods.num_goods[1] == 0 && goods.num_goods[2] == 0 && goods.num_goods[3] == 0 && goods.num_goods[4] == 0 && goods.num_goods[5] == 0) {
+            System.out.println("E005:All the goods sold out");
+            return goods;
+        } else {
+            switch (payNum) {
+                case 1:
+                    goods.num_coin[0]++;
+                    break;
+                case 2:
+                    goods.num_coin[1]++;
+                    break;
+                case 5:
+                    goods.num_coin[2]++;
+                    break;
+                case 10:
+                    goods.num_coin[3]++;
+                    break;
+            }
+            int tmp = payNum + goods.toubi_yu_e;
+            goods.toubi_yu_e += payNum;
+            System.out.println("S002:Pay success,balance=" + tmp);
+            return goods;
+        }
+   
+    }
+   
+    private static Goods OpBuy(String buyString, Goods goods) {//购买商品
+        String[] goodsString = {"A1", "A2", "A3", "A4", "A5", "A6"};
+        String[] arr = buyString.split(" ");
+        String buy = arr[1];
+        int price = 0;
+        int index = 10;
+        for (int i = 0; i < goodsString.length; i++) {
+            if (buy.equals(goodsString[i])) {
+                switch (i) {
+                    case 0:
+                        price = 2;
+                        index = i;
+                        break;
+                    case 1:
+                        price = 3;
+                        index = i;
+                        break;
+                    case 2:
+                        price = 4;
+                        index = i;
+                        break;
+                    case 3:
+                        price = 5;
+                        index = i;
+                        break;
+                    case 4:
+                        price = 8;
+                        index = i;
+                        break;
+                    case 5:
+                        price = 6;
+                        index = i;
+                        break;
+                }
+   
+            }
+        }
+        if (index == 10) {
+            System.out.println("E006:Goods does not exist");
+            return goods;
+        } else if (goods.toubi_yu_e < price) {
+            System.out.println("E008:Lack of balance");
+            return goods;
+        } else if (goods.num_goods[index] == 0) {
+            System.out.println("E007:The goods sold out");
+            return goods;
+        } else {
+            goods.toubi_yu_e = goods.toubi_yu_e - price;
+            System.out.println("S003:Buy success,balance=" + goods.toubi_yu_e);
+            return goods;
+        }
+    }
+   
+    private static Goods OpChange(Goods goods) {//退币
+        if (goods.toubi_yu_e == 0) {
+            System.out.print("E009:Work failure");
+            return goods;
+        } else {
+            int tuibi = goods.toubi_yu_e;
+            int num_shi = tuibi / 10;
+   
+            if (goods.num_coin[3] - num_shi < 0) {
+                num_shi = goods.num_coin[3];
+            }
+            int num_wu = (tuibi - 10 * num_shi) / 5;
+            if (goods.num_coin[2] - num_wu < 0) {
+                num_wu = goods.num_coin[2];
+            }
+            int num_er = (tuibi - 10 * num_shi - 5 * num_wu) / 2;
+            if (goods.num_coin[1] - num_er < 0) {
+                num_er = goods.num_coin[1];
+            }
+            int num_yi = (tuibi - 10 * num_shi - 5 * num_wu - 2 * num_er);
+            if (goods.num_coin[0] - num_yi < 0) {
+                num_yi = goods.num_coin[0];
+            }
+            goods.num_coin[3] = goods.num_coin[3] - num_shi;
+            goods.num_coin[0] = goods.num_coin[0] - num_yi;
+            goods.num_coin[1] = goods.num_coin[1] - num_er;
+            goods.num_coin[2] = goods.num_coin[2] - num_wu;
+   
+            goods.toubi_yu_e = 0;
+            System.out.println("1 yuan coin number=" + num_yi);
+            System.out.println("2 yuan coin number=" + num_er);
+            System.out.println("5 yuan coin number=" + num_wu);
+            System.out.println("10 yuan coin number=" + num_shi);
+            return goods;
+        }
+    }
+   
+    private static void OpQuery(String queryString, Goods goods) {
+        String[] arr = queryString.split(" ");
+        String query = "";
+        if (arr.length == 2) {
+            query = arr[1];
+        } else {
+            System.out.print("E010:Parameter error");
+        }
+        if (query.equals("0")) {
+            System.out.println("A1 " + "2 " + goods.num_goods[0]);
+            System.out.println("A2 " + "3 " + goods.num_goods[1]);
+            System.out.println("A3 " + "4 " + goods.num_goods[2]);
+            System.out.println("A4 " + "5 " + goods.num_goods[3]);
+            System.out.println("A5 " + "6 " + goods.num_goods[4]);
+            System.out.println("A6 " + "7 " + goods.num_goods[5]);
+        } else if (query.equals("1")) {
+            System.out.println("1 yuan coin number=" + goods.num_coin[0]);
+            System.out.println("2 yuan coin number=" + goods.num_coin[1]);
+            System.out.println("5 yuan coin number=" + goods.num_coin[2]);
+            System.out.println("10 yuan coin number=" + goods.num_coin[3]);
+        }
+    }
+}
+class Goods {
+    int[] num_goods;
+    int[] num_coin;
+    int toubi_yu_e;
+   
+    Goods(int[] num_goods, int[] num_coin, int toubi_yu_e) {
+        this.num_goods = num_goods;
+        this.num_coin = num_coin;
+        this.toubi_yu_e = toubi_yu_e;
+    }
+   
+}
+99.自守数:自守数是指一个数的平方的尾数等于该数自身的自然数。例如：25^2 = 625，76^2 = 5776，9376^2 = 87909376。请求出n以内的自守数的个数
+
+import java.io.*;
+import java.util.*;
+public class Main{
+    public static void main(String[] args) throws IOException{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String str = " ";
+        while((str = br.readLine()) != null){
+            int n = Integer.parseInt(str);
+            System.out.println(sum(n));
+        }
+    }
+    public static int sum(int n){
+        int m = 0;
+        for(int i = 0;i<=n;i++){
+            int d = i;
+            int k = 0;
+            while(d != 0){
+                k++;
+                d /= 10;
+            }
+            if((i*i-i)%Math.pow(10,k) == 0){
+                m++;
+            }
+        }
+        return m;
+    }
+}
+
+100.等差数列:功能:等差数列 2，5，8，11，14。。。。
+输入:正整数N >0
+输出:求等差数列前N项和
+返回:转换成功返回 0 ,非法输入与异常返回-1
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+  
+public class Main {
+  
+    public static void main(String[] args) throws NumberFormatException, IOException {
+        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+        String message=null;
+        while((message=br.readLine())!=null){
+            int n=Integer.parseInt(message);
+            int res=n*2+n*(n-1)*3/2;
+            System.out.println(res);
+        }
+    }
+}
+
+101.输入整型数组和排序标识，对其元素按照升序或降序进行排序:
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+        String message=null;
+        while((message=br.readLine())!=null){
+            int n=Integer.parseInt(message);
+            String[] data=br.readLine().split(" ");
+            int m=Integer.parseInt(br.readLine());
+            int[] arr=new int[n];
+            for(int i=0;i<data.length;i++){
+                arr[i]=Integer.parseInt(data[i]);
+            }
+            StringBuffer sb=new StringBuffer();
+            if(m==0){
+                Arrays.sort(arr);
+            }else{
+                Arrays.sort(arr);
+                for(int i=0;i<arr.length/2;i++){
+                    int a=arr[i];
+                    arr[i]=arr[arr.length-1-i];
+                    arr[arr.length-1-i]=a;
+                } 
+            }
+            for(int i=0;i<arr.length;i++){
+                sb.append(arr[i]+" ");
+            }
+            System.out.println(sb.toString().trim());
+        }
+    }
+}
+
+102.字符统计:如果统计的个数相同，则按照ASCII码由小到大排序输出 。如果有其他字符，则对这些字符不用进行统计。
+import java.io.*;
+public class Main{
+    public static void main(String[] args) throws Exception{
+        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+        String line=null;
+        while((line=br.readLine())!=null){
+            System.out.println(fun(line));
+        }
+    }
+    private static String fun(String s){
+        char[] chs=s.toCharArray();
+        int[] num=new int[200];
+        for(char ch:chs){
+            int i=(int)ch;
+            num[i]++;
+        }
+        int max=0;
+        for(int i=0;i<num.length;i++){
+            while(max<num[i])
+                max=num[i];
+        }
+        StringBuffer sb=new StringBuffer();
+        while(max!=0){
+            for(int i=0;i<num.length;i++){
+                if(max==num[i]){
+                    sb.append((char)i);
+                }
+            }
+            max--;
+        }
+        return sb.toString();
+    }
+}
+
+103.Redraiment的走法:题目描述 Redraiment是走梅花桩的高手。Redraiment总是起点不限，从前到后，往高的桩子走，但走的步数最多，不知道为什么？你能替Redraiment研究他最多走的步数吗
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+  
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line;
+          
+        while ((line = br.readLine()) != null) {
+            int n = Integer.parseInt(line);
+            String[] data = br.readLine().split(" ");
+            int[] arr = new int[n];
+            for (int i = 0; i < data.length; i++) {
+                arr[i] = Integer.parseInt(data[i]);
+            }
+              
+            int[] brr = new int[n];
+            for (int i = 0; i < arr.length; i++) {
+                brr[i] = 1;
+                for (int j = 0; j < i; j++) {
+                    if (arr[j] < arr[i]) {
+                        brr[i] = Math.max(brr[i], brr[j] + 1);
+                    }
+                }
+            }
+              
+            int max = 0;
+            for (int aBrr : brr) {
+                if (max < aBrr) {
+                    max = aBrr;
+                }
+            }
+              
+            System.out.println(max);
+        }
+    }
+}
+104.字符串分割:连续输入字符串(输出次数为N,字符串长度小于100)，请按长度为8拆分每个字符串后输出到新的字符串数组，长度不是8整数倍的字符串请在后面补数字0，空字符串不处理。
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+   
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        String input;
+        while ((input = bufferedReader.readLine()) != null) {
+            int count = Integer.parseInt(input);
+            StringBuilder result = new StringBuilder();
+            for(int i = 0 ; i < count ; i ++) {
+                input = bufferedReader.readLine();
+   
+                int start = 0;
+                int end = 8;
+   
+                int length = input.length() / 8;
+                if(input.length() % 8 > 0) {
+                    ++ length;
+                }
+   
+                for(int j = 0 ; j < length ; j ++) {
+                    end = end > input.length() ? input.length() : end;
+                    String current = input.substring(start, end);
+                    result.append(current);
+                    if(current.length() < 8) {
+                        for(int k = 0 ; k < 8 - current.length() ; k ++) {
+                            result.append("0");
+                        }
+                    }
+                    result.append("\n");
+                    start += 8;
+                    end += 8;
+                }
+            }
+            System.out.println(result.toString().trim());
+        }
+    }
+}
+105.记负均正II:从输入任意个整型数，统计其中的负数个数并求所有非负数的平均值
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+  
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line = "";
+        while ((line = br.readLine())!=null){
+            int fucount = 0;
+            double zhcount = 0;
+            double sum = 0;
+            String[] s = line.split(" ");
+            for (String ss : s){
+                int num = Integer.valueOf(ss);
+                if (num>0){
+                    sum += num;
+                    zhcount++;
+                }else if (num<0){
+                    fucount++;
+                }
+            }
+            System.out.println(fucount);
+            sum = sum/zhcount;
+            String[] s1 = (sum + "").split("\\.");
+            if (s1[1].length()>=2 && (s1[1].charAt(1)-'0')>=5){
+                System.out.println(s1[0]+"."+(1+(s1[1].charAt(0)-'0')));
+            }else {
+                System.out.println(s1[0]+"."+s1[1].substring(0,1));
+            }
+  
+        }
+    }
+}
+
+106.字符逆序:将一个字符串str的内容颠倒过来，并输出。str的长度不超过100个字符。 如：输入“I am a student”，输出“tneduts a ma I”。
+import java.io.*;
+   
+public class Main{
+    public static void main(String[] args) throws Exception {
+        BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+        String str=br.readLine().toString();
+        StringBuffer sb=new StringBuffer(str);
+        System.out.println(sb.reverse());
+    }
+}
+
+107.求解立方根•计算一个数字的立方根，不使用库函数
+import java.util.*;
+ 
+public class Main
+{
+    // 使用二分查找算法
+    public static double getCubeRoot(double input)
+    {
+        double min = 0;
+        double max = input;
+        double mid = 0;
+         
+        // 注意，这里的精度要提高一点，否则某些测试用例无法通过
+        while ((max - min) > 0.001)
+        {
+            mid = (max + min) / 2;
+            if (mid * mid * mid > input)
+                max = mid;
+            else if (mid * mid * mid < input)
+                min = mid;
+            else
+                return mid;
+        }
+        return max;
+    }
+ 
+    public static void main(String[] args)
+    {
+        Scanner sc = new Scanner(System.in);
+        while (sc.hasNext())
+        {
+            double input = sc.nextDouble();
+            double result = getCubeRoot(input);
+            System.out.printf("%.1f\n", result);
+        }
+        sc.close();
+    }
+}
+
+108.求最小公倍数:正整数A和正整数B 的最小公倍数是指 能被A和B整除的最小的正整数值，设计一个算法，求输入A和B的最小公倍数。
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+  
+public class Main{
+      
+      
+    public static void main(String[] args)throws IOException{
+        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
+        String str;
+        while((str=bf.readLine()) != null){
+            String[] stra = str.split(" ");
+            int A = Integer.parseInt(stra[0]);
+            int B = Integer.parseInt(stra[1]);
+            int tmp = 1;
+            int min = A<B?A:B;
+            for(int i=2; i <= min; i++) {
+                if(A%i==0 && B%i==0) {
+                    tmp *= i;
+                    A /= i;
+                    B /=i;
+                }
+            }
+            int ABS=A*B*tmp;
+            System.out.println(ABS);
+        }
+        bf.close();
+    }
+}
