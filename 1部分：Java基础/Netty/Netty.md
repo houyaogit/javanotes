@@ -1,3 +1,5 @@
+
+
 Netty  - 学习 b站 20201205
 
 from CSDN 没有 学习完
@@ -1095,4 +1097,2319 @@ public static void main(String[] args) throws IOException {
 ```
 
 > 
+
+
+
+
+
+# 三、Netty高性能架构设计
+
+## 1、Netty概述
+
+### 1.1、原生NIO存在的问题
+
+- NIO 的类库和 API 繁杂，使用麻烦：需要熟练掌握 `Selector`、`ServerSocketChannel`、`SocketChannel`、`ByteBuffer` 等。
+- 需要具备其他的额外技能：要熟悉 `Java` 多线程编程，因为 `NIO` 编程涉及到 `Reactor` 模式，你必须对多线程和网络编程非常熟悉，才能编写出高质量的 NIO 程序。
+- 开发工作量和难度都非常大：例如客户端面临**断连重连**、**网络闪断**、**半包读写**、**失败缓存**、**网络拥塞和异常流的处理**等等。
+- JDK NIO 的 Bug：例如臭名昭著的 `Epoll Bug`，它会导致 `Selector` 空轮询，最终导致 `CPU` 100%。直到 JDK 1.7 版本该问题仍旧存在，没有被根本解决。
+
+### 1.2、Netty优点
+
+ `Netty`对`JDK`自带的`NIO`的`API`进行了封装，解决了上述问题。
+
+- 设计优雅：适用于各种传输类型的统一 `API` 阻塞和非阻塞 `Socket`；基于灵活且可扩展的事件模型，可以清晰地分离关注点；高度可定制的线程模型 - 单线程，一个或多个线程池.
+- 安全：完整的 `SSL/TLS` 和 `StartTLS` 支持
+- 高性能、吞吐量更高：延迟更低；减少资源消耗；最小化不必要的内存复制。
+
+## 2、I/O线程模型
+
+- 目前存在的线程模型主要有：
+  - 传统阻塞I/O服务模型
+  - Reactor模式
+- 根据`Reactor`的数量和处理资源池线程的数量不同，有如下`3`种典型的实现
+  - 单`Reactor`单线程
+  - 单`Reactor`多线程
+  - 主从`Reactor`多线程
+- `Netty`线程模型主要基于**主从Reactor多线程模型**做了一定的改进，其中主从`Reactor`多线程模型有多个`Reactor`。
+
+### 2.1、传统阻塞I/O服务模型
+
+![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135112218.png)
+
+图解说明：黄色的框表示对象，蓝色的框表示线程、白色的框表示方法（API）。之后的图相同。
+
+#### 2.1.1、模型分析
+
+**模型特点：**
+
+- 采用阻塞`IO`模式获取输入的数据
+- 每个链接都需要独立的线程完成数据的输入，业务处理、数据返回。
+
+**问题分析：**
+
+- 当并发数很大，就会创建大量的线程，占用很大系统资源
+- 连接创建后，如果当前线程暂时没有数据可读，该线程会阻塞在`read`操作，造成线程资源浪费。
+
+#### 2.1.2、模型实现代码示例
+
+> 由于模型的逻辑主要集中在服务端，所以所有模型代码示例基本上都是服务端的示例
+
+```java
+public static void main(String[] args) throws IOException {
+    //1、创建一个线程池
+    //2、如果有客户端连接，就创建一个线程，与之通讯（单独写一个方法）
+    ExecutorService executorService = Executors.newCachedThreadPool();
+
+    //创建ServerSocket
+    ServerSocket serverSocket = new ServerSocket(6666);
+    System.out.println("服务器启动了");
+
+    while (true) {
+        //监听，等待客户端连接
+        final Socket socket = serverSocket.accept();
+        System.out.println("连接到一个客户端");
+        //创建一个线程，与之通讯
+        executorService.execute(() -> {
+            //重写Runnable方法，与客户端进行通讯
+            handler(socket);
+        });
+    }
+}
+
+//编写一个Handler方法，和客户端通讯。主要进行数据的读取和业务处理。
+public static void handler(Socket socket) {
+    try {
+        byte[] bytes = new byte[1024];
+        //通过socket获取输入流
+        InputStream inputStream = socket.getInputStream();
+        //循环的读取客户端发送的数据
+        while (true){
+            int read = inputStream.read(bytes);
+            if (read != -1){
+                System.out.println(new String(bytes, 0, read));//输出客户端发送的数据
+            } else {
+                break;
+            }
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    } finally {
+        System.out.println("关闭和client的连接");
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+1234567891011121314151617181920212223242526272829303132333435363738394041424344454647
+```
+
+### 2.2、Reactor模型概述
+
+**针对传统阻塞I/O服务模型的2个缺点，解决方案如下：**
+
+- 基于 `I/O` 复用模型：多个连接共用一个阻塞对象，应用程序只需要在一个阻塞对象等待，无需阻塞等待所有连接。当某个连接有新的数据可以处理时，操作系统通知应用程序，线程从阻塞状态返回，开始进行业务处理。`Reactor` 对应的叫法: 1. 反应器模式 2. 分发者模式(`Dispatcher`) 3. 通知者模式(`notifier`)
+- 基于线程池复用线程资源：不必再为每个连接创建线程，将连接完成后的业务处理任务分配给线程进行处理，一个线程可以处理多个连接的业务。
+
+**I/O复用结合线程池，就是Reactor模式基本设计思想，如图所示：**
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200222144736861.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70)
+
+- `Reactor`模式，通过一个或多个输入同时传递给服务处理器的模式（基于事件驱动）
+- 服务器端程序处理传入的多个请求，并将它们同步分派到响应的处理线程，因此`Reactor`模式也叫`Dispatcher`模式。
+- `Reactor`模式使用`IO`复用监听事件，收到事件后，分发的某个线程（进程），这点就是网络服务高并发处理的关键。
+
+**Reactor模式中的核心组成部分：**
+
+- ```
+  Reactor
+  ```
+
+  ：
+
+  ```
+  Reactor
+  ```
+
+  在一个单独的线程中运行，负责监听和分发事件，分发给适当的处理程序来对
+
+  ```
+  IO
+  ```
+
+  事件作出反应。
+
+   
+
+  - 我的理解是将`Reactor`理解成一个`Selector`，它可以对建立新的连接，也可以将产生的读写事件交换给`Handler`进行处理
+
+- `Handlers`：处理程序执行`I/O`事件要完成的实际事件，类似于客户想要与之交谈的公司中的实际官员。`Reactor`通过调度适当的处理程序来响应`I/O`事件，处理程序执行非阻塞操作。
+
+### 2.3、单Reactor单线程模式
+
+![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135112328.png)
+
+**方案说明：**
+
+- `Select` 是前面 `I/O` 复用模型介绍的标准网络编程 API，可以实现应用程序通过一个阻塞对象监听多路连接请求
+- `Reactor` 对象通过 `Select` 监控客户端请求事件，收到事件后通过 `Dispatch` 进行分发
+- 如果是建立连接请求事件，则由 `Acceptor` 通过 `Accept` 处理连接请求，然后创建一个 `Handler` 对象处理连接完成后的后续业务处理
+- 如果不是建立连接事件，则 `Reactor` 会分发调用连接对应的 Handler 来响应
+- `Handler` 会完成 `Read`→业务处理→`Send` 的完整业务流程
+
+**结合实例**：服务器端用一个线程通过多路复用搞定所有的 `IO` 操作（包括连接，读、写等），编码简单，清晰明了，但是如果客户端连接数量较多，将无法支撑，前面的 `NIO` 案例就属于这种模型。
+
+#### 2.2.1、模型分析
+
+- **优点**：模型简单，没有多线程、进程通信、竞争的问题，全部都在一个线程中完成
+- **缺点**：性能问题，只有一个线程，无法完全发挥多核 `CPU` 的性能。`Handler` 在处理某个连接上的业务时，整个进程无法处理其他连接事件，很容易导致性能瓶颈
+- **缺点**：可靠性问题，线程意外终止，或者进入死循环，会导致整个系统通信模块不可用，不能接收和处理外部消息，造成节点故障
+- **使用场景**：客户端的数量有限，业务处理非常快速，比如 `Redis`在业务处理的时间复杂度 `O(1)` 的情况
+
+#### 2.2.2、模型实现代码示例
+
+> 这里面我为了简便，我将Reactor和Acceptor和Handler三个对象搞成了方法。
+
+```java
+public class SReactorSThread {
+    private Selector selector;
+    private ServerSocketChannel serverSocketChannel;
+    private int PORT = 6666;
+
+    public SReactorSThread() {
+        try {
+            selector = Selector.open();
+            serverSocketChannel = ServerSocketChannel.open();
+            serverSocketChannel.bind(new InetSocketAddress(PORT));
+            serverSocketChannel.configureBlocking(false);
+            serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //对客户端进行监听
+    public void listen() {
+        try {
+            while (true) {
+                int count = selector.select();
+                //表示有客户端产生事件
+                if (count > 0) {
+                    Set<SelectionKey> selectionKeys = selector.selectedKeys();//取出产生事件的Channel
+                    Iterator<SelectionKey> iterator = selectionKeys.iterator();//准备对其进行遍历
+                    while (iterator.hasNext()) {
+                        SelectionKey key = iterator.next();
+                        //将key交给dispatch去处理
+                        dispatch(key);
+                        iterator.remove();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    //dispatch
+    private void dispatch(SelectionKey key) {
+        if (key.isAcceptable()){
+            accept(key);
+        }else {
+            handler(key);
+        }
+    }
+
+    //建立新的连接
+    private void accept(SelectionKey key) {
+        try {
+            SocketChannel socketChannel = serverSocketChannel.accept();
+            socketChannel.configureBlocking(false);
+            socketChannel.register(selector, SelectionKey.OP_READ);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //对请求进行处理，接收消息---业务处理---返回消息
+    private void handler(SelectionKey key) {
+        SocketChannel channel = null;
+        try {
+            channel = (SocketChannel) key.channel();
+            ByteBuffer buffer = ByteBuffer.allocate(3);
+            StringBuilder msg = new StringBuilder();
+            while (channel.read(buffer) > 0) {
+                msg.append(new String(buffer.array()));
+                buffer.clear();
+            }
+            System.out.println("接收到消息：" + msg.toString());
+            //发送消息
+            String ok = "OK";
+            buffer.put(ok.getBytes());
+            //这个flip非常重要哦，是将position置0，limit置于position的位置，以便下面代码进行写入操作能够正确写入buffer中的所有数据
+            buffer.flip();  
+            channel.write(buffer);
+            buffer.clear();
+        } catch (IOException e) {
+            try {
+                System.out.println(channel.getRemoteAddress() + "离线了");
+                //取消该通道的注册并关闭通道，这里非常重要，没有这一步的话当客户端断开连接就会不断抛出IOException
+                //是因为，select会一直产生该事件。
+                key.cancel();
+                channel.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+}
+
+/********调用**************/
+
+public static void main(String[] args) {
+    SReactorSThread sReactorSThread = new SReactorSThread();
+    sReactorSThread.listen();
+}
+1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980818283848586878889909192939495969798
+```
+
+**这里有更牛逼更完整的`Reactor`单线程模型的代码案例：**https://www.cnblogs.com/hama1993/p/10611229.html
+
+> 我悄悄咪咪的仔细看了看，我感觉他的案例模型是单Reactor多线程模型。错了勿喷
+
+### 2.4、单Reactor多线程模型
+
+![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135112280.png)
+
+**方案说明：**
+
+- `Reactor` 对象通过`select` 监控客户端请求事件, 收到事件后，通过`dispatch`进行分发
+- 如果建立连接请求, 则右`Acceptor` 通过accept 处理连接请求, 然后创建一个`Handler`对象处理完成连接后的各种事件
+- 如果不是连接请求，则由`reactor`分发调用连接对应的`handler` 来处理
+- handler 只负责响应事件，不做具体的业务处理, 通过`read` 读取数据后，会分发给后面的`worker`线程池的某个线程处理业务
+- `worker` 线程池会分配独立线程完成真正的业务，并将结果返回给`handler`
+- `handler`收到响应后，通过`send` 将结果返回给`client`
+
+#### 2.4.1、模型分析
+
+- **优点**：可以充分的利用多核`cpu` 的处理能力
+- **缺点**：多线程数据共享和访问比较复杂， `reactor` 处理所有的事件的监听和响应，在单线程运行， 在高并发场景容易出现性能瓶颈.
+
+#### 2.4.2、模型实现代码示例
+
+> 我感觉，这个多线程就是在单线程的基础之上，在读取数据之后进行业务处理的时候，另起一个线程。网上也有说读取数据很消耗性能，将读取数据和业务处理统一另起一个线程。我有点迷糊，代码就写不出来了。
+
+### 2.5、主从Reactor多线程
+
+![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135112329.png)
+
+**方案说明：**
+
+- `Reactor`主线程 `MainReactor` 对象就只注册一个用于监听连接请求的`ServerSocketChannel`，通过`select` 监听连接事件, 收到事件后，通过`Acceptor` 处理连接事件
+- 当 `Acceptor` 处理连接事件后，`MainReactor` 通过`accept`获取新的连接，并将连接注册到`SubReactor`
+- `subreactor` 将连接加入到连接队列进行监听,并创建`handler`进行各种事件处理
+- 当有新事件发生时， `subreactor` 就会调用对应的`handler`处理
+- `handler` 通过`read` 读取数据，分发给后面的`worker` 线程处理
+- `worker` 线程池分配独立的`worker` 线程进行业务处理，并返回结果
+- `handler` 收到响应的结果后，再通过`send` 将结果返回给`client`
+- `Reactor` 主线程可以对应多个`Reactor` 子线程, 即`MainRecator` 可以关联多个`SubReactor`
+
+#### 2.5.1、模型分析
+
+- **优点**：父线程与子线程的数据交互简单职责明确，父线程只需要接收新连接，子线程完成后续的业务处理。
+- **优点**：父线程与子线程的数据交互简单，`Reactor` 主线程只需要把新连接传给子线程，子线程无需返回数据
+- **缺点**：编程复杂度较高
+- **结合实例**：这种模型在许多项目中广泛使用，包括 `Nginx` 主从 `Reactor` 多进程模型，`Memcached` 主从多线程，`Netty` 主从多线程模型的支持
+
+#### 2.5.2、模型实现代码示例
+
+> 还是去看别人大佬写的吧。https://www.cnblogs.com/eason-ou/p/11912010.html
+
+## 3、Netty模型
+
+### 3.1、主从Reactor进阶
+
+ `Netty`主要是基于主从`Reactor`多线程模式做了一定的改进，其中主从`Reactor`都有单一的一个变成了多个。下面是简单的改进图。
+![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135112275.png)
+
+- 如图所示，增加了`BossGroup`来维护多个主`Reactor`，主`Reactor`还是只关注连接的`Accept`；增加了`WorkGroup`来维护多个从`Reactor`，从`Reactor`将接收到的请求交给`Handler`进行处理。
+- 在主`Reactor`中接收到`Accept`事件，获取到对应的`SocketChannel`，`Netty`会将它进一步封装成`NIOSocketChannel`对象，这个封装后的对象还包含了该`Channel`对应的`SelectionKey`、通信地址等详细信息
+- `Netty`会将装个封装后的`Channel`对象注册到`WorkerGroup`中的从`Reactor`中。
+- 当`WorkerGroup`中的从`Reactor`监听到事件后，就会将之交给与此`Reactor`对应的`Handler`进行处理。
+
+### 3.2、再进阶版
+
+![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135112388.png)
+
+- `Netty`将`Selector`以及`Selector`相关的事件及任务封装了`NioEventLoop`，这样`BossGroup`就可以通过管理`NioEventLoop`去管理各个`Selector`。
+- 同时，`Netty`模型中主要存在两个大的线程池组`BossGroup`和`WorkerGroup`，用于管理主`Reactor`线程和从`Reactor`线程。
+
+### 3.3、Netty模型
+
+![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135112283.png)
+
+- `Netty`抽象出两组线程池，`BossGroup`专门负责接收客户端的连接，`WorkerGroup`专门负责网络的读写
+
+- `BossGroup`和`WorkerGroup`类型的本质都是`NioEventLoopGroup`类型。
+
+- `NioEventLoopGroup`相当于一个线程管理器（类似于`ExecutorServevice`），它下面维护很多个`NioEventLoop`线程。（我认为图中的`NioEventGroup`的地方应该改成`NioEventLoop`，可能我的理解有点差错吧）
+
+  - 在初始化这两个`Group`线程组时，默认会在每个`Group`中生成`CPU*2`个`NioEventLoop`线程
+  - 当`n`个连接来了，`Group`默认会按照连接请求的顺序分别将这些连接分给各个`NioEventLoop`去处理。
+  - 同时`Group`还负责管理`EventLoop`的生命周期。
+
+- `NioEventLoop`表示一个不断循环的执行处理任务的线程
+
+  - 它维护了一个线程和任务队列。
+  - 每个`NioEventLoop`都包含一个`Selector`，用于监听绑定在它上面的`socket`通讯。
+  - 每个`NioEventLoop`相当于`Selector`，负责处理多个`Channel`上的事件
+  - 每增加一个请求连接，`NioEventLoopGroup`就将这个请求依次分发给它下面的`NioEventLoop`处理。
+
+- 每个`Boss NioEventLoop`循环执行的步骤有3步：
+
+  - 轮询`accept`事件
+  - 处理`accept`事件，与`client`建立连接，生成`NioSocketChannel`，并将其注册到某个`Worker NioEventLoop`的`selector`上。
+  - 处理任务队列到任务，即`runAllTasks`
+
+- 每个`Worker NioEventLoop`循环执行的步骤：
+
+  - 轮询`read`，`write`事件
+  - 处理`I/O`事件，即`read`，`write`事件，在对应的`NioSocketChannel`中进行处理
+  - 处理任务队列的任务，即`runAllTasks`
+
+- 每个 `Worker NioEventLoop`处理业务时，会使用`pipeline`（管道），`pipeline`中维护了一个`ChannelHandlerContext`链表，而`ChannelHandlerContext`则保存了`Channel`相关的所有上下文信息，同时关联一个`ChannelHandler`对象。如图所示，`Channel`和`pipeline`一一对应，ChannelHandler和`ChannelHandlerContext`一一对应。
+
+  ![img](format,png.png)
+
+- `ChannelHandler`是一个接口，负责处理或拦截`I/O`操作，并将其转发到`Pipeline`中的下一个处理`Handler`进行处理。
+
+  ```java
+                                                   I/O Request
+                                              via Channel or
+                                          ChannelHandlerContext
+                                                        |
+    +---------------------------------------------------+---------------+
+    |                           ChannelPipeline         |               |
+    |                                                  \|/              |
+    |    +---------------------+            +-----------+----------+    |
+    |    | Inbound Handler  N  |            | Outbound Handler  1  |    |
+    |    +----------+----------+            +-----------+----------+    |
+    |              /|\                                  |               |
+    |               |                                  \|/              |
+    |    +----------+----------+            +-----------+----------+    |
+    |    | Inbound Handler N-1 |            | Outbound Handler  2  |    |
+    |    +----------+----------+            +-----------+----------+    |
+    |              /|\                                  .               |
+    |               .                                   .               |
+    | ChannelHandlerContext.fireIN_EVT() ChannelHandlerContext.OUT_EVT()|
+    |        [ method call]                       [method call]         |
+    |               .                                   .               |
+    |               .                                  \|/              |
+    |    +----------+----------+            +-----------+----------+    |
+    |    | Inbound Handler  2  |            | Outbound Handler M-1 |    |
+    |    +----------+----------+            +-----------+----------+    |
+    |              /|\                                  |               |
+    |               |                                  \|/              |
+    |    +----------+----------+            +-----------+----------+    |
+    |    | Inbound Handler  1  |            | Outbound Handler  M  |    |
+    |    +----------+----------+            +-----------+----------+    |
+    |              /|\                                  |               |
+    +---------------+-----------------------------------+---------------+
+                    |                                  \|/
+    +---------------+-----------------------------------+---------------+
+    |               |                                   |               |
+    |       [ Socket.read() ]                    [ Socket.write() ]     |
+    |                                                                   |
+    |  Netty Internal I/O Threads (Transport Implementation)            |
+    +-------------------------------------------------------------------+
+  
+  123456789101112131415161718192021222324252627282930313233343536373839
+  ```
+
+### 3.4、代码示例
+
+**服务端代码：**
+
+```java
+public class NettyServer {
+    public static void main(String[] args) throws InterruptedException {
+        //创建BossGroup 和 WorkerGroup
+        //1、创建两个线程组，bossGroup 和 workerGroup
+        //2、bossGroup 只是处理连接请求，真正的和客户端业务处理，会交给 workerGroup 完成
+        //3、两个都是无限循环
+        //4、bossGroup 和 workerGroup 含有的子线程（NioEventLoop）个数为实际 cpu 核数 * 2
+        EventLoopGroup bossGroup = new NioEventLoopGroup();
+        EventLoopGroup worderGroup = new NioEventLoopGroup();
+
+        try {
+            //创建服务器端的启动对象，配置参数
+            ServerBootstrap bootstrap = new ServerBootstrap();
+
+            //使用链式编程来进行设置，配置
+            bootstrap.group(bossGroup, worderGroup) //设置两个线程组
+                    .channel(NioServerSocketChannel.class) //使用 NioServerSocketChannel 作为服务器的通道实现
+                    .option(ChannelOption.SO_BACKLOG, 128) //设置线程队列得到连接个数
+                    .childOption(ChannelOption.SO_KEEPALIVE, true) //设置保持活动连接状态
+                    .childHandler(new ChannelInitializer<SocketChannel>() { //为accept channel的pipeline预添加的handler
+                        //给 pipeline 添加处理器，每当有连接accept时，就会运行到此处。
+                        @Override
+                        protected void initChannel(SocketChannel socketChannel) throws Exception {
+                            socketChannel.pipeline().addLast(new NettyServerHandler());
+                        }
+                    }); //给我们的 workerGroup 的 EventLoop 对应的管道设置处理器
+
+            System.out.println("........服务器 is ready...");
+            //绑定一个端口并且同步，生成了一个ChannelFuture 对象
+            //启动服务器（并绑定端口）
+            ChannelFuture future = bootstrap.bind(6668).sync();
+
+            //对关闭通道进行监听
+            future.channel().closeFuture().sync();
+        } finally {
+            bossGroup.shutdownGracefully();
+            worderGroup.shutdownGracefully();
+        }
+    }
+}
+12345678910111213141516171819202122232425262728293031323334353637383940
+```
+
+**服务端Handler处理：**
+
+```java
+public class NettyServerHandler extends ChannelInboundHandlerAdapter {
+
+    /**
+     *读取客户端发送过来的消息
+     * @param ctx 上下文对象，含有 管道pipeline，通道channel，地址
+     * @param msg 就是客户端发送的数据，默认Object
+     * @throws Exception
+     */
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        System.out.println("服务器读取线程：" + Thread.currentThread().getName());
+        System.out.println("server ctx = " + ctx);
+        //看看Channel和Pipeline的关系
+        Channel channel = ctx.channel();
+        ChannelPipeline pipeline = ctx.pipeline(); //本质是个双向链表，出栈入栈
+
+        //将msg转成一个ByteBuf，比NIO的ByteBuffer性能更高
+        ByteBuf buf = (ByteBuf)msg;
+        System.out.println("客户端发送的消息是：" + buf.toString(CharsetUtil.UTF_8));
+        System.out.println("客户端地址：" + ctx.channel().remoteAddress());
+    }
+
+    //数据读取完毕
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        //它是 write + flush，将数据写入到缓存buffer，并将buffer中的数据flush进通道
+        //一般讲，我们对这个发送的数据进行编码
+        ctx.writeAndFlush(Unpooled.copiedBuffer("hello, 客户端~", CharsetUtil.UTF_8));
+    }
+
+    //处理异常，一般是关闭通道
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        ctx.close();
+    }
+}
+123456789101112131415161718192021222324252627282930313233343536
+```
+
+**客户端：**
+
+```java
+public class NettyClient {
+    public static void main(String[] args) throws InterruptedException {
+        //客户端需要一个事件循环组
+        EventLoopGroup group = new NioEventLoopGroup();
+        try {
+            //创建客户端启动对象
+            //注意：客户端使用的不是 ServerBootStrap 而是 Bootstrap
+            Bootstrap bootstrap = new Bootstrap();
+
+            //设置相关参数
+            bootstrap.group(group) //设置线程组
+                    .channel(NioSocketChannel.class) //设置客户端通道的实现类（使用反射）
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel socketChannel) throws Exception {
+                            socketChannel.pipeline().addLast(new NettyClientHandler()); //加入自己的处理器
+                        }
+                    });
+            System.out.println("客户端 OK...");
+
+            //启动客户端去连接服务器端
+            //关于 channelFuture 涉及到 netty 的异步模型
+            ChannelFuture channelFuture = bootstrap.connect("127.0.0.1", 6668).sync();
+            //给关闭通道进行监听
+            channelFuture.channel().closeFuture().sync();
+        } finally {
+            group.shutdownGracefully();
+        }
+    }
+}
+123456789101112131415161718192021222324252627282930
+```
+
+**客户端Handler处理：**
+
+```java
+public class NettyClientHandler extends ChannelInboundHandlerAdapter {
+    /**
+     * 当通道就绪就会触发
+     * @param ctx
+     * @throws Exception
+     */
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("client: " + ctx);
+        ctx.writeAndFlush(Unpooled.copiedBuffer("hello, server", CharsetUtil.UTF_8));
+    }
+
+    /**
+     * 当通道有读取事件时，会触发
+     * @param ctx
+     * @param msg
+     * @throws Exception
+     */
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        ByteBuf buf = (ByteBuf)msg;
+        System.out.println("服务器回复的消息：" + buf.toString(CharsetUtil.UTF_8));
+        System.out.println("服务器的地址：" + ctx.channel().remoteAddress());
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        ctx.close();
+    }
+}
+12345678910111213141516171819202122232425262728293031
+```
+
+### 3.5、任务队列
+
+ 任务队列由`NioEventLoop`维护并不断执行。当我们就收到请求之后，在当前`channel`对应的`pipeline`中的各个`Handler`里面进行业务处理和请求过滤。当某些业务需要耗费大量时间的时候，我们可以将任务提交到由`NioEventLoop`维护的`taskQueue`或`scheduleTaskQueue`中，让当前的`NioEventLoop`线程在空闲时间去执行这些任务。下面将介绍提交任务的3种方式
+
+**用户程序自定义的普通任务：**
+
+ 该方式会将任务提交到`taskQueue`队列中。提交到该队列中的任务会按照提交顺序依次执行。
+
+```java
+channelHandlerContext.channel().eventLoop().execute(new Runnable(){
+    @Override
+    public void run() {
+        //...
+    }
+});
+123456
+```
+
+**用户自定义的定时任务：**
+
+ 该方式会将任务提交到`scheduleTaskQueue`定时任务队列中。该队列是底层是优先队列`PriorityQueue`实现的，固该队列中的任务会按照时间的先后顺序定时执行。
+
+```java
+channelHandlerContext.channel().eventLoop().schedule(new Runnable() {
+    @Override
+    public void run() {
+
+    }
+}, 60, TimeUnit.SECONDS);
+123456
+```
+
+**为其他EventLoop线程对应的Channel添加任务**
+可以在`ChannelInitializer`中，将刚创建的各个`Channel`以及对应的标识加入到统一的集合中去，然后可以根据标识获取`Channel`以及其对应的`NioEventLoop`，然后就课程调用`execute()`或者`schedule()`方法。
+
+### 3.6、异步模型
+
+**基本介绍**
+
+- 异步的概念和同步相对。当一个异步过程调用发出后，调用者不能立刻得到结果。实际处理这个调用的组件在完成后，通过状态、通知和回调来通知调用者。
+- `Netty` 中的 `I/O` 操作是异步的，包括 `Bind`、`Write`、`Connect` 等操作会简单的返回一个 `ChannelFuture`。
+- 调用者并不能立刻获得结果，而是通过 `Future-Listener` 机制，用户可以方便的主动获取或者通过通知机制获得 `IO` 操作结果
+- `Netty` 的异步模型是建立在 `future` 和 `callback` 的之上的。`callback` 就是回调。重点说 `Future`，它的核心思想是：假设一个方法 `fun`，计算过程可能非常耗时，等待 `fun`返回显然不合适。那么可以在调用 `fun` 的时候，立马返回一个 `Future`，后续可以通过 `Future`去监控方法 `fun` 的处理过程(即 ： `Future-Listener` 机制)
+
+**Future说明**
+
+- 表示异步的执行结果, 可以通过它提供的方法来检测执行是否完成，比如检索计算等等.
+- `ChannelFuture` 是一个接口 ： `public interface ChannelFuture extends Future<Void>`。我们可以添加监听器，当监听的事件发生时，就会通知到监听器
+
+**工作原理示意图**
+![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135112313.png)
+![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135112341.png)
+
+- 在使用 `Netty` 进行编程时，拦截操作和转换出入站数据只需要您提供 `callback` 或利用`future` 即可。这使得链式操作简单、高效, 并有利于编写可重用的、通用的代码。
+- `Netty` 框架的目标就是让你的业务逻辑从网络基础应用编码中分离出来、解脱出来
+
+**Future-Listener机制**
+
+- 当 `Future` 对象刚刚创建时，处于非完成状态，调用者可以通过返回的 `ChannelFuture` 来获取操作执行的状态，注册监听函数来执行完成后的操作。
+
+- 常用方法如下：
+
+  | 方法名称      | 方法作用                                                   |
+  | ------------- | ---------------------------------------------------------- |
+  | isDone()      | 判断当前操作是否完成                                       |
+  | isSuccess()   | 判断已完成的当前操作是否成功                               |
+  | getCause()    | 获取已完成当前操作失败的原因                               |
+  | isCancelled() | 判断已完成的当前操作是否被取消                             |
+  | addListener() | 注册监听器，当前操作（Future）已完成，将会通知指定的监听器 |
+
+**举例说明**
+绑定端口操作时异步操作，当绑定操作处理完，将会调用相应的监听器处理逻辑。
+
+```java
+serverBootstrap.bind(port).addListener(future -> {
+       if(future.isSuccess()) {
+           System.out.println(newDate() + ": 端口["+ port + "]绑定成功!");
+       } else{
+           System.err.println("端口["+ port + "]绑定失败!");
+       }
+   });
+1234567
+```
+
+### 3.7、快速入门实例-HTTP HelloWorld
+
+ 浏览器访问`Netty`服务器后，返回`HelloWorld`
+
+**启动**
+
+```java
+public static void main(String[] args) throws InterruptedException {
+    NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
+    NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+
+    try {
+        ServerBootstrap bootstrap = new ServerBootstrap();
+        bootstrap.group(bossGroup, workerGroup)
+            .channel(NioServerSocketChannel.class)
+            .childHandler(new TestServerInitializer());
+        ChannelFuture channelFuture = bootstrap.bind(8080).sync();
+        channelFuture.channel().closeFuture().sync();
+    } finally {
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
+    }
+}
+12345678910111213141516
+```
+
+**定义ChannelInitializer**
+
+ 用于给`Channel`对应的`pipeline`添加`handler`。该`ChannelInitializer`中的代码在`SocketChannel`被创建时都会执行
+
+```java
+public class TestServerInitializer extends ChannelInitializer<SocketChannel> {
+    @Override
+    protected void initChannel(SocketChannel socketChannel) throws Exception {
+        //向管道加入处理器
+
+        //得到管道
+        ChannelPipeline pipeline = socketChannel.pipeline();
+        //加入一个 netty 提供的 httpServerCodec：codec => [coder - decoder]
+        //1、HttpServerCodec 是 netty 提供的处理http的编解码器
+        pipeline.addLast("MyHttpServerCodec", new HttpServerCodec());
+        //2、增加自定义的Handler
+        pipeline.addLast("MyTestHttpServerHandler", new TestHttpServerHandler());
+    }
+}
+1234567891011121314
+```
+
+**自定义Handler**
+
+```java
+public class TestHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
+    /**
+     * 读取客户端数据。
+     *
+     * @param channelHandlerContext
+     * @param httpObject            客户端和服务器端互相通讯的数据被封装成 HttpObject
+     * @throws Exception
+     */
+    @Override
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, HttpObject httpObject) throws Exception {
+
+        //判断 msg 是不是 HTTPRequest 请求
+        if (httpObject instanceof HttpRequest) {
+            System.out.println("msg 类型 = " + httpObject.getClass());
+            System.out.println("客户端地址：" + channelHandlerContext.channel().remoteAddress());
+            //获取
+            HttpRequest request = (HttpRequest) httpObject;
+            //获取uri，进行路径过滤
+            URI uri = new URI(request.uri());
+            if ("/favicon.ico".equals(uri.getPath())) {
+                System.out.println("请求了 favicon.ico，不做响应");
+            }
+
+            //回复信息给浏览器[http协议]
+            ByteBuf content = Unpooled.copiedBuffer("HelloWorld", CharsetUtil.UTF_8);
+            //构造一个http的响应，即HTTPResponse
+            DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
+            response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
+            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, content.readableBytes());
+
+            //将构建好的 response 返回
+            channelHandlerContext.writeAndFlush(response);
+        }
+    }
+}
+1234567891011121314151617181920212223242526272829303132333435
+```
+
+> 本文档整理自 尚硅谷韩顺平Netty 相关课程。
+
+
+
+
+
+# 四、Netty核心组成
+
+## 1、Bootstrap、ServerBootstrap
+
+- `Bootstrap` 意思是引导，一个 `Netty` 应用通常由一个 `Bootstrap` 开始，主要作用是配置整个 `Netty` 程序，串联各个组件，`Netty` 中 `Bootstrap` 类是客户端程序的启动引导类，`ServerBootstrap` 是服务端启动引导类
+
+**常见方法：**
+
+| 方法名称                                                     | 方法介绍                                     |
+| ------------------------------------------------------------ | -------------------------------------------- |
+| `public ServerBootstrap group(EventLoopGroup parentGroup, EventLoopGroup childGroup)` | 该方法用于服务器端，用来设置两个EventLoop    |
+| `public B group(EventLoopGroup group)`                       | 该方法用于客户端，用来设置一个EventLoop      |
+| `public B channel(Class<? extends C> channelClass)`          | 该方法用来设置一个服务器端的通道实现         |
+| `public <T> B option(ChannelOption<T> option, T value)`      | 用来给 ServerChannel 添加配置                |
+| `public <T> ServerBootstrap childOption(ChannelOption<T> childOption, T value)` | 用来给接收到的通道添加配置                   |
+| `public ServerBootstrap childHandler(ChannelHandler childHandler)` | 该方法用来设置业务处理类（自定义的 handler） |
+| `public ChannelFuture bind(int inetPort)`                    | 该方法用于服务器端，用来设置占用的端口号     |
+| `public ChannelFuture connect(String inetHost, int inetPort)` | 该方法用于客户端，用来连接服务器             |
+
+## 2、Future、ChannelFuture
+
+- `Netty` 中所有的 `IO` 操作都是异步的，不能立刻得知消息是否被正确处理。但是可以过一会等它执行完成或者直接注册一个监听，具体的实现就是通过 `Future` 和 `ChannelFutures`，他们可以注册一个监听，当操作执行成功或失败时监听会自动触发注册的监听事件
+
+**常见的方法有**
+
+| 方法名                 | 方法介绍                                   |
+| ---------------------- | ------------------------------------------ |
+| `Channel channel()`    | 返回当前正在进行 IO 操作的通道             |
+| `ChannelFuture sync()` | 等待异步操作执行完毕，相当于将阻塞在当前。 |
+
+## 3、Channel
+
+- `Netty` 网络通信的组件，能够用于执行网络 `I/O` 操作。
+- 通过`Channel` 可获得当前网络连接的通道的状态
+- 通过`Channel` 可获得 网络连接的配置参数 （例如接收缓冲区大小）
+- `Channel` 提供异步的网络 `I/O` 操作(如建立连接，读写，绑定端口)，异步调用意味着任何 `I/O` 调用都将立即返回，并且不保证在调用结束时所请求的 `I/O` 操作已完成
+- 调用立即返回一个 `ChannelFuture` 实例，通过注册监听器到 `ChannelFuture` 上，可以 `I/O` 操作成功、失败或取消时回调通知调用方
+- 支持关联 `I/O` 操作与对应的处理程序
+- 不同协议、不同的阻塞类型的连接都有不同的 `Channel` 类型与之对应
+
+**常用的 `Channel` 类型**
+
+| 名称                     | 介绍                                                         |
+| ------------------------ | ------------------------------------------------------------ |
+| `NioSocketChannel`       | 异步的客户端 TCP Socket 连接。                               |
+| `NioServerSocketChannel` | 异步的服务器端 TCP Socket 连接                               |
+| `NioDatagramChannel`     | 异步的 UDP 连接。                                            |
+| `NioSctpChannel`         | 异步的客户端 Sctp 连接。                                     |
+| `NioSctpServerChannel`   | 异步的 Sctp 服务器端连接，这些通道涵盖了 UDP 和 TCP 网络 IO 以及文件 IO。 |
+
+## 4、Selector
+
+- `Netty` 基于 `Selector` 对象实现 `I/O` 多路复用，通过 `Selector` 一个线程可以监听多个连接的 `Channel` 事件。
+- 当向一个 `Selector` 中注册 `Channel` 后，`Selector` 内部的机制就可以自动不断地查询(`Select`) 这些注册的 `Channel` 是否有已就绪的 `I/O` 事件（例如可读，可写，网络连接完成等），这样程序就可以很简单地使用一个线程高效地管理多个 `Channel`
+- 同时，`Netty`中对`selector`中的`selectedKey`集合进行了替换，它替换成了一个它自己实现的一个`set`集合，这样效率更高。
+
+## 5、ChannelHandler及其实现类
+
+- `ChannelHandler` 是一个接口，处理 `I/O` 事件或拦截 `I/O` 操作，并将其转发到其 `ChannelPipeline`(业务处理链)中的下一个处理程序。
+- `ChannelHandler` 本身并没有提供很多方法，因为这个接口有许多的方法需要实现，方便使用期间，可以继承它的子类
+- 我们经常需要自定义一个 `Handler` 类去继承 `ChannelInboundHandlerAdapter`，然后通过重写相应方法实现业务逻辑，我们接下来看看一般都需要重写哪些方法
+
+```java
+public class ChannelInboundHandlerAdapter extends ChannelHandlerAdapter implements ChannelInboundHandler {
+
+    //通道注册事件
+    @Skip
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        ctx.fireChannelRegistered();
+    }
+
+    //通道取消注册事件
+    @Skip
+    @Override
+    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+        ctx.fireChannelUnregistered();
+    }
+
+    //通道就绪事件
+    @Skip
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        ctx.fireChannelActive();
+    }
+
+    /**
+     * Calls {@link ChannelHandlerContext#fireChannelInactive()} to forward
+     * to the next {@link ChannelInboundHandler} in the {@link ChannelPipeline}.
+     *
+     * Sub-classes may override this method to change behavior.
+     */
+    @Skip
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        ctx.fireChannelInactive();
+    }
+
+    //通道读取数据事件
+    @Skip
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        ctx.fireChannelRead(msg);
+    }
+
+    //通道数据读取完毕事件
+    @Skip
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        ctx.fireChannelReadComplete();
+    }
+
+    /**
+     * Calls {@link ChannelHandlerContext#fireUserEventTriggered(Object)} to forward
+     * to the next {@link ChannelInboundHandler} in the {@link ChannelPipeline}.
+     *
+     * Sub-classes may override this method to change behavior.
+     */
+    @Skip
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        ctx.fireUserEventTriggered(evt);
+    }
+
+    /**
+     * Calls {@link ChannelHandlerContext#fireChannelWritabilityChanged()} to forward
+     * to the next {@link ChannelInboundHandler} in the {@link ChannelPipeline}.
+     *
+     * Sub-classes may override this method to change behavior.
+     */
+    @Skip
+    @Override
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        ctx.fireChannelWritabilityChanged();
+    }
+
+    //通道发生异常事件
+    @Skip
+    @Override
+    @SuppressWarnings("deprecation")
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+            throws Exception {
+        ctx.fireExceptionCaught(cause);
+    }
+}
+12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758596061626364656667686970717273747576777879808182
+```
+
+![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135208204.png)
+
+- `ChannelInboundHandler` 用于处理入站 I/O 事件。
+- `ChannelOutboundHandler` 用于处理出站 I/O 操作。
+
+**适配器**
+
+- `ChannelInboundHandlerAdapter` 用于处理入站 I/O 事件。
+- `ChannelOutboundHandlerAdapter` 用于处理出站 I/O 操作。
+- `ChannelDuplexHandler` 用于处理入站和出站事件。
+
+## 6、Pipeline和ChannelPipeline
+
+- `ChannelPipeline` 是一个 `Handler` 的集合，它负责处理和拦截 `inbound` 或者 `outbound` 的事件和操作，相当于一个贯穿 `Netty` 的链。(也可以这样理解：`ChannelPipeline` 是 保存 `ChannelHandler` 的 `List`，用于处理或拦截 `Channel` 的入站事件和出站操作)
+- `ChannelPipeline` 实现了一种高级形式的拦截过滤器模式，使用户可以完全控制事件的处理方式，以及 `Channel` 中各个的 `ChannelHandler` 如何相互交互
+- 在 `Netty` 中每个 `Channel` 都有且仅有一个 `ChannelPipeline` 与之对应，它们的组成关系如下
+  ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135208424.png)
+- 一个 `Channel` 包含了一个 `ChannelPipeline`，而 `ChannelPipeline` 中又维护了一个由 `ChannelHandlerContext` 组成的双向链表，并且每个 `ChannelHandlerContext` 中又关联着一个 `ChannelHandler`
+- 入站事件和出站事件在一个双向链表中，入站事件会从链表 `head` 往后传递到最后一个入站的 `handler`，出站事件会从链表 `tail` 往前传递到最前一个出站的 `handler`，两种类型的 `handler` 互不干扰
+
+**常用方法：**
+
+| 方法名                                                 | 介绍                                                |
+| ------------------------------------------------------ | --------------------------------------------------- |
+| `ChannelPipeline addFirst(ChannelHandler... handlers)` | 把一个业务处理类（handler）添加到链中的第一个位置   |
+| ChannelPipeline addLast(ChannelHandler… handlers)      | 把一个业务处理类（handler）添加到链中的最后一个位置 |
+
+## 7、ChannelHandlerContext
+
+- 保存 `Channel` 相关的所有上下文信息，同时关联一个 `ChannelHandler` 对象
+- 即`ChannelHandlerContext` 中 包 含 一 个 具 体 的 事 件 处 理 器 `ChannelHandler` ， 同 时`ChannelHandlerContext` 中也绑定了对应的 `pipeline` 和 `Channel` 的信息，方便对 `ChannelHandler`进行调用.
+
+**常用方法：**
+
+| 方法名                                    | 介绍                                                         |
+| ----------------------------------------- | ------------------------------------------------------------ |
+| `ChannelFuture close()`                   | 关闭通道                                                     |
+| `ChannelOutboundInvoker flush()`          | 刷新                                                         |
+| `ChannelFuture writeAndFlush(Object msg)` | 将 数 据 写 到 ChannelPipeline 中 当 前ChannelHandler 的下一个 ChannelHandler 开始处理（出站） |
+
+## 8、ChannelOption
+
+- `Netty` 在创建 `Channel` 实例后,一般都需要设置 `ChannelOption` 参数。
+
+**ChannelOption 参数如下:**
+
+- `ChannelOption.SO_BACKLOG`
+  - 对应 TCP/IP 协议 listen 函数中的 backlog 参数，用来初始化服务器可连接队列大小。
+  - 服务端处理客户端连接请求是顺序处理的，所以同一时间只能处理一个客户端连接。多个客户端来的时候，服务端将不能处理的客户端连接请求放在队列中等待处理，backlog 参数指定了队列的大小。
+- `ChannelOption.SO_KEEPALIVE`
+  - 一直保持连接活动状态
+
+## 9、EventLoopGroup和其实现类NioEventLoopGroup
+
+- EventLoopGroup是一组 EventLoop的抽象，Netty为了更好的利用多核 CPU资源，一般会有多个 EventLoop同时工作，每个 EventLoop维护着一个 Selector 实例。
+- EventLoopGroup 提供 next 接口，可以从组里面按照一定规则获取其中一个 EventLoop来处理任务。在 Netty 服务器端编程中，我们一般都需要提供两个 EventLoopGroup，例如：BossEventLoopGroup 和WorkerEventLoopGroup。
+- 通常一个服务端口即一个 ServerSocketChannel对应一个Selector 和一个EventLoop线程。BossEventLoop 负责接收客户端的连接并将 SocketChannel 交给 WorkerEventLoopGroup 来进行 IO 处理，如下图所示
+  ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135208263.png)
+- BossEventLoopGroup 通常是一个单线程的 EventLoop，EventLoop 维护着一个注册了ServerSocketChannel 的 Selector 实例BossEventLoop 不断轮询 Selector 将连接事件分离出来
+- 通常是 OP_ACCEPT 事件，然后将接收到的 SocketChannel 交给 WorkerEventLoopGroup
+- WorkerEventLoopGroup 会由 next 选择其中一个 EventLoop来将这个 SocketChannel 注册到其维护的 Selector 并对其后续的 IO 事件进行处理
+
+**常用方法：**
+
+| 方法名                                  | 介绍               |
+| --------------------------------------- | ------------------ |
+| `public NioEventLoopGroup()`            | 构造方法           |
+| `public Future<?> shutdownGracefully()` | 断开连接，关闭线程 |
+
+## 10、Unpooled
+
+- Netty 提供一个专门用来操作缓冲区(即Netty的数据容器)的工具类
+
+**常用方法**
+
+| 方法名                                                       | 介绍                                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `public static ByteBuf copiedBuffer(CharSequence string, Charset charset)` | 通过给定的数据和字符编码返回一个 ByteBuf 对象（类似于 NIO 中的 ByteBuffer 但有区别） |
+
+**代码示例**
+
+```java
+//创建一个ByteBuf
+//1、创建对象，该对象包含一个数组，是一个byte[10]
+//2、在netty的buffer中，写入数据后再读取数据不需要使用 flip 进行反转
+// 底层维护了 readerIndex 和 writeIndex
+//往buffer中写的范围为 [writeIndex, capacity)
+//往buffer中可读的范围为 [readerIndex, writeIndex)。使用 buf.readByte() 会往后移动 readerIndex 指针，使用 buf.getByte(i) 通过索引获取就不会移动该指针
+ByteBuf byteBuf = Unpooled.buffer(10);
+for (int i = 0; i < 10; i++) {
+    byteBuf.writeByte(i);
+}
+//获取该buf的大小
+int capacity = byteBuf.capacity();
+//输出
+for (int i = 0; i < byteBuf.capacity(); i++) {
+    System.out.println(byteBuf.getByte(i));
+    System.out.println(byteBuf.readByte());
+}
+byte[] content = byteBuf.array();
+//将content转成字符串
+String c = new String(content, StandardCharsets.UTF_8);
+//数组偏移量
+int offset = byteBuf.arrayOffset();
+//获取读取偏移量
+int readerIndex = byteBuf.readerIndex();
+//获取写偏移量
+int writerIndex = byteBuf.writerIndex();
+//获取容量
+int capacity = byteBuf.capacity();
+//获取可读取的字节数
+int readableBytes = byteBuf.readableBytes();
+//通过索引获取某个位置的字节
+byte aByte = byteBuf.getByte(0);
+//获取Buf中某个范围的字符序列
+CharSequence charSequence = byteBuf.getCharSequence(0, 4, StandardCharsets.UTF_8);
+
+1234567891011121314151617181920212223242526272829303132333435
+```
+
+## 11、Netty群聊系统
+
+**实例要求：**
+
+- 编写一个 Netty 群聊系统，实现服务器端和客户端之间的数据简单通讯（非阻塞）
+- 实现多人群聊
+- 服务器端：可以监测用户上线，离线，并实现消息转发功能
+- 客户端：通过channel 可以无阻塞发送消息给其它所有用户，同时可以接受其它用户发送的消息(有服务器转发得到)
+- 目的：进一步理解Netty非阻塞网络编程机制
+
+**服务器端代码：**
+
+```java
+/*************启动类**************/
+public class GroupChatServer {
+    private int port; //监听端口
+    public GroupChatServer(int port){
+        this.port = port;
+    }
+    //编写run 方法，处理客户端的请求
+    public void run() throws InterruptedException {
+        //创建两个线程组
+        NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
+        NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+
+        try {
+            ServerBootstrap serverBootstrap = new ServerBootstrap();
+            serverBootstrap.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel socketChannel) throws Exception {
+                            ChannelPipeline pipeline = socketChannel.pipeline();
+                            pipeline.addLast("decoder", new StringDecoder()); //向pipeline加入解码器
+                            pipeline.addLast("encoder", new StringEncoder()); //加入编码器
+                            pipeline.addLast(new GroupChatServerHandler());
+                        }
+                    });
+            System.out.println("netty服务器启动");
+            ChannelFuture channelFuture = serverBootstrap.bind(port).sync();
+
+            //监听关闭事件
+            channelFuture.channel().closeFuture().sync();
+        } finally {
+            bossGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();
+        }
+    }
+    public static void main(String[] args) throws InterruptedException {
+        GroupChatServer groupChatServer = new GroupChatServer(7000);
+        groupChatServer.run();
+    }
+}
+
+/***********************Handler**********************/
+public class GroupChatServerHandler extends SimpleChannelInboundHandler<String> {
+
+    //定义一个Channel组，管理所有的channel
+    //GlobalEventExecutor.INSTANCE 是全局事件执行器，是一个单例
+    private static ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    //此方法表示连接建立，一旦建立连接，就第一个被执行
+    @Override
+    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+        Channel channel = ctx.channel();
+        //该方法会将 channelGroup 中所有 channel 遍历，并发送消息，而不需要我们自己去遍历
+        channelGroup.writeAndFlush("[客户端]" + channel.remoteAddress() + sdf.format(new Date()) + "加入聊天\n");
+        //将当前的Channel加入到 ChannelGroup
+        channelGroup.add(channel);
+    }
+
+    //表示 channel 处于活动状态，提示 xxx 上线
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println(ctx.channel().remoteAddress() + " " + sdf.format(new Date()) + "上线了~");
+    }
+
+    //表示 channel 处于不活动状态，提示 xxx 离线
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println(ctx.channel().remoteAddress() + " " + sdf.format(new Date()) + "离线了~");
+    }
+
+    //表示 channel 断开连接，将xx客户离开信息推送给当前在线客户
+    @Override
+    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+        Channel channel = ctx.channel();
+        channelGroup.writeAndFlush("[客户端]" + channel.remoteAddress() +" "+ sdf.format(new Date()) + "离开了\n");
+        System.out.println("当前channelGroup大小 ：" + channelGroup.size());
+    }
+
+    //读取数据，并进行消息转发
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+        //获取当前channel
+        Channel channel = ctx.channel();
+        //这时，遍历channelGroup，根据不同的情况，回送不同的消息
+        channelGroup.forEach(item -> {
+            if (item != channel) {
+                item.writeAndFlush("[客户]" + channel.remoteAddress() + "发送了消息：" + msg + "\n");
+            } else { //把自己发送的消息发送给自己
+                item.writeAndFlush("[自己]发送了消息：" + msg + "\n");
+            }
+        });
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        ctx.close();
+    }
+}
+123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899100101
+```
+
+**客户端代码：**
+
+```java
+/*********************启动类******************/
+public class GroupChatClient {
+
+    //属性
+    private final String host;
+    private final int port;
+
+    public GroupChatClient(String host, int port) {
+        this.port = port;
+        this.host = host;
+    }
+
+    public void run() throws InterruptedException {
+        NioEventLoopGroup eventExecutors = new NioEventLoopGroup();
+
+        try {
+            Bootstrap bootstrap = new Bootstrap()
+                    .group(eventExecutors)
+                    .channel(NioSocketChannel.class)
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel ch) throws Exception {
+                            ChannelPipeline pipeline = ch.pipeline();
+                            //加入Handler
+                            pipeline.addLast("decoder", new StringDecoder());
+                            pipeline.addLast("encoder", new StringEncoder());
+                            pipeline.addLast(new GroupChatClientHandler());
+                        }
+                    });
+            ChannelFuture channelFuture = bootstrap.connect(host, port).sync();
+            //得到channel
+            Channel channel = channelFuture.channel();
+            System.out.println("--------" + channel.localAddress() + "---------");
+            //客户端需要输入信息，创建一个扫描器
+            Scanner scanner = new Scanner(System.in);
+            while (scanner.hasNextLine()){
+                String msg = scanner.nextLine();
+                //通过channel发送到服务器端
+                channel.writeAndFlush(msg + "\r\n");
+            }
+        } finally {
+            eventExecutors.shutdownGracefully();
+        }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        new GroupChatClient("127.0.0.1", 7000).run();
+    }
+}
+
+/*****************Handler*****************/
+public class GroupChatClientHandler extends SimpleChannelInboundHandler<String> {
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+        System.out.println(msg.trim());
+    }
+}
+123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657
+```
+
+## 12、Netty心跳检测机制案例
+
+**实例要求:**
+
+- 编写一个 Netty心跳检测机制案例, 当服务器超过3秒没有读时，就提示读空闲
+- 当服务器超过5秒没有写操作时，就提示写空闲
+- 实现当服务器超过7秒没有读或者写操作时，就提示读写空闲
+
+**启动类：**
+
+```java
+public static void main(String[] args) throws InterruptedException {
+    NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
+    NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+
+    try {
+        ServerBootstrap serverBootstrap = new ServerBootstrap();
+        serverBootstrap.group(bossGroup, workerGroup)
+            .channel(NioServerSocketChannel.class)
+            .handler(new LoggingHandler(LogLevel.INFO))  //为BossGroup中的请求添加日志处理Handler
+            .childHandler(new ChannelInitializer<SocketChannel>() {
+                @Override
+                protected void initChannel(SocketChannel ch) throws Exception {
+                    ChannelPipeline pipeline = ch.pipeline();
+                    //加入一个 netty 提供的 IdleStateHandler
+                    /**
+                             * 1、IdleStateHandler 是 netty 提供的检测空闲状态的处理器
+                             * 2、long readerIdleTime：表示多长时间没有读，就会发送一个心跳检测包检测是否还是连接的状态
+                             * 3、long writerIdleTime：表示多长时间没有写，就会发送一个心跳检测包检测是否还是连接的状态
+                             * 4、long allIdleTime：表示多长时间没有读写，就会发送一个心跳检测包检测是否还是连接的状态
+                             * 5、当 IdleStateEvent 触发后，就会传递给管道的下一个 Handler，通过调用（触发）下一个Handler的 userEventTriggered，在该方法区处理这个事件。
+                             */
+                    pipeline.addLast(new IdleStateHandler(3, 5, 7, TimeUnit.SECONDS));
+
+                    //加入一个对空闲检测进一步处理的Handler（自定义）
+                    pipeline.addLast(new MyServerHandler());
+                }
+            });
+        //启动服务器，设置为同步模式。
+        ChannelFuture channelFuture = serverBootstrap.bind(7000).sync();
+        channelFuture.channel().closeFuture().sync();
+    } finally {
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
+    }
+}
+1234567891011121314151617181920212223242526272829303132333435
+```
+
+**Handler：**
+
+```java
+public class MyServerHandler extends ChannelInboundHandlerAdapter {
+
+    /**
+     * @param ctx 上下文
+     * @param evt 事件
+     * @throws Exception
+     */
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (evt instanceof IdleStateEvent) {
+            //将 evt 向下转型 IdleStateEvent
+            IdleStateEvent event = (IdleStateEvent)evt;
+            String eventTye = null;
+            switch (event.state()) {
+                case READER_IDLE:
+                    eventTye = "读空闲";
+                    break;
+                case WRITER_IDLE:
+                    eventTye = "写空闲";
+                    break;
+                case ALL_IDLE:
+                    eventTye = "读写空闲";
+                    break;
+            }
+            System.out.println(ctx.channel().remoteAddress() +"---超时时间--" + eventTye);
+            System.out.println("服务器做相应处理。。");
+        }
+    }
+}
+1234567891011121314151617181920212223242526272829
+```
+
+## 13、Netty建立Websocket连接
+
+**实例要求：**
+
+- Http协议是无状态的, 浏览器和服务器间的请求响应一次，下一次会重新创建连接.
+- 要求：实现基于webSocket的长连接的全双工的交互
+- 改变Http协议多次请求的约束，实现长连接了， 服务器可以发送消息给浏览器
+- 客户端浏览器和服务器端会相互感知，比如服务器关闭了，浏览器会感知，同样浏览器关闭了，服务器会感知
+
+**启动代码：**
+
+```java
+public static void main(String[] args) throws InterruptedException {
+    NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
+    NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+    try{
+        ServerBootstrap serverBootstrap = new ServerBootstrap();
+        serverBootstrap.group(bossGroup, workerGroup)
+            .channel(NioServerSocketChannel.class)
+            .handler(new LoggingHandler(LogLevel.INFO))
+            .childHandler(new ChannelInitializer<SocketChannel>() {
+                @Override
+                protected void initChannel(SocketChannel ch) throws Exception {
+                    ChannelPipeline pipeline = ch.pipeline();
+                    //因为是基于Http协议，所以要使用Http的编码和解码器
+                    pipeline.addLast(new HttpServerCodec());
+                    //是以块方式写，添加ChunkedWriter处理器
+                    pipeline.addLast(new ChunkedWriteHandler());
+                    /**
+                    * 1、http数据在传输过程中是分裂的,HttpObjectAggregator就可以将多个段聚合
+                    * 2、这就是为什么，当浏览器发送大量数据时，就会发出多次http请求
+                    */
+                    pipeline.addLast(new HttpObjectAggregator(8192));
+
+                    /**
+                    * 1、对于websocket，它的数据是以帧的形式传递的
+                    * 2、可以看到 WebsocketFrame 下面有六个子类
+                    * 3、浏览器请求时：ws://localhost:7000/hello 表示请求的uri
+                    * 4、WebSocketServerProtocolHandler 核心功能是将 http 协议升级为 ws 协议，保持长连接
+                    * 5、从Http协议升级到Websocket协议，是通过StatusCode 101（Switching Protocols）来切换的。
+                    */
+                    pipeline.addLast(new WebSocketServerProtocolHandler("/hello"));
+
+                    //自定义Handler，处理业务逻辑
+                    pipeline.addLast(new MyTextWebSocketFrameHandler());
+                }
+            });
+        ChannelFuture sync = serverBootstrap.bind(7000).sync();
+        sync.channel().closeFuture().sync();
+    } finally {
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
+    }
+}
+123456789101112131415161718192021222324252627282930313233343536373839404142
+```
+
+## 14、案例简单总结
+
+**创建启动类：**
+
+- 首先初始化两个NioEventLoopGroup。其中BossGroup一般设置线程为1
+- 初始化一个ServerBootStrap类。并调用它设置很多参数。
+  - `group()`：服务端设置两个Group，客户端设置一个Group
+  - `chnnel()`：服务端传入`NioServerSocketChannel`，客户端传入`NioSocketChannel`
+  - `option()`：服务端给BossGroup设置`SO_BACKLOG`任务队列大小
+  - `childOption()`：服务端给WorkerGroup设置连接`SO_KEEPALIVE`保持连接状态
+  - `handler()`：服务端给BossGroup设置Handler，客户端设置Handler
+  - `childHandler()`：服务端给WorkerGroup设置Handler。
+- 通过BootStrap去绑定端口，监听关闭事件。设置为同步
+
+**Handler：**
+
+- `SimpleChannelInboundHandler`
+  - 可以继承它来处理很多通信。经过上面几个案例推敲，一般写自己的Handler继承它就可以了
+- `ChannelInboundHandlerAdapter`
+  - 这个是上一个的父类，我们在心跳检测的时候通过继承它的`userEventTriggered`去判断连接状态
+  - 其实通过上面那个`simple`也可以继承这个`trigger`
+- `IdleStateHandler`
+  - 在心跳检测时我们要通过这个Handler去触发上面的`trigger`
+- `HttpServerCodec`
+  - 提供好的用于Http编码解码，一般用于Http请求
+- `ChunkedWriteHandler`
+  - 提供好的Handler，以块方式写，添加ChunkedWriter处理器
+  - 我搜了一下，它一般用于发送大文件。这个东西使我们在Websocket的时候用的。
+- `HttpObjectAggregator`
+  - 它会将http数据聚合在一起发送
+- `WebSocketServerProtocolHandler`
+  - 传入ws路径，将Http协议升级成为ws协议
+
+**Netty中通信数据实体：**
+
+- `TextWebSocketFrame`
+  - 这是我们在websocket连接的时候用的，它表示一个文本帧，是websocket进行通信的数据形式
+- `HttpObject`
+  - 这是我们在建立Http连接的时候用到的，可以将它转换成一个`HttpRequest`
+
+**Hander常用方法：**
+
+| 方法名                                                       | 介绍                                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `channelRead0(ChannelHandlerContext channelHandlerContext, T t)` | 读取数据，并进行消息转发                                     |
+| `handlerAdded(ChannelHandlerContext ctx)`                    | 连接建立，一旦建立连接，就第一个被执行                       |
+| `channelActive(ChannelHandlerContext ctx)`                   | 表示 channel 处于活动状态，提示 xxx 上线                     |
+| `channelInactive(ChannelHandlerContext ctx)`                 | 表示 channel 处于不活动状态，提示 xxx 离线                   |
+| `handlerRemoved(ChannelHandlerContext ctx)`                  | 表示 channel 断开连接，将xx客户离开信息推送给当前在线客户    |
+| `exceptionCaught(ChannelHandlerContext ctx, Throwable cause)` | 出现错误如何进行处理                                         |
+| `userEventTriggered(ChannelHandlerContext ctx, Object evt)`  | 事件触发器，通过判断evt的类型去判断发生了什么事件，再通过里面的属性判断事件发生的类型。我们在`IdleStateHandler`后面加上一个触发器，可以检测心跳。 |
+
+> 本文档整理自 尚硅谷韩顺平Netty 相关课程。
+
+
+
+
+
+# 五、GoogleProtobuf
+
+## 1、编码与解码
+
+- 编写网络应用程序时，因为数据在网络中传输的都是二进制字节码数据，在发送数据时就需要编码，接收数据时就需要解码
+- `codec`(编解码器) 的组成部分有两个：`decoder`(解码器)和 `encoder`(编码器)。`encoder` 负责把业务数据转换成字节码数据，`decoder` 负责把字节码数据转换成业务数据。
+  ![在这里插入图片描述](20200227152528968.png)
+
+**Netty本身的编解码的机制和问题分析（为什么要引入Protobuf)**
+
+- Netty 提供的编码器
+
+   
+
+  - StringEncoder，对字符串数据进行编码
+  - ObjectEncoder，对 Java 对象进行编码
+
+- Netty 提供的解码器
+
+   
+
+  - StringDecoder, 对字符串数据进行解码
+  - ObjectDecoder，对 Java 对象进行解码
+
+- Netty 本身自带的 ObjectDecoder 和 ObjectEncoder 可以用来实现 POJO 对象或各种业务对象的编码和解码，底层使用的仍是 Java 序列化技术 , 而Java 序列化技术本身效率就不高，存在如下问题
+
+   
+
+  - 无法跨语言
+  - 序列化后的体积太大，是二进制编码的 5 倍多。
+  - 序列化性能太低
+  - 引出 新的解决方案 [Google 的 Protobuf]
+
+## 2、Protobuf简介
+
+ 首先Protobuf是用来将对象序列化的，相类似的技术还有Json序列化等等。它是一种高效的结构化数据存储格式，可以用于结构化数据串行化（序列化）。它很适合做数据存储或**RPC（远程过程调用）数据交换格式**。目前很多公司 `http+json =》 tcp+protobuf`
+
+- Protobuf 是以 message 的方式来管理数据的
+- 支持跨平台、跨语言，即[客户端和服务器端可以是不同的语言编写的] （支持目前绝大多数语言，例如 C++、C#、Java、python 等
+- 高性能，高可靠性
+- 使用 protobuf 编译器能自动生成代码，Protobuf 是将类的定义使用.proto 文件进行描述。说明，在idea 中编写 .proto 文件时，会自动提示是否下载 .ptotot 编写插件. 可以让语法高亮。
+- 然后通过 protoc.exe 编译器根据.proto 自动生成.java 文件
+  ![在这里插入图片描述](20200227152546169.png)
+
+## 3、proto文件格式
+
+ 首先我们需要在`.proto`文件中定义好实体及他们的属性，再进行编译成`java`对象为我们所用。下面将介绍`proto`文件的写法。
+
+**文件头**
+
+ 就想我们写`java`需要写`package`包名一样，`.proto`文件也要写一些文件的全局属性，主要用于将`.proto`文件编译成`Java`文件。
+
+| `实例`                                 | `介绍`                       |
+| -------------------------------------- | ---------------------------- |
+| `syntax="proto3";`                     | 声明使用到的protobuf的版本   |
+| `optimize_for=SPEED;`                  | 表示                         |
+| `java_package="com.mical.netty.pojo";` | 表示生成Java对象所在包名     |
+| `java_outer_classname="MyWorker";`     | 表示生成的Java对象的外部类名 |
+
+ 我们一般将这些代码写在`proto`文件的开头，以表明生成`Java`对象的相关文件属性。
+
+**定义类和属性**
+
+```protobuf
+syntax = "proto3"; //版本
+option optimize_for = SPEED; //加快解析
+option java_outer_classname = "MyDataInfo"; //生成的外部类名，同时也是文件名
+
+message Student { //会在StudentPojo 外部类生成一个内部类Student，他是真正发送的pojo对象
+    int32 id = 1; //Student类中有一个属性名字为ID，类型为int32（protobuf类型），1表示序号，不是值
+    string name = 2;
+}
+
+enum DateType {
+    StudentType = 0; //在proto3中，要求enum的编号从0开始
+    WorkerType = 1;
+}
+12345678910111213
+```
+
+ 如上图所示，我们在文件中不但声明了protobuf的版本，还声明了生成java对象的类名。当生成java对象后，`MyDataInfo`将是对象的类名，同时，它使用`message`声明了`Student`这个内部类，使用`enum`声明了`DataType`这个内部枚举类。就像下面这个样子
+
+- `messag`：声明类。
+- `enum`：声明枚举类。
+
+```java
+public final class MyDataInfo {
+    public static final class Student { }
+    public enum DataType { }
+}
+1234
+```
+
+然后需要注意的是，protobuf中的变量类型和其他语言的声明有所不同。下面是类型的对照表。
+
+| .proto类型 | java类型    | C++类型    | 备注                                                         |
+| ---------- | ----------- | ---------- | ------------------------------------------------------------ |
+| **double** | **double**  | **double** |                                                              |
+| **float**  | **float**   | **float**  |                                                              |
+| **int32**  | **int**     | **int32**  | **使用可变长编码方式。编码负数时不够高效——如果你的字段可能含有负数，那么请使用sint32。** |
+| **int64**  | **long**    | **int64**  | **使用可变长编码方式。编码负数时不够高效——如果你的字段可能含有负数，那么请使用sint64。** |
+| unit32     | int[1]      | unit32     | 总是4个字节。如果数值总是比总是比228大的话，这个类型会比uint32高效。 |
+| unit64     | long[1]     | unit64     | 总是8个字节。如果数值总是比总是比256大的话，这个类型会比uint64高效。 |
+| sint32     | int         | int32      | 使用可变长编码方式。有符号的整型值。编码时比通常的int32高效。 |
+| sint64     | long        | int64      | 使用可变长编码方式。有符号的整型值。编码时比通常的int64高效。 |
+| fixed32    | int[1]      | unit32     |                                                              |
+| fixed64    | long[1]     | unit64     | 总是8个字节。如果数值总是比总是比256大的话，这个类型会比uint64高效。 |
+| sfixed32   | int         | int32      | 总是4个字节。                                                |
+| sfixed64   | long        | int64      | 总是8个字节。                                                |
+| **bool**   | **boolean** | **bool**   |                                                              |
+| **string** | **String**  | **string** | **一个字符串必须是UTF-8编码或者7-bit ASCII编码的文本。**     |
+| bytes      | ByteString  | string     | 可能包含任意顺序的字节数据                                   |
+
+ 类型关注之后,我们看到代码中`string name = 2`，它并不是给name这个变量赋值，而是给它标号。每个类都需要给其中的变量标号，且需要注意的是类的标号是从1开始的，枚举的标号是从0开始的。
+
+**复杂对象**
+
+ 当我们需要统一发送对象和接受对象时，就需要使用一个对象将其他所有对象进行包装，再获取里面的某一类对象。
+
+```java
+syntax = "proto3"; //版本
+option optimize_for = SPEED; //加快解析
+option java_outer_classname = "MyDataInfo"; //生成的外部类名，同时也是文件名
+
+message MyMessage {
+    //定义一个枚举类型
+    enum DateType {
+        StudentType = 0; //在proto3中，要求enum的编号从0开始
+        WorkerType = 1;
+    }
+
+    //用data_type来标识传的是哪一个枚举类型
+    DateType data_type = 1;
+
+    //标识每次枚举类型最多只能出现其中的一个类型，节省空间
+    oneof dataBody {
+        Student stuent = 2;
+        Worker worker = 4;
+    }
+}
+
+message Student { //会在StudentPojo 外部类生成一个内部类Student，他是真正发送的pojo对象
+    int32 id = 1; //Student类中有一个属性名字为ID，类型为int32（protobuf类型），1表示序号，不是值
+    string name = 2;
+}
+message Worker {
+    string name = 1;
+    int32 age = 2;
+}
+1234567891011121314151617181920212223242526272829
+```
+
+ 这里面我们定义了`MyMessage`、`Student`、`Worker`三个对象，`MyMessage`里面持有了一个枚举类`DataType`和，`Student`、`Worker`这两个类对象中的其中一个。这样设计的目的是什么呢？当我们在发送对象时，设置`MyMessage`里面的对象的同时就可以给枚举赋值，这样当我们接收对象时，就可以根据枚举判断我们接受到哪个实例类了。
+
+## 4、Netty中使用Protobuf
+
+- 需要给发送端的`pipeline`添加编码器：`ProtobufEncoder`。
+
+  ```java
+  bootstrap.group(group)
+      .channel(NioSocketChannel.class)
+      .handler(new ChannelInitializer<SocketChannel>() {
+          @Override
+          protected void initChannel(SocketChannel ch) throws Exception {
+              ChannelPipeline pipeline = ch.pipeline();
+              pipeline.addLast("encoder", new ProtobufEncoder());
+              pipeline.addLast(new ProtoClientHandler());
+          }
+      });
+  12345678910
+  ```
+
+- 需要在接收端添加解码器：`ProtobufDecoder`
+
+  ```java
+  serverBootstrap.group(bossGroup, workerGroup)
+      .channel(NioServerSocketChannel.class)
+      .handler(new LoggingHandler())
+      .option(ChannelOption.SO_BACKLOG, 128)
+      .childOption(ChannelOption.SO_KEEPALIVE, true)
+      .childHandler(new ChannelInitializer<SocketChannel>() {
+          @Override
+          protected void initChannel(SocketChannel ch) throws Exception {
+              ChannelPipeline pipeline = ch.pipeline();
+              //需要指定对哪种对象进行解码
+              pipeline.addLast("decoder", new ProtobufDecoder(MyDataInfo.MyMessage.getDefaultInstance()));
+              pipeline.addLast(new ProtoServerHandler());
+          }
+      })
+  1234567891011121314
+  ```
+
+- 在发送时，如何构造一个具体对象呢？以上面复杂对象为例，我们主要构造的是`MyMessage`对象，设置里面的枚举属性，和对应的对象。
+
+  ```java
+  MyDataInfo.MyMessage build = MyDataInfo.MyMessage.
+      newBuilder().
+      setDataType(MyDataInfo.MyMessage.DateType.StudentType)
+      .setStuent(MyDataInfo.Student
+                          .newBuilder()
+                 .setId(5)
+                 .setName("王五")
+                 .build())
+      .build();
+  123456789
+  ```
+
+- 在接收对象时，我们就可以根据枚举变量去获取实例对象了。
+
+  ```java
+  MyDataInfo.MyMessage message = (MyDataInfo.MyMessage) msg;
+  MyDataInfo.MyMessage.DateType dataType = message.getDataType();
+  
+  switch (dataType) {
+      case StudentType:
+          MyDataInfo.Student student = message.getStuent();
+          System.out.println("学生Id = " + student.getId() + student.getName());
+      case WorkerType:
+          MyDataInfo.Worker worker = message.getWorker();
+          System.out.println("工人：name = " + worker.getName() + worker.getAge());
+      case UNRECOGNIZED:
+          System.out.println("输入的类型不正确");
+  }
+  12345678910111213
+  ```
+
+> 本文档整理自 尚硅谷韩顺平Netty 相关课程。
+
+
+
+
+
+# 六、Netty的Handler
+
+
+
+### 文章目录
+
+- [六、Netty的Handler](https://blog.csdn.net/qq_35751014/article/details/104548228#NettyHandler_0)
+- - [1、Handler介绍](https://blog.csdn.net/qq_35751014/article/details/104548228#1Handler_3)
+  - [2、Handler链式调用](https://blog.csdn.net/qq_35751014/article/details/104548228#2Handler_20)
+  - [3、Handler编解码器](https://blog.csdn.net/qq_35751014/article/details/104548228#3Handler_49)
+  - [4、简单实例](https://blog.csdn.net/qq_35751014/article/details/104548228#4_101)
+  - [5、Log4j整合到Netty](https://blog.csdn.net/qq_35751014/article/details/104548228#5Log4jNetty_174)
+
+
+
+## 1、Handler介绍
+
+- netty的组件设计：Netty的主要组件有`Channel、EventLoop、ChannelFuture、ChannelHandler、ChannelPipe`等
+- 我们先来复习一下`ChannelHandler`和`ChannelPipeline`的关系。示例图如下：我们可以将`pipeline`理解为一个双向链表，`ChannelHandlerContext`看作链表中的一个节点，`ChannelHandler`则为每个节点中保存的一个属性对象。
+  ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135547667.png)
+- `ChannelHandler`充当了处理入站和出站数据的应用程序逻辑的容器。例如，实现`ChannelInboundHandler`接口（或`ChannelInboundHandlerAdapter`），你就可以接收入站事件和数据，这些数据会被业务逻辑处理。当要给客户端发送响应时，也可以从`ChannelInboundHandler`冲刷数据。业务逻辑通常写在一个或者多个`ChannelInboundHandler`中。`ChannelOutboundHandler`原理一样，只不过它是用来处理出站数据的
+- `ChannelPipeline`提供了`ChannelHandler`链的容器。以客户端应用程序为例，如果事件的运动方向是从客户端到服务端的，那么我们称这些事件为出站的，即客户端发送给服务端的数据会通过`pipeline`中的一系列`ChannelOutboundHandler`，并被这些`Handler`处理，反之则称为入站的
+- 简单来说，以服务器端为例：接受数据的过程就是入站，发送数据的过程就是出站。客户端也一样。
+- 下面，来看看我们常用的`Handler`的关系图：`Inbound`处理入站，`Outbound`处理出站
+  ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135547661.png)
+- 一般来说，在我们接收数据时将数据解码后，就进行业务的相关处理，所以上图的入站的常用类更多。在数据出站时，一般我们只需要将数据编码后直接发出。
+
+## 2、Handler链式调用
+
+ 我们知道，`Pipeline`中的`Handler`可以当作一个双向链表。但是，`Handler`却又存在着入站和出站之分。那么`Netty`是如何将两种类型的`Handler`保存在一个链表中，却又能够入站的时候调用`InboundHandler`，出栈的时候调用`OutBoundHandler`呢？看下图，黄色的表示入站，以及入站的`Handler`，绿色的表示出站，以及出站的`Handler`。
+![在这里插入图片描述](2020022800205860.png)
+​ 当我们调用如下代码时，我们就会获得一个上图所示的`Handler`链表。下面代码时在`ChannelInitializer`类中添加`Handler`的部分代码。
+
+```java
+@Override
+protected void initChannel(SocketChannel ch) throws Exception {
+    ChannelPipeline pipeline = ch.pipeline();
+    pipeline.addLast(new LongToByteEncoder()); //out
+    pipeline.addLast(new ByteToLongDecoder()); //in
+    pipeline.addLast(new OutBoundHandler()); //out
+    pipeline.addLast(new InBoundHandler()); //in
+}
+12345678
+```
+
+ 当一个请求来了的时候，首先会将请求发给`pipeline`中位于链表首部的`Handler`。如图所示，首先由`LongToByteEncoder`（这个东西不管，就是个出站的）接受到入站请求，但是这个东西是个`OutBound`。所以它收到入站请求时就不做处理，直接转发给它的下一个`ByteToLongDecoder`（这个东西也不管，它是入站的）。这个东西接受到了入站请求了，一看它自己也是一个`Inbound`，所以它就将请求的数据进行处理，然后转发给下一个。之后又是一个`Outbound`，然后再进行转发，到了最后的`InBoundHandler`，在这里我们可以进行业务的处理等等操作。
+
+ 然后如果需要返回数据，我们就调用`writeAndFlush`方法，这个方法可不简单，当他一调用，就会触发出站的请求，然后就由当前所在的`Handler`节点往回调用。往回调用的途中，如果遇到`InBound`就直接转发给下一个`Handler`，直到最后将消息返回。
+
+通过上面的描述，我们可以总结添加`Handler`的以下节点总结：
+
+- 调用`InboundHandler`的顺序和添加的顺序是一致的。
+- 调用`OutboundHandler`的顺序和添加它的顺序是相反的。
+- 链表的末尾不能有`OutHandler`，因为如果最后是`OutHandler`的话，当他前面的`InHandler`处理完数据返回消息调用`writeflush`时，它直接在前面进行反向调用了，就调用不到最后的这个`Out`了。所以我们平常可以将`OutHandler`写在前面，`InHandler`写在后面。
+- `InHandler`一旦进行`writeAndFlush`，只有这个`InHandler`之前添加的`OutHandler`能够处理他
+
+## 3、Handler编解码器
+
+- 当Netty发送或者接受一个消息的时候，就将会发生一次数据转换。入站消息会被解码：从字节转换为另一种格式（比如java对象）；如果是出站消息，它会被编码成字节。
+- Netty提供一系列实用的编解码器，他们都实现了ChannelInboundHadnler或者ChannelOutboundHandler接口。在这些类中，channelRead方法已经被重写了。以入站为例，对于每个从入站Channel读取的消息，这个方法会被调用。随后，它将调用由解码器所提供的decode()方法进行解码，并将已经解码的字节转发给ChannelPipeline中的下一个ChannelInboundHandler。
+
+**解码器-ByteToMessageDecoder**
+
+- 由于不可能知道远程节点是否会一次性发送一个完整的信息，tcp有可能出现粘包拆包的问题，这个类会对入站数据进行缓冲，直到它准备好被处理。
+
+- 下面是段示例代码：
+
+  ```java
+  public class ToIntegerDecoder extends ByteToMessageDecoder {
+      @Override
+      protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+          if (in.readableBytes() >= 4) {
+              out.add(in.readInt());
+          }
+      }
+  }
+  12345678
+  ```
+
+  - 这个例子，每次入站从`ByteBuf`中读取4字节，将其解码为一个`int`，然后将它添加到下一个`List`中。当没有更多元素可以被添加到该`List`中时，它的内容将会被发送给下一个`ChannelInboundHandler`。int在被添加到List中时，会被自动装箱为Integer。在调用`readInt()`方法前必须验证所输入的`ByteBuf`是否具有足够的数据
+    ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135547672.png)
+
+**解码器-ReplayingDecoder**
+
+- `public abstract class ReplayingDecoder<S> extends ByteToMessageDecoder{ }`
+
+- `ReplayingDecoder`扩展了`ByteToMessageDecoder`类，使用这个类，我们不必调用`readableBytes()`方法。参数S指定了用户状态管理的类型，其中Void代表不需要状态管理
+
+- 下面是代码示例：这段代码起到了上面`ByteToMessageDecoder`一样的作用
+
+  ```java
+  public class ByteToLongDecoder2 extends ReplayingDecoder<Void> {
+      @Override
+      protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+          out.add(in.readLong());
+      }
+  }
+  123456
+  ```
+
+- `ReplayingDecoder`使用方便，但它也有一些局限性：
+
+  - 并不是所有的 `ByteBuf` 操作都被支持，如果调用了一个不被支持的方法，将会抛出一个 `UnsupportedOperationException`。
+  - `ReplayingDecoder` 在某些情况下可能稍慢于 `ByteToMessageDecoder`，例如网络缓慢并且消息格式复杂时，消息会被拆成了多个碎片，速度变慢
+
+**其他解码器**
+
+- `LineBasedFrameDecoder`：这个类在Netty内部也有使用，它使用行尾控制字符（\n或者\r\n）作为分隔符来解析数据。
+- `DelimiterBasedFrameDecoder`：使用自定义的特殊字符作为消息的分隔符。
+- `HttpObjectDecoder`：一个HTTP数据的解码器
+- `LengthFieldBasedFrameDecoder`：通过指定长度来标识整包消息，这样就可以自动的处理黏包和半包消息。
+
+## 4、简单实例
+
+**实例要求**
+
+- 使用自定义的编码器和解码器来说明Netty的handler 调用机制
+- 客户端发送long -> 服务器
+- 服务端发送long -> 客户端
+
+**实例代码**
+
+ 这里只展示，`Handler`相应的代码和添加`Handler`的关键代码。
+
+**Decoder**：
+
+```java
+public class ByteToLongDecoder extends ByteToMessageDecoder {
+    /**
+     * decode 方法会根据接收到的数据，被调用多次，知道确定没有新的元素被添加到list，或者是ByteBuf 没有更多的可读字节为止
+     * 如果 list out不为空，就会将list的内容传递给下一个 Handler 进行处理，该处理器的方法也会被调用多次。
+     * @param ctx 上下文对象
+     * @param in 入栈的 ByteBuf
+     * @param out list集合，将解码后的数据传给下一个Handler
+     * @throws Exception
+     */
+    @Override
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        //因为long为8个字节，所以需要8个字节才能读取成一个long类型的数据
+        System.out.println("ByteToLongDecoder：入栈数据被解码");
+        if (in.readableBytes() >= 8){
+            out.add(in.readLong());
+        }
+    }
+}
+123456789101112131415161718
+```
+
+**Encoder：**
+
+```java
+public class LongToByteEncoder extends MessageToByteEncoder<Long> {
+    @Override
+    protected void encode(ChannelHandlerContext ctx, Long msg, ByteBuf out) throws Exception {
+        System.out.println("LongToByteEncoder: 出栈数据，msg = " + msg);
+        out.writeLong(msg);
+    }
+}
+1234567
+```
+
+**服务端添加Handler：**
+
+```java
+@Override
+protected void initChannel(SocketChannel ch) throws Exception {
+    ChannelPipeline pipeline = ch.pipeline();
+    pipeline.addLast(new LongToByteEncoder()); //编码器，出站
+    pipeline.addLast(new ByteToLongDecoder()); //解码器，入站
+    pipeline.addLast(new ServerInBoundHandler()); //业务处理，入站
+}
+1234567
+```
+
+**客户端添加Handler：**
+
+```java
+@Override
+protected void initChannel(SocketChannel ch) throws Exception {
+    ChannelPipeline pipeline = ch.pipeline();
+    pipeline.addLast(new LongToByteEncoder()); //编码器，出站
+    pipeline.addLast(new ByteToLongDecoder()); //解码器，入站
+    pipeline.addLast(new ClientInBoundHandler()); //业务处理，入站。
+}
+1234567
+```
+
+ 这里当客户端或者服务端接受消息的时候，首先会调用入站的解码器，然后业务处理，然后调用出站的编码器返回消息。后面可以在业务处理类中，增加发送消息的代码，此处省略。
+
+## 5、Log4j整合到Netty
+
+**添加依赖**
+
+```xml
+<dependency>
+    <groupId>log4j</groupId>
+    <artifactId>log4j</artifactId>
+    <version>1.2.17</version>
+</dependency>
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-api</artifactId>
+    <version>1.7.25</version>
+</dependency>
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-log4j12</artifactId>
+    <version>1.7.25</version>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-simple</artifactId>
+    <version>1.7.25</version>
+    <scope>test</scope>
+</dependency>
+12345678910111213141516171819202122
+```
+
+**添加配置文件：**
+
+ 在`resource`目录下新建`log4j.properties`即可
+
+```properties
+log5j.rootLogger=DEBUG, stdout
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=[%p] %C{1} - %m%n
+1234
+```
+
+> 本文档整理自 尚硅谷韩顺平Netty 相关课程。
+
+
+
+
+
+# 七、TCP粘包和拆包
+
+## 1、什么是拆包和粘包
+
+- TCP是面向连接的，面向流的，提供高可靠性服务。收发两端（客户端和服务器端）都要有一一成对的socket，因此，发送端为了将多个发给接收端的包，更有效的发给对方，使用了优化方法（Nagle算法），将多次**间隔较小且数据量小**的数据，合并成一个大的数据块，然后进行封包。这样做虽然提高了效率，但是接收端就难于分辨出完整的数据包了，因为**面向流的通信是无消息保护边界**的
+- 由于TCP无消息保护边界，需要在接收端处理消息边界问题，也就是我们所说的粘包、拆包问题。
+- 通常的解决方案是：发送端每发送一次消息，就需要在消息的内容之前携带消息的长度，这样，接收方每次先接受消息的长度，再根据长度去读取该消息剩余的内容。如果`socket`中还有没有读取的内容，也只能放在下一次读取事件中进行。
+
+## 2、拆包、粘包的图解
+
+![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135611510.png)
+
+ 假设客户端同时发送了两个数据包D1和D2给服务端，由于服务端一次读取到字节数是不确定的，固可能存在以下四种情况：
+
+1. 服务端分两次读取到了两个独立的数据包，分别是D1和D2，没有粘包和拆包
+2. 服务端一次接受到了两个数据包，D1和D2粘合在一起，称之为TCP粘包
+3. 服务端分两次读取到了数据包，第一次读取到了完整的D1包和D2包的部分内容，第二次读取到了D2包的剩余内容，这称之为TCP拆包
+4. 服务端分两次读取到了数据包，第一次读取到了D1包的部分内容D1_1，第二次读取到了D1包的剩余部分内容D1_2和完整的D2包。
+
+## 3、解决方案图解
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2020030314102917.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70)
+
+- 我们可以在数据包的前面加上一个固定字节数的数据长度，如加上一个 `int`（固定四个字节）类型的数据内容长度
+- 就算客户端同时发送两个数据包到服务端，当服务端接受时，也可以先读取四个字节的长度，然后根据长度获取消息的内容，这样就不会出现多读取或者少读取的情况了。
+
+## 4、TCP粘包代码示例
+
+ 本实例主要演示出现拆包和粘包的场景。
+
+**客户端：**
+
+ 我们将使用循环连续发送10个`String`类型的字符串。这里相当于发送了10次。
+
+```java
+@Override
+public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    //使用客户端发送10条数据，hello，server
+    for (int i = 0; i < 10; i++) {
+        String msg = "server" + i + "  ";
+        System.out.println("发送消息 " + msg);
+        ByteBuf byteBuf = Unpooled.copiedBuffer(msg, CharsetUtil.UTF_8);
+        ctx.writeAndFlush(byteBuf);
+    }
+}
+12345678910
+```
+
+**服务端：**
+
+ 我们接受客户端发过来的字符串。
+
+```java
+private int count = 0;
+@Override
+protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+    byte[] bytes = new byte[msg.readableBytes()];
+    msg.readBytes(bytes);
+
+    //将buffer转成字符串
+    String message = new String(bytes, CharsetUtil.UTF_8);
+
+    System.out.println("服务器接收到数据 " + message);
+    System.out.println("服务器接收到消息量 = " + (++this.count));
+
+    //服务器回送数据到客户端，回送一个随机Id
+    ByteBuf response = Unpooled.copiedBuffer(UUID.randomUUID().toString() + "--", CharsetUtil.UTF_8);
+    ctx.writeAndFlush(response);
+}
+12345678910111213141516
+```
+
+服务端输出结果如下：
+![在这里插入图片描述](20200303141043195.png)
+
+- 我们可以看到，服务端直接一次就把我们客户端10次发送的内容读取完成了。
+- 这里也印证了我们开篇所说的，当**数据量小且发送间隔短**，如果我们客户端每次发送的都是不同的结果，这种情况下我们就不知道客户端返回了多少次结果以及每次结果究竟是什么。这就是我们本篇需要解决的问题。
+
+## 5、解决方案代码示例
+
+- 使用自定义协议 + 编解码器 来解决
+- 关键就是要解决 **服务器端每次读取数据长度的问题**, 这个问题解决，就不会出现服务器多读或少读数据的问题，从而避免的TCP 粘包、拆包 。
+
+**自定义Message对象：**
+
+```java
+public class MessageProtocol {
+    private int len; //关键
+    private byte[] content;
+}
+1234
+```
+
+**添加将ByteBuf转换成Message的解码器：**
+
+```java
+public class MessageDecoder extends ReplayingDecoder<Void> {
+    @Override
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        System.out.println("MessageDecoder 被调用");
+        //需要将获取到的二进制字节码转换成 MessageProtocol
+        int length = in.readInt();
+        byte[] content = new byte[length];
+        in.readBytes(content);
+
+        //封装成 MessageProtocol 对象，放入 out，传递到下一个Handler
+        MessageProtocol messageProtocol = new MessageProtocol();
+        messageProtocol.setLen(length);
+        messageProtocol.setContent(content);
+        out.add(messageProtocol);
+    }
+}
+12345678910111213141516
+```
+
+**添加将Message转换为ByteBuf的编码器：**
+
+```java
+public class MessageEncoder extends MessageToByteEncoder<MessageProtocol> {
+    @Override
+    protected void encode(ChannelHandlerContext ctx, MessageProtocol msg, ByteBuf out) throws Exception {
+        System.out.println("MessageEncoder 方法被调用");
+        out.writeInt(msg.getLen());
+        out.writeBytes(msg.getContent());
+    }
+}
+12345678
+```
+
+**客户端连续发送3个Message对象：**
+
+```java
+@Override
+public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    //使用客户端发送10条数据，"今天天气冷，吃火锅" 编号
+    for (int i = 0; i < 3; i++) {
+        String message = "Server" + i;
+        byte[] content = message.getBytes(CharsetUtil.UTF_8);
+        int length = content.length;
+
+        //创建协议包对象
+        MessageProtocol messageProtocol = new MessageProtocol();
+        messageProtocol.setLen(length);
+        messageProtocol.setContent(content);
+        ctx.writeAndFlush(messageProtocol);
+    }
+}
+123456789101112131415
+```
+
+**服务端接收：**
+
+```java
+//接收的Handler继承了SimpleChannelInboundHandler，以MessageProtocol的类型接受消息
+@Override
+protected void channelRead0(ChannelHandlerContext ctx, MessageProtocol msg) throws Exception {
+    //接收到数据，并处理
+    int len = msg.getLen();
+    byte[] content = msg.getContent();
+
+    System.out.println("服务器第 " + (++count) +" 次接收到信息如下：");
+    System.out.println("长度：" + len);
+    System.out.println("内容：" + new String(content, CharsetUtil.UTF_8));
+
+    //回复消息
+    String response = UUID.randomUUID().toString();
+    int length = response.getBytes(CharsetUtil.UTF_8).length;
+    MessageProtocol messageProtocol = new MessageProtocol();
+    messageProtocol.setLen(length);
+    messageProtocol.setContent(response.getBytes());
+    ctx.writeAndFlush(messageProtocol);
+}
+12345678910111213141516171819
+```
+
+**结果展示：**
+![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135611509.png)
+
+- 首先，当客户端的通道激活后，就直接调用方法发送10个Message对象。
+- 服务端接收对象时，首先调用`MessageDecoder`进行解码，将`ByteBuf`类型的数据转换成`MessageProtocol`，然后再进入进行读取的`Handler`中读取消息。
+- 最后返回给客户端消息，调用`MessageEncoder`将`MessageProtocol`转换成`Byte`然后发送出去。
+
+> 本文档整理并出 自尚硅谷韩顺平Netty教程
+
+
+
+# 八、Netty简单RPC调用
+
+## 1、RPC基本介绍
+
+- `RPC（Remote Procedure Call`,远程过程调用，是一个计算机通信协议。该协议允许运行于一台计算机的程序调用另一台计算机的子程序，而程序员无需额外地为这个交互作用编程
+- 两个或多个应用程序都分布在不同的服务器上，它们之间的调用都像是本地方法调用一样(如图)
+  ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135634698.png)
+- 常见的 RPC 框架有: 比较知名的如阿里的Dubbo、google的gRPC、Go语言的rpcx、Apache的thrift， Spring 旗下的 Spring Cloud。
+
+**RPC调用流程：**
+
+![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1NzUxMDE0,size_16,color_FFFFFF,t_70-20201210135634699.png)
+
+> 在RPC 中， Client 叫服务消费者，Server 叫服务提供者
+
+**PRC调用流程说明**
+
+1. 服务消费方(client)以本地调用方式调用服务
+2. client stub 接收到调用后负责将方法、参数等封装成能够进行网络传输的消息体
+3. client stub 将消息进行编码并发送到服务端
+4. server stub 收到消息后进行解码
+5. server stub 根据解码结果调用本地的服务
+6. 本地服务执行并将结果返回给 server stub
+7. server stub 将返回导入结果进行编码并发送至消费方
+8. client stub 接收到消息并进行解码
+9. 服务消费方(client)得到结果
+
+小结：RPC 的目标就是将 2-8 这些步骤都封装起来，用户无需关心这些细节，可以像调用本地方法一样即可完成远程服务调用。
+
+## 2、代码示例
+
+**服务接口：**
+
+```java
+public interface HelloService {
+
+    String hello(String message);
+}
+1234
+```
+
+**服务端服务接口实现类：**
+
+```java
+public class HelloServiceImpl implements HelloService {
+    @Override
+    public String hello(String message) {
+        System.out.println("收到客户端消息=" + message);
+        //根据 message 返回不同的结果
+        if(message != null) {
+            return "你好客户端，我已经收到你的消息【" + message + "】";
+        } else {
+            return "你好客户端，我已经收到你的消息。";
+        }
+    }
+}
+123456789101112
+```
+
+**服务端初始化Netty：**
+
+```java
+public class NettyServer {
+
+    public static  void startServer(String hostName, int port) {
+        startServer0(hostName, port);
+    }
+
+    private static void startServer0(String hostname, int port) {
+        NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
+        NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+
+        try {
+            ServerBootstrap serverBootstrap = new ServerBootstrap();
+            serverBootstrap.group(bossGroup, workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel ch) throws Exception {
+                            ChannelPipeline pipeline = ch.pipeline();
+                            pipeline.addLast(new StringDecoder());
+                            pipeline.addLast(new StringEncoder());
+                            pipeline.addLast(new NettyServerHandler()); //业务处理器
+                        }
+                    });
+            ChannelFuture channelFuture = serverBootstrap.bind(hostname,port).sync();
+            System.out.println("服务提供方开始运行");
+            channelFuture.channel().closeFuture().sync();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+             bossGroup.shutdownGracefully();
+             workerGroup.shutdownGracefully();
+        }
+    }
+}
+12345678910111213141516171819202122232425262728293031323334
+```
+
+**服务端Handler：**
+
+```java
+public class NettyServerHandler extends ChannelInboundHandlerAdapter {
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        //获取客户端发送的消息，并调用服务
+        System.out.println("msg=" + msg);
+        //客户端在调用服务器的api 时，我们需要定义一个协议
+        //比如要求，每次发消息时，都必须以某个字符串开头 "HelloService#hello#你好"
+        if (msg.toString().startsWith("HelloService#hello#")) {
+            String result = new HelloServiceImpl().hello(msg.toString().substring(msg.toString().lastIndexOf("#") + 1));
+            ctx.writeAndFlush(result);
+        }
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        ctx.close();
+    }
+}
+123456789101112131415161718
+```
+
+**Netty客户端**
+
+```java
+public class NettyClient {
+    //创建一个线程池
+    private static ExecutorService executor= Executors.newFixedThreadPool(5);
+
+    private static NettyClientHandler client;
+
+    //编写方法，使用代理模式，获取一个代理对象
+    public Object getBean(final Class<?> serviceClass, final String providerName) {
+        return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class<?>[]{serviceClass},
+                (proxy, method, args) -> {
+                    System.out.println("代理被调用");
+                    if (client == null)
+                        initClient();
+                    //设置要发给服务器端的信息
+                    client.setPara(providerName + args[0]);
+                    return executor.submit(client).get();
+                });
+    }
+
+
+    //初始化客户端
+    private static void initClient() {
+        client = new NettyClientHandler();
+        //创建EventLoopGroup
+        NioEventLoopGroup group = new NioEventLoopGroup();
+        try {
+            Bootstrap bootstrap = new Bootstrap();
+            bootstrap.group(group)
+                    .channel(NioSocketChannel.class)
+                    .option(ChannelOption.TCP_NODELAY, true)
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel ch) throws Exception {
+                            ChannelPipeline pipeline = ch.pipeline();
+                            pipeline.addLast(new StringDecoder());
+                            pipeline.addLast(new StringEncoder());
+                            pipeline.addLast(client);
+                        }
+                    });
+            ChannelFuture channelFuture = bootstrap.connect("127.0.0.1", 7000).sync();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+123456789101112131415161718192021222324252627282930313233343536373839404142434445
+```
+
+**客户端Handler**
+
+```java
+public class NettyClientHandler extends ChannelInboundHandlerAdapter implements Callable {
+
+    private ChannelHandlerContext context; //上下文
+    private String result; //返回的结果
+    private String para; //客户端调用方法时，传入的参数
+
+    //与服务端创建连接后调用
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("通道连接成功");
+        context = ctx; //因为我们在其他方法会使用到 ctx
+    }
+
+    @Override
+    public synchronized void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        result = msg.toString();
+        notify(); //唤醒等待的线程
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        ctx.close();
+    }
+
+    //被代理对象的调用，真正发送数据给服务器，发送完后就阻塞，等待被唤醒（channelRead）
+    @Override
+    public synchronized Object call() throws Exception {
+        System.out.println("线程被调用-----");
+        context.writeAndFlush(para);
+        //进行wait
+        wait(); //等待 channelRead 获取到服务器的结果后，进行唤醒。
+        return result; //服务方返回的结果
+    }
+
+    public void setPara(String para){
+        this.para = para;
+    }
+}
+123456789101112131415161718192021222324252627282930313233343536373839
+```
+
+**客户端启动并调用远程方法：**
+
+```java
+public class ClientBootStrap {
+
+    //这里定义协议头
+    public static final String providerName = "HelloService#hello#";
+
+    public static void main(String[] args) throws InterruptedException {
+        //创建一个消费者
+        NettyClient customer = new NettyClient();
+        //创建代理对象
+        HelloService service = (HelloService) customer.getBean(HelloService.class, providerName);
+
+        //通过代理对象调用服务提供者的方法
+        String res = service.hello("你好 Dubbo");
+        System.out.println("调用的结果，res = " + res);
+        Thread.sleep(2000);
+    }
+}
+1234567891011121314151617
+```
+
+> 本文档整理并出 自尚硅谷韩顺平Netty教程
 
