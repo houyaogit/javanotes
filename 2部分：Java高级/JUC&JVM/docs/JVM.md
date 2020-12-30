@@ -1,10 +1,12 @@
-# JVM核心知识点
+#  JVM核心知识点
 
 # Java8  JVM内存结构
 
 基本结构与之前类似，只是Java8取消了之前的“永久代”，取而代之的是“元空间”——**Metaspace**，两者本质是一样的。“永久代”使用的是JVM的堆内存，而“元空间”是直接使用的本机物理内存。
 
-![](https://raw.githubusercontent.com/MaJesTySA/JVM-JUC-Core/master/imgs/JVMMem.png)
+![](https://gitee.com/houyao123/my-resource/raw/master/img/JVMMem-20201215110159087.png)
+
+
 
 # GC Roots
 
@@ -12,7 +14,7 @@
 
 ### 引用计数算法
 
-维护一个计数器，如果有对该对象的引用，计数器+1，反之-1。无法解决循环引用的问题。
+维护一个计数器，如果有对该对象的引用，计数器+ 1，反之-1。无法解决循环引用的问题。
 
 ### 可达性分析算法
 
@@ -37,7 +39,7 @@
 
 用得不多，比如`-Xint`，解释执行模式；`-Xcomp`，编译模式；`-Xmixed`，开启混合模式（默认）。
 
-![](https://raw.githubusercontent.com/MaJesTySA/JVM-JUC-Core/master/imgs/InkedJVMXParam_LI.jpg)
+![](https://gitee.com/houyao123/my-resource/raw/master/img/InkedJVMXParam_LI.jpg)
 
 ### XX参数
 
@@ -60,6 +62,8 @@
 ## JVM 查看参数
 
 ### 查看某个参数
+
+- flag 
 
 使用`jps -l`配合`jinfo -flag JVM参数 pid` 。先用`jsp -l`查看java进程，选择某个进程号。
 
@@ -128,6 +132,8 @@
 
 输出GC收集信息，包含`GC`和`Full GC`信息。
 
+读GC信息，分析内存
+
 ### -XX:SurvivorRatio
 
 新生代中，`Eden`区和两个`Survivor`区的比例，默认是`8:1:1`。通过`-XX:SurvivorRatio=4`改成`4:1:1`
@@ -141,6 +147,8 @@
 新生代设置进入老年代的时间，默认是新生代逃过15次GC后，进入老年代。如果改成0，那么对象不会在新生代分配，直接进入老年代。
 
 # 四大引用
+
+- 强、软、弱、虚
 
 以下Demo都需要设置`-Xmx`和`-Xms`，不然系统默认很大，很难演示。
 
@@ -280,7 +288,7 @@ Java 8可以将垃圾收集器分为四类。
 
 ## 七大垃圾收集器
 
-### 体系结构
+### 体系结构（重要哪些老年代，哪些用在新生代）
 
 `Serial`、`Parallel Scavenge`、`ParNew`用户回收新生代；`SerialOld`、`ParallelOld`、`CMS`用于回收老年代。而`G1`收集器，既可以回收新生代，也可以回收老年代。
 
@@ -351,7 +359,7 @@ Java 8可以将垃圾收集器分为四类。
 
 ### G1收集器
 
-`G1`收集器与之前垃圾收集器的一个显著区别就是——之前收集器都有三个区域，新、老两代和元空间。而G1收集器只有G1区和元空间。而G1区，不像之前的收集器，分为新、老两代，而是一个一个Region，每个Region既可能包含新生代，也可能包含老年代。
+`G1`收集器与之前垃圾收集器的一个显著区别就是——之前收集器都有三个区域，新、老两代和元空间。而G1收集器只有G1区和元空间。而G1区，不像之前的收集器，分为新、老两代，而是一个一个Region，每个Region既可能包含新生代，也可能包含老年代，只在逻辑上分新生代，老年代。
 
 `G1`收集器既可以提高吞吐量，又可以减少GC时间。最重要的是**STW可控**，增加了预测机制，让用户指定停顿时间。
 
@@ -381,7 +389,9 @@ Java 8可以将垃圾收集器分为四类。
 
 ## vmstat
 
-查看进程、内存、I/O等多个系统运行状态。2表示每两秒采样一次，3表示一共采样3次。`procs`的`r`表示运行和等待CPU时间片的进程数，原则上1核CPU不要超过2。`b`是等待资源的进程数，比如磁盘I/O、网络I/O等。
+查看进程、内存、I/O等多个系统运行状态。2表示每两秒采样一次，3表示一共采样3次。`procs`的`r` (run
+
+)表示运行和等待CPU时间片的进程数，原则上1核CPU不要超过2。`b` (block)是等待资源的进程数，比如磁盘I/O、网络I/O等。
 
 ```shell
 [root@ ~]# vmstat -n 2 3
@@ -394,7 +404,7 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 
 ## pidstat
 
-查看某个进程的运行信息。
+pidstat -p xxx(pid) 查看某个进程的运行信息。 
 
 ## free
 
@@ -406,6 +416,10 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 
 ## iostat
 
+iostat -xdk -2 -3 （查看磁盘io）
+
+pidstat -d 2 -p pid. (查看磁盘io)
+
 查看磁盘I/O信息。比如有时候MySQL在查表的时候，会占用大量磁盘I/O，体现在该指令的`%util`字段很大。对于死循环的程序，CPU占用固然很高，但是磁盘I/O不高。
 
 ## ifstat
@@ -415,6 +429,20 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 # CPU占用过高原因定位
 
 先用`top`找到CPU占用最高的进程，然后用`ps -mp pid -o THREAD,tid,time`，得到该**进程**里面占用最高的**线程**。这个线程是10进制的，将其转成16进制，然后用`jstack pid | grep tid`可以定位到具体哪一行导致了占用过高。
+
+ps -mp pid -o THREAD,tid,time 
+
+-m 显示所有线程
+
+-p pid 进程使用的cpu时间
+
+-o 后是用户自定义格式
+
+转16进制 ： printf “%x\n“ pid 
+
+Top-> ps -ef|grep pid -> ps -mp pid -o THREAD,tid,time -> jstack pid |grep tid 
+
+
 
 # JVM性能调优和监控工具
 
@@ -521,7 +549,7 @@ HotSpot JVM把年轻代分为了三部分：1个Eden区和2个Survivor区（分�
 
 #### Step4:设置对象头
 
-初始化零值完成之后，**虚拟机要对对象进行必要的设置**，例如这个对象是哪个类的实例、如何才能找到类的元数据信息、对象的哈希码、对象的 GC 分代年龄等信息。 **这些信息存放在对象头中。**
+初始化零值完成之后，**虚拟机要对对象进行必要的设置**，例如这个对象是哪个类的实例、如何才能找到类的元数据信息、对象的哈希码、对象的 GC 分代年龄等Z/信息。 **这些信息存放在对象头中。**
 
 #### Step5:执行 init 方法
 

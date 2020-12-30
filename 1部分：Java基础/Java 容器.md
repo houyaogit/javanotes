@@ -1,9 +1,10 @@
 # 一 概览
+
 容器的思维导图：
 
 
 
-<img src="imgs/1.png" style="zoom:70%;" />
+<img src="https://gitee.com/houyao123/my-resource/raw/master/img/1.png" style="zoom:70%;" />
 
 ## Collection
 
