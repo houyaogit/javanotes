@@ -8,7 +8,7 @@ JMM是指Java**内存模型**，不是Java**内存布局**，不是所谓的栈�
 
 每个Java线程都有自己的**工作内存**。操作数据，首先从主内存中读，得到一份拷贝，操作完毕后再写回到主内存。
 
-![](https://raw.githubusercontent.com/MaJesTySA/JVM-JUC-Core/master/imgs/JMM.png)
+![](https://gitee.com/houyao123/my-resource/raw/master/img/JMM.png)
 
 JMM可能带来**可见性**、**原子性**和**有序性**问题。所谓可见性，就是某个线程对主内存内容的更改，应该立刻通知到其它线程。原子性是指一个操作是不可分割的，不能执行到一半，就不执行了。所谓有序性，就是指令是有序的，不会被重排。
 
