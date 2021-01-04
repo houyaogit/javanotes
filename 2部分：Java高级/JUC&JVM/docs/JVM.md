@@ -229,21 +229,21 @@ java.lang.OutOfMemoryError: GC overhead limit exceeded
 
 ### 标记整理
 
-![](https://raw.githubusercontent.com/MaJesTySA/JVM-JUC-Core/master/imgs/GCbq.png)
+![](https://gitee.com/houyao123/my-resource/raw/master/img/GCbq.png)
 
-![](https://raw.githubusercontent.com/MaJesTySA/JVM-JUC-Core/master/imgs/GCbz.png)
+![](https://gitee.com/houyao123/my-resource/raw/master/img/GCbz.png)
 
 ### 标记清除
 
-![](https://raw.githubusercontent.com/MaJesTySA/JVM-JUC-Core/master/imgs/GCbq.png)
+![](https://gitee.com/houyao123/my-resource/raw/master/img/GCbq-20210103212409964.png)
 
-![](https://raw.githubusercontent.com/MaJesTySA/JVM-JUC-Core/master/imgs/GCbq2.png)
+![](https://gitee.com/houyao123/my-resource/raw/master/img/GCbq2.png)
 
 ### 复制算法
 
-![](https://raw.githubusercontent.com/MaJesTySA/JVM-JUC-Core/master/imgs/GCfz.png)
+![](https://gitee.com/houyao123/my-resource/raw/master/img/GCfz.png)
 
-![](https://raw.githubusercontent.com/MaJesTySA/JVM-JUC-Core/master/imgs/GCfz2.png)
+![](https://gitee.com/houyao123/my-resource/raw/master/img/GCfz2.png)
 
 ### 分代收集算法
 
@@ -292,11 +292,11 @@ Java 8可以将垃圾收集器分为四类。
 
 `Serial`、`Parallel Scavenge`、`ParNew`用户回收新生代；`SerialOld`、`ParallelOld`、`CMS`用于回收老年代。而`G1`收集器，既可以回收新生代，也可以回收老年代。
 
-![](https://raw.githubusercontent.com/MaJesTySA/JVM-JUC-Core/master/imgs/GCqi.png)
+![](https://gitee.com/houyao123/my-resource/raw/master/img/GCqi.png)
 
 连线表示可以搭配使用，红叉表示不推荐一同使用，比如新生代用`Serial`，老年代用`CMS`。
 
-![](https://raw.githubusercontent.com/MaJesTySA/JVM-JUC-Core/master/imgs/GCqi2.png)
+![](https://gitee.com/houyao123/my-resource/raw/master/img/GCqi2-20210103212653484.png)
 
 
 
@@ -306,7 +306,7 @@ Java 8可以将垃圾收集器分为四类。
 
 使用`-XX:+UseSerialGC`可以显式开启，开启后默认使用`Serial`+`SerialOld`的组合。
 
-![](https://raw.githubusercontent.com/MaJesTySA/JVM-JUC-Core/master/imgs/serial.jpeg)
+![](https://gitee.com/houyao123/my-resource/raw/master/img/serial.jpeg)
 
 ### ParNew收集器
 
@@ -314,7 +314,7 @@ Java 8可以将垃圾收集器分为四类。
 
 使用`-XX:+UseParNewGC`可以显式开启，开启后默认使用`ParNew`+`SerialOld`的组合。但是由于`SerialOld`已经过时，所以建议配合`CMS`使用。
 
-![](https://raw.githubusercontent.com/MaJesTySA/JVM-JUC-Core/master/imgs/parnew.jpeg)
+![](https://gitee.com/houyao123/my-resource/raw/master/img/parnew-20210103212738439.jpeg)
 
 ### Parallel Scavenge收集器
 
@@ -507,7 +507,7 @@ JVM内存映像工具。
 
 堆内存模型：
 
-[![image-20200227234850635](JVM.png)](https://github.com/lvminghui/Java-Notes/blob/master/docs/imgs/JVM.png)
+[![image-20200227234850635](https://gitee.com/houyao123/my-resource/raw/master/img/JVM.png)](https://github.com/lvminghui/Java-Notes/blob/master/docs/imgs/JVM.png)
 
 **此内存区域的唯一目的就是存放对象实例，几乎所有的对象实例以及数组都在这里分配内存。**
 

@@ -454,7 +454,7 @@ for (int i = 1; i <=6 ; i++) {
 
 **概念**：当阻塞队列为空时，获取（take）操作是阻塞的；当阻塞队列为满时，添加（put）操作是阻塞的。
 
-![](https://raw.githubusercontent.com/MaJesTySA/JVM-JUC-Core/master/imgs/BlockingQueue.png)
+![](https://gitee.com/houyao123/my-resource/raw/master/img/BlockingQueue.png)
 
 **好处**：阻塞队列不用手动控制什么时候该被阻塞，什么时候该被唤醒，简化了操作。
 
@@ -637,11 +637,11 @@ public static ExecutorService newCachedThreadPool() {
 
 **原理图**：上面银行的例子，实际上就是线程池的工作原理。
 
-![](https://raw.githubusercontent.com/MaJesTySA/JVM-JUC-Core/master/imgs/threadPool.png)
+![](https://gitee.com/houyao123/my-resource/raw/master/img/threadPool.png)
 
 **流程图**：
 
-![](https://raw.githubusercontent.com/MaJesTySA/JVM-JUC-Core/master/imgs/threadPoolProcedure.png)
+![](https://gitee.com/houyao123/my-resource/raw/master/img/threadPoolProcedure.png)
 
 新任务到达→
 

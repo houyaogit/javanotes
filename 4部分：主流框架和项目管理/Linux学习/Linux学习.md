@@ -4,7 +4,7 @@
 
 Linux操作系统具有一定层次结构，由若干目录和子目录组成，不同于windows操作系统，Linux只有一个根目录，用“/”表示，它采用的是**级层式的树形结构**。
 ----*在Linux世界里，一切皆文件。*
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70.png)
 
 ## 具体的目录结构
 
@@ -83,7 +83,7 @@ Linux操作系统具有一定层次结构，由若干目录和子目录组成，
 vi 文件名（进入vi正常模式）
 按i或a进入编辑模式
 按esc+：进入命令模式（wq：保存并退出，q：不保存退出，q！：强制退出）
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126162218676.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126162218676.png)
 
 ## vi快捷键
 
@@ -134,13 +134,13 @@ history 历史命令
 该命令会默认创建一个与用户同名的组
 在/home/目录下可查看新建用户的家目录
 也可以通过 **useradd -d 指定目录 新的用户名**，给新创建的用户指定家目录
-![在这里插入图片描述](20200416161947329.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200416161947329.png)
 指定密码：passwd +用户名（密码不回显）
 删除用户（要root）：
 **userdel** 用户名（这种方法家目录会保留）
 userdel -r 用户名（删除用户及家目录）
 查询用户信息 id 用户名
-![在这里插入图片描述](20200416163148711.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200416163148711.png)
 GID 是group ID(用户组的ID)
 UID是user ID（用户的ID）
 组：所在组名称
@@ -158,7 +158,7 @@ UID是user ID（用户的ID）
 **/etc/passwd** 文件
 用户（user）的配置文件，记录用户的各种信息
 每行的含义：用户名:口令:用户标识号:组标识号:注释性描述:主目录:登录Shell
-![在这里插入图片描述](20200416170619344.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200416170619344.png)
 **/etc/shadow** 文件
 口令的配置文件
 每行的含义：登录名:加密口令:最后一次修改时间:最小时间间隔:最大时间间隔:警告时间:不活动时间:失效时间:标志
@@ -166,7 +166,7 @@ UID是user ID（用户的ID）
 **/etc/group** 文件
 组(group)的配置文件，记录 Linux 包含的组的信息
 每行含义：组名:口令:组标识号:组内用户列表
-![在这里插入图片描述](20200416170656164.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200416170656164.png)
 
 ## Linux指定运行级别
 
@@ -179,7 +179,7 @@ UID是user ID（用户的ID）
 6：系统重启
 常用运行级别为3或5，保存运行级别的文件在/etc/inittab/的id:5:initdefault:这一行的数字里。
 我们使用vim查看一下这个文件：
-![在这里插入图片描述](20200420193613657.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200420193613657.png)
 使用init 3可使界面切换到命令行界面，其他同理。（关机重启后还是回到图形界面），那么怎么才能一直保存修改呢，其实只要修改保存配置的文件/etc/inittab/就行了。
 应用：怎么才能在忘记root密码的情况下修改root密码呢？
 1.在开机界面按下erter键
@@ -193,11 +193,11 @@ UID是user ID（用户的ID）
 
 通过Linux提供的帮助指令了解这个命令。
 **man**[命令]
-![在这里插入图片描述](20200420202734936.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200420202734936.png)
 然后会跳到这个页面
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163118008.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163118008.png)
 help[命令]
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163118076.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163118076.png)
 
 ## 文件目录
 
@@ -239,7 +239,7 @@ cp [选项] source dest
 
 - -r 递归拷贝整个文件夹
   下面不使用-r选项将无法拷贝，因为目录下带有文件
-  ![在这里插入图片描述](20200422192511166.png)
+  ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200422192511166.png)
   当目标目录下已存在相同文件时，在命令前加 \ 将不提示直接覆盖
   例如：\cp -r dir/ dir1/
 
@@ -269,11 +269,11 @@ cp [选项] source dest
 - -n显示行号
   cat命令常与管道符|more连用，方便分页浏览
   例如：
-  ![在这里插入图片描述](20200422203602894.png)
-  ![在这里插入图片描述](20200422203636723.png)
-  ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163118048.png)
+  ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200422203602894.png)
+  ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200422203636723.png)
+  ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163118048.png)
   **more** 指令是一个基于 VI 编辑器的文本过滤器，它以全屏幕的方式按页显示文本文件的内容。
-  ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163118099.png)
+  ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163118099.png)
 
 **less** 指令用来分屏查看文件内容，它的功能与 more 指令类似，但是比 more 指令更加强大，支持各种显示终端。less 指令在显示文件内容时，并不是一次将整个文件加载之后才显示，而是**根据显示需要加载内容**，对于显示大型文件具有较高的效率。
 对于以上三个查看文件的目录，以下快捷键大部分能通用：
@@ -295,7 +295,7 @@ ls -l > a.txt
 追加指令：>>
 ll >> b.txt
 将当前列表的信息追加到b.txt文件中，如果不存在则会创建。
-![在这里插入图片描述](20200422211717275.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200422211717275.png)
 **echo**指令：输出内容到控制台
 例如：
 echo “hello world”
@@ -346,17 +346,17 @@ history 10
 5. date “+%Y-%m-%d %H:%M:%S”（显示年月日时分秒）
 
 例如：
-![在这里插入图片描述](20200423093300969.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200423093300969.png)
 这里%Y、%m或其他之间可以加任意的连接符
 设置日期：date -s 日期
 例如：
-![在这里插入图片描述](20200423093610729.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200423093610729.png)
 cal指令：查看日历
 语法：
 cal：查看本月日历
 cal 年份：查看全年日历
-![在这里插入图片描述](20200423093821967.png)
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163118096.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200423093821967.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163118096.png)
 
 ## 查询
 
@@ -392,7 +392,7 @@ grep 过滤查找 ， 管道符，“|”，表示将前一个命令的处理结
 - -i忽略大小写
 
 示例：
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163118089.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163118089.png)
 
 ## 压缩与解压
 
@@ -445,7 +445,7 @@ Linux 组基本介绍
 查看文件的所有者
 
 - ls -ahl
-  ![在这里插入图片描述](20200429202412917.png)
+  ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200429202412917.png)
 
 ## 更改用户组和文件主
 
@@ -456,8 +456,8 @@ Linux 组基本介绍
    
 
   - -R：如果是目录 则使其下所有子文件或目录递归生效
-    ![在这里插入图片描述](20200429202952726.png)
-    ![在这里插入图片描述](20200429202938133.png)
+    ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200429202952726.png)
+    ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200429202938133.png)
     这里将a.txt文件的拥有者从tom该为root
 
 **修改文件所在组**
@@ -467,15 +467,15 @@ Linux 组基本介绍
    
 
   - -R：如果是目录 则使其下所有子文件或目录递归生效
-    ![在这里插入图片描述](20200429203256604.png)
+    ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200429203256604.png)
     这里将a.txt文件的组名该为root
 
 **该用户所在组**
 
 - usermod -g 组名 用户名
 
-![在这里插入图片描述](20200429203751873.png)
-![在这里插入图片描述](20200429203813649.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200429203751873.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200429203813649.png)
 tom用户本来在police组，通过命令变为dancer组
 **修改用户的附加组**
 usermod -G 附加组名 用户
@@ -491,7 +491,7 @@ groupmod -g 3000 组名
 ## 权限的基本介绍
 
 ls -l显示如下：
-![在这里插入图片描述](20200429205032952.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200429205032952.png)
 说明：
 
 - 第0位：文件类型（d,-,l,c,b）
@@ -523,7 +523,7 @@ ls -l显示如下：
 \6. [ w ]代表可写(write): 可以修改,目录内创建+删除+重命名目录
 \7. [ x ]代表可执行(execute):可以进入该目录
 
-![在这里插入图片描述](20200429205930629.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200429205930629.png)
 后面
 
 - 1：如果是文件则表示硬链接数，如果是文件表示子目录数
@@ -542,14 +542,14 @@ ls -l显示如下：
 1. chmod u=rwx,g=rx,o=x 文件目录名
 2. chmod o+w 文件目录名
 3. chmod a-x 文件目录名
-   ![在这里插入图片描述](20200429214852404.png)
-   ![在这里插入图片描述](20200429214819417.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200429214852404.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200429214819417.png)
    这里将aaa.txt用户权限该为rwx，用户组权限改为x，其他组权限改为w
 
 - 第二种方式：通过数字变更权限
   规则：r=4 w=2 x=1,rwx=4+2+1=7
   chmod u=rwx,g=rx,o=x 文件目录名相当于 chmod 751 文件目录名
-  ![在这里插入图片描述](20200429215155488.png)
+  ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200429215155488.png)
   使用数字更改权限较为简单
 
 ### 修改密码
@@ -595,11 +595,11 @@ ls -l显示如下：
 
 意思说每小时的每分钟执行 ls –l /etc/ > /tmp/to.txt 命令
 参数说明：
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163609020.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163609020.png)
 特殊符号说明：
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163609110.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163609110.png)
 案例：
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163609057.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163609057.png)
 案例：每隔 1 分钟，就将当前的日期信息，追加到 /tmp/mydate 文件
 中
 
@@ -631,7 +631,7 @@ ls -l显示如下：
 
 ## window下的磁盘分区
 
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163704739.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163704739.png)
 
 ## linux分区
 
@@ -647,7 +647,7 @@ ls -l显示如下：
 3. 对于 SCSI 硬盘则标识为“sdx~”，SCSI 硬盘是用“sd”来表示分区所在设备的类型的，其余则和 IDE 硬盘的表示方法一样
 
 通过lsblk指令可查看系统分区和挂载情况：
-![在这里插入图片描述](20200505162356989.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200505162356989.png)
 
 ## 在虚拟机上挂载一块硬盘
 
@@ -665,7 +665,7 @@ ls -l显示如下：
    /dev/sdb1 /home/newdisk ext4 defaults 0 0
 
 步骤：
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163704673.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163704673.png)
 
 - 输入命令：fdisk /dev/sdb1
   依次输入n，新增分区，p，默认（按回车），默认，w（保存）
@@ -674,13 +674,13 @@ ls -l显示如下：
   ext4为分区类型
 - 创建目录，使用mount 命令将磁盘分区挂载到目录下
 - 修改/etc/fstab 文件添加下面这行，然后mount -a生效
-  ![在这里插入图片描述](20200505170519639.png)
+  ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200505170519639.png)
 
 ## 磁盘情况查询
 
 命令：df -lh
 查询系统磁盘总体占用情况
-![在这里插入图片描述](20200505173222331.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200505173222331.png)
 查询指定目录的磁盘占用情况
 • 基本语法
 du -h /目录
@@ -692,19 +692,19 @@ du -h /目录
 - –max-depth=1 子目录深度
 
 实例：
-![在这里插入图片描述](20200505173426134.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200505173426134.png)
 **实用指令**：
 
 1. 统计/home 文件夹下文件的个数
-   ![在这里插入图片描述](20200505173645818.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200505173645818.png)
 2. 统计/home 文件夹下目录的个数
-   ![在这里插入图片描述](2020050517380962.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/2020050517380962.png)
 3. 统计/home 文件夹下文件的个数，包括子文件夹里的
-   ![在这里插入图片描述](20200505173846353.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200505173846353.png)
 4. 统计文件夹下目录的个数，包括子文件夹里的
-   ![在这里插入图片描述](20200505173905189.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200505173905189.png)
 5. 以树状显示目录结构
-   ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163704737.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163704737.png)
 
 
 
@@ -713,14 +713,14 @@ du -h /目录
 ## 自动获取
 
 点击系统，首选项，网络连接，点击网卡，编辑，点击自动连接，应用
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163957540.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163957540.png)
 缺点是每次自动获取的 ip 地址可能不一样。这个不适用于做服务器，因为我们的服务器的 ip 需要时固定的。
 
 ## 固定IP
 
 直 接 修 改 配 置 文 件 来 指 定 IP, 并 可 以 连 接 到 外 网 ( 程 序 员 推 荐 ) ， 编 辑vi /etc/sysconfig/network-scripts/ifcfg-eth0
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163957532.png)
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163957625.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163957532.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126163957625.png)
 修改后，重启服务，使用service network restart这条命令。
 
 
@@ -759,10 +759,10 @@ ps指令详解：
 • START：进程的启动时间
 • TIME：CPU 时间，即进程使用 CPU 的总时间
 • COMMAND：启动进程所用的命令和参数，如果过长会被截断显示
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165652977.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165652977.png)
 应用案例：
 以全格式显示当前所有的进程，查看进程的父进程
-![在这里插入图片描述](20200507095556587.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200507095556587.png)
 -e 显示所有进程。-f 全格式
 
 - C：CPU 用于计算执行优先级的因子。数值越大，表明进程是 CPU 密集型运算，执行优先级会降低；数值越小，表明进程是 I/O 密集型运算，执行优先级会提高
@@ -783,14 +783,14 @@ killall 进程名称（功能描述：通过进程名称杀死进程，也支持
 案例：
 
 1. 踢掉非法登录用户
-   ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165652806.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165652806.png)
 2. 终止远程登录服务 sshd, 在适当时候再次重启 sshd 服务，重启命令为
    （service sshd start）
-   ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165653016-6381013.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165653016-6381013.png)
 3. 终止多个 gedit 编辑器 【killall , 通过进程名称来终止进程】
-   ![在这里插入图片描述](20200507102825840.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200507102825840.png)
 4. 强制杀掉一个终端
-   ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165652979.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165652979.png)
 
 ## 查看进程树pstree
 
@@ -809,20 +809,20 @@ service 服务名 [start | stop | restart | reload | status]
 案例：
 查看当前防火墙的状况，关闭防火墙和重启防火墙
 
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165652780.png)
-![在这里插入图片描述](20200507111725863.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165652780.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200507111725863.png)
 这种方式只是**临时生效**，当重启系统后，还是回归以前对服务的设置。如果希望设置某个服务自启动或关闭永久生效，要使用 chkconfig 指令
 
 注意：可以在windows下使用telnet测试linux端口是否有效
 用法：telnet ip 端口号
 下图表示连接成功
-![在这里插入图片描述](20200507111937398.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200507111937398.png)
 
 ## 查看服务名
 
 1. 使用setup命令，选择系统服务，进入可查看及修改
-   ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165652864.png)
-2. 查看/etc/init.b/目录 ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165652923.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165652864.png)
+2. 查看/etc/init.b/目录 ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165652923.png)
 
 ## 服务的运行级别(runlevel):
 
@@ -837,15 +837,15 @@ Linux 系统有 7 种运行级别(runlevel)：常用的是级别 3 和 5
 • 运行级别 6：系统正常关闭并重启，默认运行级别不能设为 6，否则不能正常启动
 
 开机流程
-![在这里插入图片描述](2020050711260240.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/2020050711260240.png)
 
 ## chkconfig指令
 
 通过 chkconfig 命令可以给每个服务的各个运行级别设置自启动/关闭
 查看服务 chkconfig --list|grep xxx
-![在这里插入图片描述](20200507112722262.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200507112722262.png)
 查看某个服务
-![在这里插入图片描述](20200507112820851.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200507112820851.png)
 在某个运行级下设置服务是否自启动：chkconfig --level 5 服务名 on/off
 案例：
 
@@ -896,10 +896,10 @@ top [选项]
 
 1. 监听特定用户
    输入top进入监听，在输入u，选择监听用户
-   ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165653010.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165653010.png)
 2. 终止指定的进程
    输入k，然后输入进程号
-   ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165653039.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165653039.png)
 3. 指定系统状态更新的时间(每隔 10 秒自动更新， 默认是 3 秒)：
    top -d 10
 
@@ -911,9 +911,9 @@ netstat [选项]
 
 - -an 按一定顺序排列输出
 - -p 显示哪个进程在调用
-  ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165653022.png)
+  ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165653022.png)
   查看具体某个服务
-  ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165653016.png)
+  ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165653016.png)
 
 
 
@@ -932,7 +932,7 @@ Linux 的分发版本都有采用（suse,redhat, centos 等等），可以算是
 
 **rpm 包的简单查询指令**：
 rpm –qa|grep xx：查询已安装的 rpm 列表
-![在这里插入图片描述](20200507164730402.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200507164730402.png)
 rpm 包名**基本格式**：
 rpm 包名：firefox-45.0.1-1.el6.centos.x86_64.rpm
 
@@ -941,18 +941,18 @@ rpm 包名：firefox-45.0.1-1.el6.centos.x86_64.rpm
 - 适用操作系统: el6.centos.x86_64，表示 centos6.x 的 64 位系统
 
 rpm -qi 软件包名 ：查询软件包信息
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165826940.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165826940.png)
 rpm -ql 软件包名 :查询软件包中的文件
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165826935.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165826935.png)
 rpm -qf 文件全路径名：查询文件所属的软件包
-![在这里插入图片描述](20200507165518674.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200507165518674.png)
 
 ## rpm包卸载
 
 rpm -e RPM 包的名称
-![在这里插入图片描述](20200507165908552.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200507165908552.png)
 火狐被卸载了
-![在这里插入图片描述](20200507165856736.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200507165856736.png)
 
 - 如果其它软件包依赖于您要卸载的软件包，卸载时则会产生错误信息。如： rpm -e foo
   removing these packages would break dependencies:foo is needed by bar-1.0-1
@@ -970,9 +970,9 @@ rpm -ivh RPM 包全路径名称
 
 步骤：
 首先需要将iso文件挂载，然后在去/media/，进入镜像文件里的Packages目录，然后将安装包复制到/opt/目录下，最后进行安装。
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165826957.png)
-![在这里插入图片描述](20200507170756443.png)
-![在这里插入图片描述](20200507170914728.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165826957.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200507170756443.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200507170914728.png)
 
 ## yum
 
@@ -982,8 +982,8 @@ Yum 是一个 Shell 前端软件包管理器。基于 RPM 包管理，能够从�
 - yum install xxx 下载安装：安装指定的 yum 包
 
 安装firefox:
-![在这里插入图片描述](20200507172324207.png)
-![在这里插入图片描述](20200507172704676.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200507172324207.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200507172704676.png)
 安装完毕！
 
 
@@ -1002,7 +1002,7 @@ Yum 是一个 Shell 前端软件包管理器。基于 RPM 包管理，能够从�
 2. eclipse-jee-mars-2-linux-gtk-x86_64.tar
 3. jdk-7u79-linux-x64
 4. mysql-5.6.14.tar
-   ![在这里插入图片描述](20200513202516590.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200513202516590.png)
    **下载地址**：
    链接：https://pan.baidu.com/s/19qK8FU-ylnYNxTaGbru_Sw
    提取码：l3ch
@@ -1012,14 +1012,14 @@ ftp的使用可参考：
 
 > https://blog.csdn.net/qq_45260767/article/details/105972350
 
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165956812.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165956812.png)
 
 ## JDK的安装
 
 ## 解压jdk压缩包
 
 先进入/opt目录，然后使用tar -zxvf 文件名 将文件解压，得到如下文件：
-![在这里插入图片描述](20200514101650342.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514101650342.png)
 
 ## 配置环境变量
 
@@ -1028,52 +1028,52 @@ ftp的使用可参考：
 JAVA_HOME=/opt/jdk1.7.0_79
 PATH=/opt/jdk1.7.0_79/bin:$PATH
 export JAVA_HOME PATH
-![在这里插入图片描述](2020051410234023.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/2020051410234023.png)
 这时候使用java命令，但是没有用，因为配置文件还未生效
-![在这里插入图片描述](20200514102627411.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514102627411.png)
 可以选择注销用户，然后重新登录让文件生效，也可以使用source命令直接将文件生效
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165956807.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165956807.png)
 
 ## 测试使用
 
 配置完毕我们创建一个Hello.java文件打印Hello World试试效果
-![在这里插入图片描述](20200514103257882.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514103257882.png)
 使用javac编译然后使用java运行，成功打印Hello world，说明jdk配置成功~
-![在这里插入图片描述](20200514103337592.png)
-![在这里插入图片描述](20200514103355120.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514103337592.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514103355120.png)
 
 ## tomcat安装
 
 ## 解压tomcat安装包
 
 同样在/opt命令下使用tar命令解压，得到以下目录
-![在这里插入图片描述](20200514104735122.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514104735122.png)
 
 ## 启动tomcat
 
 要想运行tomcat，**必须先进入apache-tomcat文件的bin目录**下，然后启动startup.sh文件，当然也可以将该路径加入环境变量里。
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165956936.png)
-![在这里插入图片描述](20200514105049899.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165956936.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514105049899.png)
 
 ## 防火墙配置
 
 启动tomcat之后，我们通过Linux本地浏览器可以访问tomcat
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957075-6381197.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957075-6381197.png)
 但是在Windows环境下面，无法访问tomcat
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165956885.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165956885.png)
 分析原因是防火墙没有打开8080端口，我们通过service iptables status命令可知只有22号端口开启。
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165956847.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165956847.png)
 我们进入/etc/sysconfig/iptables，对文件进行配置，添加上8080端口（对22号端口那行使用yy p 复制粘贴）
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165956846.png)
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165956993.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165956846.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165956993.png)
 文件配置完毕，重启防火墙服务，查看防火墙状态发现端口已经打开
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165956894.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165956894.png)
 
 ## 测试访问
 
 这时外网也可以访问tomcat，这里我们使用浏览器和telnet命令（需在管理员身份下运行cmd）测试都可顺利访问
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957066.png)
-![在这里插入图片描述](20200514111613108.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957066.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514111613108.png)
 
 ## eclipse安装
 
@@ -1084,52 +1084,52 @@ export JAVA_HOME PATH
 ## 启动eclipse
 
 1. 创建一个快捷方式
-   ![在这里插入图片描述](20200514115823343.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514115823343.png)
 2. 进入eclipse目录下，执行eclipse
-   ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957075.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957075.png)
 
 ## 测试jsp小项目
 
 创建一个demo，输出 hello from Linux（注意，这里运行会发生错误，因为我们在安装tomcat时启动了tomcat，这里我们要将其关闭，方法是进入tomcat的bin目录下运行shutdown.sh文件）
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957003.png)
-![在这里插入图片描述](20200514120220909.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957003.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514120220909.png)
 运行jsp文件
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957067.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957067.png)
 在url后面加上/hello.jsp，就能成功访问，同样我们也可以在外网使用浏览器访问
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957084.png)
-![在这里插入图片描述](20200514120601762.png)
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957087.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957084.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514120601762.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957087.png)
 
 ## mysql安装（源码安装）
 
 ## 安装步骤：
 
 1.**查看是否存在旧版本，并卸载**
-![在这里插入图片描述](20200514121528392.png)
-![在这里插入图片描述](20200514121546472.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514121528392.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514121546472.png)
 2.**安装编译代码需要的包**
 
 > yum -y install make gcc-c++ cmake bison-devel ncurses-devel
 
-![在这里插入图片描述](20200514121618807.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514121618807.png)
 \3. **解压mysql压缩包**
-![在这里插入图片描述](20200514121813451.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514121813451.png)
 \4. **编译安装**（直接复制下列代码）
 
 > cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql
 > -DMYSQL_DATADIR=/usr/local/mysql/data -DSYSCONFDIR=/etc -DWITH_MYISAM_STORAGE_ENGINE=1 -DWITH_INNOBASE_STORAGE_ENGINE=1 -DWITH_MEMORY_STORAGE_ENGINE=1 -DWITH_READLINE=1 -DMYSQL_UNIX_ADDR=/var/lib/mysql/mysql.sock -DMYSQL_TCP_PORT=3306 -DENABLED_LOCAL_INFILE=1 -DWITH_PARTITION_STORAGE_ENGINE=1 -DEXTRA_CHARSETS=all -DDEFAULT_CHARSET=utf8 -DDEFAULT_COLLATION=utf8_general_ci
 
-![在这里插入图片描述](20200514122419818.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514122419818.png)
 \5. **编译并安装**（花费时间较长）
 
 > make && make install
 
-![在这里插入图片描述](20200514122538696.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514122538696.png)
 
 ## 配置mysql
 
 创建mysql用户及mysql用户组，现在mysql目录用户及用户组还是root用户，我们需要将其改为mysql用户
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957118.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957118.png)
 进入安装路径/usr/local/mysql目录下，然后执行**初始化指令**（下面这条脚本）
 
 > scripts/mysql_install_db --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data --user=mysql
@@ -1149,19 +1149,19 @@ export JAVA_HOME PATH
 
 > 使用service mysql start命令
 
-![在这里插入图片描述](20200514135142766.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514135142766.png)
 进入/usr/local/mysql/bin目录下，执行mysql，默认密码为空
-![在这里插入图片描述](20200514135604522.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514135604522.png)
 我们设置一下密码：
-![在这里插入图片描述](20200514135757849.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200514135757849.png)
 现在mysql就可以使用了
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957292.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957292.png)
 
 ## 配置环境变量
 
 编辑etc/profile文件，在之前jdk的路径后加上mysql的路径，然后重新使用配置文件，mysql就能在其他目录下使用了。
-![在这里插入图片描述](2020051414115514.png)
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957129.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/2020051414115514.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126165957129.png)
 
 
 
@@ -1173,7 +1173,7 @@ export JAVA_HOME PATH
 
 Shell 是一个命令行解释器，它为用户提供了一个向 Linux 内核发送请求以便运行程序的界面系统级程序，用户可以用 Shell 来启动、挂起、停止甚至是编写一些程序。
 示意图：
-![在这里插入图片描述](20200513204226499.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200513204226499.png)
 脚本格式要求：
 
 1. 脚本以#!/bin/bash开头
@@ -1182,17 +1182,17 @@ Shell 是一个命令行解释器，它为用户提供了一个向 Linux 内核�
 ## 创建第一个shell脚本
 
 在这里我们先创建一个hello.sh文件，然后用vi编辑器输入内容
-![在这里插入图片描述](20200513204851666.png)
-![在这里插入图片描述](20200513204750550.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200513204851666.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200513204750550.png)
 
 执行方式：
 
 1. 通过sh/bash命令执行
-   ![在这里插入图片描述](2020051320571019.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/2020051320571019.png)
 2. 先给文件赋予可执行权限，然后通过相对路径或绝对路径的方式执行
-   ![在这里插入图片描述](20200513210201421.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200513210201421.png)
    绝对路径执行：
-   ![在这里插入图片描述](20200513210219109.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200513210219109.png)
 
 ## shell变量
 
@@ -1206,11 +1206,11 @@ Shell 是一个命令行解释器，它为用户提供了一个向 Linux 内核�
 **声明静态变量**：readonly 变量，注意：不能 unset
 
 案例 1：定义变量 A，然后撤销变量 A
-![在这里插入图片描述](20200513224454420.png)
-![在这里插入图片描述](20200513224541214.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200513224454420.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200513224541214.png)
 
 案例 2：显示当前 shell 中所有变量：set
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170130611.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170130611.png)
 
 ## 定义变量的规则
 
@@ -1222,11 +1222,11 @@ Shell 是一个命令行解释器，它为用户提供了一个向 Linux 内核�
 
 也就是在shell文件里使用终端的命令，并将命令返回的字符串返回给变量。
 方法：
-![在这里插入图片描述](20200513225044196.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200513225044196.png)
 注意：反引号在键盘esc键的下面，一般我们习惯使用上述第二种方式赋值。
 案例：
-![在这里插入图片描述](20200513225640901.png)
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170130559.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200513225640901.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170130559.png)
 上面我们将ls -l /home 命令的返回值赋给了LS变量，date命令赋值给了MY_DATE变量，然后输出。
 
 ## 设置环境变量
@@ -1237,8 +1237,8 @@ Shell 是一个命令行解释器，它为用户提供了一个向 Linux 内核�
 Linux里将环境变量存放在/etc/profile文件里
 
 案例：设置tomcat的环境变量
-![在这里插入图片描述](20200518195154519.png)
-![在这里插入图片描述](20200518195325445.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200518195154519.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200518195325445.png)
 使用**vim**编辑/etc/profile文件，在**文件末尾**添加export语句，然后使用**source命令**让文件生效，最后使用**echo**测试输出TOMCAT_HOME成功。
 
 ## 位置参数变量
@@ -1256,9 +1256,9 @@ $ 0表示命令名，$ 1代表第一个参数…，在执行脚本前应为文�
 
 > 参考https://blog.csdn.net/miachen520/article/details/98661139
 
-![在这里插入图片描述](20200518201758508.png)
-![在这里插入图片描述](2020051820182867.png)
-![在这里插入图片描述](20200518201839158.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200518201758508.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/2020051820182867.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200518201839158.png)
 
 ## 预定义变量
 
@@ -1271,7 +1271,7 @@ $ 0表示命令名，$ 1代表第一个参数…，在执行脚本前应为文�
 
 案例：
 创建preVar.sh文件，在第二行进行后台执行position.sh(在命令后面加&),最后返回成功执行状态
-![在这里插入图片描述](20200518203920953.png)![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170130636.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200518203920953.png)![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170130636.png)
 
 ## 运算符
 
@@ -1286,7 +1286,7 @@ $ 0表示命令名，$ 1代表第一个参数…，在执行脚本前应为文�
 - 计算（3+2）*4
 - 2.计算两个参数的和
 
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170130794.png)![在这里插入图片描述](20200518210116690.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170130794.png)![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200518210116690.png)
 
 ## 条件判断
 
@@ -1317,13 +1317,13 @@ $ 0表示命令名，$ 1代表第一个参数…，在执行脚本前应为文�
 
 1. “ok"是否等于"ok”
 2. 23是否大于22
-   ![在这里插入图片描述](20200518212908687.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200518212908687.png)
    结果：
-   ![在这里插入图片描述](20200518212822704.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200518212822704.png)
 3. aaa.txt文件是否存在
 4. aaa.txt文件是否有读写权限
-   ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170130684.png)
-   ![在这里插入图片描述](20200518213113529.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170130684.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200518213113529.png)
 
 ## 流程控制
 
@@ -1351,8 +1351,8 @@ $ 0表示命令名，$ 1代表第一个参数…，在执行脚本前应为文�
 
 **注意**：中括号与条件判断式之间必须要有空格
 案例：判断输入参数大于等于80优秀，大于等于60及格，否则不及格
-![在这里插入图片描述](20200518214739879.png)
-![在这里插入图片描述](20200518214714300.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200518214739879.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200518214714300.png)
 
 ### case语句
 
@@ -1370,8 +1370,8 @@ case $变量名 in
 ;;
 esac
 案例：当命令行参数是 1 时，输出 “周一”, 是 2 时，就输出"周二"， 其它情况输出 “其他”
-![在这里插入图片描述](20200518215856831.png)
-![在这里插入图片描述](2020051821593415.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200518215856831.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/2020051821593415.png)
 
 ### for循环
 
@@ -1382,15 +1382,15 @@ esac
    程序
    done
    案例1:打印命令行参数
-   ![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170130745.png)
-   ![在这里插入图片描述](20200518221412345.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170130745.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200518221412345.png)
 2. for (( 初始值;循环控制条件;变量变化 ))
    do
    程序
    done
    案例2：1到100累加并输出
-   ![在这里插入图片描述](2020051822175417.png)
-   ![在这里插入图片描述](20200518221803654.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/2020051822175417.png)
+   ![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200518221803654.png)
 
 ### while循环
 
@@ -1400,8 +1400,8 @@ do
 程序
 done
 案例：命令行输入一个数n，计算1+…+n的值
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170130840.png)
-![在这里插入图片描述](20200518222724390.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170130840.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200518222724390.png)
 
 ## read读取控制台
 
@@ -1416,9 +1416,9 @@ read(选项)(参数)
 案例：
 1.读取控制台输入一个 num 值
 \2. 读取控制台输入一个 num 值，在 10 秒内输入。
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170130850.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170130850.png)
 测试案例2时第一次十秒内未输入，第二次输入
-![在这里插入图片描述](2020051919332339.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/2020051919332339.png)
 
 ## 函数
 
@@ -1434,13 +1434,13 @@ shell 编程和其它编程语言一样，有系统函数，也可以自定义�
 注意：basename 命令会删掉所有的前缀包括最后一个（‘/’）字符，然后将字符串显示出来，如果选项带有后缀，返回值将会把后缀删掉
 
 案例：
-![在这里插入图片描述](20200519194721854.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200519194721854.png)
 
 - dirname
   功能描述：从给定的包含绝对路径的文件名中去除文件名（非目录的部分），然后返回剩下的路径（目录的部分）
 
 案例：
-![在这里插入图片描述](20200519194911829.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200519194911829.png)
 
 ### 自定义函数
 
@@ -1451,8 +1451,8 @@ Action;
 [return int;]
 }
 案例：就是输入的两个数之和
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170130875.png)
-![在这里插入图片描述](20200519200139756.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170130875.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200519200139756.png)
 
 
 
@@ -1474,8 +1474,8 @@ Action;
 分析：
 首先我们要编写一个shell脚本，功能将数据库备份并打包，然后使用cron任务调度设置每天执行的时间。
 
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170257734.png)
-![在这里插入图片描述](20200519221429336.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170257734.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200519221429336.png)
 shell代码：
 
 ```powershell
@@ -1542,22 +1542,22 @@ sudo apt-cache rdepends package 查看该包被哪些包依赖
 
 **原理**：
 在ubuntu的/etc/apt/sources.list文件里指定了官方的软件仓库，apt软件下载都是通过里面的网址进行下载，但是这个网址在美国，因此下载的速度比较慢。我们可以通过修改source.list文件，将下载点转换到国内的镜像站。
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170401853.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170401853.png)
 先进入/etc/apt/目录
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170401725.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170401725.png)
 使用cp命令对sources.list文件进行备份
-![在这里插入图片描述](20200516174318561.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200516174318561.png)
 将sources.list文件内容清空，将站点的代码粘贴到文件内
-![在这里插入图片描述](20200516174714204.png)
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170401789.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200516174714204.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170401789.png)
 更新服务器列表
-![在这里插入图片描述](20200516175149620.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200516175149620.png)
 
 # vim卸载安装案例
 
 卸载
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170401820.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170401820.png)
 安装
-![在这里插入图片描述](20200516182203226.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/20200516182203226.png)
 显示安装软件信息
-![在这里插入图片描述](watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170401875.png)
+![在这里插入图片描述](https://gitee.com/houyao123/my-resource/raw/master/img/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQ1MjYwNzY3,size_16,color_FFFFFF,t_70-20201126170401875.png)

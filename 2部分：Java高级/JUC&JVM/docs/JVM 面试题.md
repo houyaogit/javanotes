@@ -37,7 +37,7 @@
 
 堆内存模型：
 
-![image-20200227234850635](https://github.com/lvminghui/Java-Notes/blob/master/docs/imgs/JVM.png)
+![image-20210103212847230](https://gitee.com/houyao123/my-resource/raw/master/img/image-20210103212847230.png)
 
  **此内存区域的唯一目的就是存放对象实例，几乎所有的对象实例以及数组都在这里分配内存。** 
 
