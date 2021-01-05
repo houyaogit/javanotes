@@ -31,7 +31,7 @@ location:shanghai language:java <br>
 https://github.com/codingXiaxw/seckill/blob/master/src/main/java/cn/codingxiaxw/dao/SeckillDao.java#L13
 https://github.com/codingXiaxw/seckill/blob/master/src/main/java/cn/codingxiaxw/dao/SeckillDao.java#L13-L23
 
-### Git 帮助文档：
+### Github 帮助文档：
 https://help.github.com/en/articles/using-keyboard-shortcuts
 
 seckill in:name,readme
