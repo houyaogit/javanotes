@@ -31,8 +31,7 @@ location:shanghai language:java <br>
 https://github.com/codingXiaxw/seckill/blob/master/src/main/java/cn/codingxiaxw/dao/SeckillDao.java#L13
 https://github.com/codingXiaxw/seckill/blob/master/src/main/java/cn/codingxiaxw/dao/SeckillDao.java#L13-L23
 
-### Github 帮助文档：
-https://help.github.com/en/articles/using-keyboard-shortcuts
+
 
 seckill in:name,readme
 
@@ -44,4 +43,10 @@ seckill in:name,readme
    git remote add origin 你的远程库http地址<br>
 6、把本地库的内容推送到远程，使用 git push<br>
    git push -u origin master
+
+
+
+**Github 帮助文档：https://help.github.com/en/articles/using-keyboard-shortcuts**
+
+**java官网文档： https://docs.oracle.com/javase/8/docs/index.html**
 
