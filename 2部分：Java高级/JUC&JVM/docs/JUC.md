@@ -359,6 +359,8 @@ public CopyOnWriteArraySet() {
 
 就像有了家门的锁，厕所、书房、厨房就为你敞开了一样。可重入锁可以**避免死锁**的问题。
 
+ReentrantLock 和synchronized 都是 可重入锁
+
 详见[ReentrantLockDemo](https://github.com/MaJesTySA/JVM-JUC-Core/blob/master/src/thread/ReentrantLockDemo.java)。
 
 ### 锁的配对
