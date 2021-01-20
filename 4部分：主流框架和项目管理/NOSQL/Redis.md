@@ -91,7 +91,7 @@ Watch , unwatch 实现乐观锁
 
 ## SpringBoot 整合
 
-SpringBoot2.X之后，原来使用的jedis被替换为两lettuce
+SpringBoot2.X之后，原来使用的jedis（被舍弃）被替换为两lettuce
 
 jedis：采用的直连，多个线程操作是不安全的，如果想避免不安全，使用jedis pool 连接池，像BIO模式
 
@@ -101,11 +101,37 @@ lettuce：采用netty，实例可以在多个线程中进行共享不存在线�
 
 
 
+redisTemplate 传输对象，所有对象需要序列化 
+
+要么序列化对象， 要么转换成 String json = new ObjectMapper().writeValueAsString(new Object());
 
 
 
+redis conf 详解 
 
 
+
+redis持久化
+
+redis rdb 快照
+
+redis aof ， 如果appendonly.aof 破环了可以用redis-check-aof 修复
+
+
+
+redis发布订阅
+
+
+
+redis主从复制
+
+主机写，从机读 
+
+哨兵模式，配置比较复杂
+
+
+
+redis缓存
 
 
 
