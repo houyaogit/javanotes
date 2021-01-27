@@ -29,7 +29,7 @@ HashMap 和 Hashtable
 * ArrayList 和 LinkedList
   * Arraylist动态数组 、LinkedList双向链表数据结构。
   * ArrayList ①末尾增删O(1) ②指定增删O(n-x)移动整个数组，LinkedList 增删断链更改指向O(1)。
-  * ArrayList位移运算1.5倍扩容列表结尾会预留空间，LinkedList存放next、pre、数据 单元素消耗大。
+  * ArrayList位移运算1.5倍扩容列表结尾会预留空间，LinkedList存放next、prev、数据 单元素消耗大。
   * 当从 ArrayList 的中间位置插入或者删除元素时，需要对数组进行复制、移动、代价比较高。因此，它适合随机查找和遍历，不适合插入和删除。
   * LinkList：LinkedList 是用链表结构存储数据的，很适合数据的动态插入和删除，随机访问和遍历速度比较慢。另外，他还提供了 List 接口中没有定义的方法，专门用于操作表头和表尾元素，可以当作**堆栈、队列和双向队列**使用。
 
@@ -43,7 +43,13 @@ Vector 与 ArrayList 一样，也是通过数组实现的，不同的是它支�
 不重复、一个 null、无序（TreeSet通过Comparator、Comparable维护排序），实现类是 HashSet、LinkedHashSet 以及 TreeSet。
 
 * HashSet：基于哈希表实现，存入数据是按照哈希值，所以并不是按照存入的顺序排序，为保证存入的唯一性，存入元素哈希值相同时，会使用 equals 方法比较，如果比较出不同就放入同一个哈希桶里。
+
+  * 实现原理： HashSet底层由HashMap实现 ，值存放于HashMap的key上 ，HashMap的value统一为PRESENT 。
+
+    检查重复： 先对插入的元素的hashcode值和现有的元素的hashcode作比较，如果没有相符的hashcode，HashSet会假设对象没有重复出现，直接插入。但是如果发现有相同hashcode值的对象，这时会调用`equals（）`方法来检查hashcode相等的对象是否真的相同。  如果两者相同，HashSet就不会让加入操作成功 。
+
 * TreeSet：基于红黑树实现，支持有序性操作，每增加一个对象都会进行排序，将对象插入的二叉树指定的位置。
+
 * LinkHashSet（ HashSet+LinkedHashMap-> Redis 的 LRU最近最少算法 ）：继承于 HashSet、又是基于 LinkedHashMap 来实现的， 具有 HashSet 的查找效率 。
 
 #### Queue： 
@@ -81,13 +87,45 @@ Hashtable 是遗留类，不建议使用，很多映射的常用功能与 HashMa
 
 红黑树实现，可排序，需要对一个有序的key集合进行遍历时建议使用。
 
-### LinkHashMap： 
+* TreeMap 其 key 对象为什么必须要实现 Compare 接口
+  * 通过阅读 TreeMap 的 put 方法的源码发现：TreeMap 实现元素不重复就是通过调用 compareTo 方法，而要使用 compareTo 方法就必须实现Compare接口。
+
+### LinkHashMap - LRU：
 
 (实现Redis的缓存过期策略 LRU最少最近算法 )  是 HashMap 的一个子类， 增加了一条双向链表， **从而可以保存记录的插入顺序**，在用 Iterator 遍历 LinkedHashMap 时，先得到的记录肯定是先插入的，也可以在构造时带参数，按照访问次序排序。
 
+* LinkedHashMap 实现LRU（least recently used）
+  * 设定最大缓存空间 MAX_ENTRIES 为 3；
+  * 使用 LinkedHashMap 的构造函数将 accessOrder 设置为 true，开启 LRU 顺序；
+  * 覆盖 removeEldestEntry() 方法实现，在节点多于 MAX_ENTRIES 就会将最近最久未使用的数据移除。
+
+```java
+class LRUCache<K, V> extends LinkedHashMap<K, V> {
+    private static final int MAX_ENTRIES = 3;
+    protected boolean removeEldestEntry(Map.Entry eldest) {
+        return size() > MAX_ENTRIES;
+    }
+    LRUCache() {
+        super(MAX_ENTRIES, 0.75f, true);
+    }
+}
+public static void main(String[] args) {
+    LRUCache<Integer, String> cache = new LRUCache<>();
+    cache.put(1, "a");
+    cache.put(2, "b");
+    cache.put(3, "c");
+    cache.get(1);
+    cache.put(4, "d");
+    System.out.println(cache.keySet());
+}
+```
+
 ### ConcurrentHashMap：
 
-支持并发操作的HashMap，在JDK1.7和1.8实现线程安全的方式不同。
+* 支持并发操作的HashMap，在JDK1.7和1.8实现线程安全的方式不同。
+
+* JDK1.8：
+  * 使用了 CAS 操作来支持更高的并发度，在 CAS 操作失败时使用内置锁 synchronized。  synchronized只锁定当前链表或红黑二叉树的首节点，这样只要hash不冲突，就不会产生并发，效率又提升N倍。 
 
 ### HashMap：
 
@@ -124,26 +162,6 @@ Hashtable 是遗留类，不建议使用，很多映射的常用功能与 HashMa
   * 为了存取高效，减少碰撞，把数据在链表均匀分配，数据存链表的算法=取模 hash%length，计算机直接求余效率不如位移运算，源码中做了优化hash&(length-1)。
   * hash%length==hash&(length-1)的前提是 length 是2的 n 次方。
 
-* HashMap ， map.put("a","b")的整个流程
-
-  * ```
-    1. 先判断散列表是否没有初始化或者为空，如果是就扩容
-    2. 根据键值 key 计算 hash 值，得到要插入的数组索引 
-    3. 判断要插入的那个数组是否为空：
-    		1. 如果为空直接插入。
-    		2. 如果不为空，判断 key 的值是否是重复（用 equals 方法）：
-        		1. 如果是就直接覆盖
-            2. 如果不重复就再判断此节点是否已经是红黑树节点：
-            		1. 如果是红黑树节点就把新增节点放入树中
-                2. 如果不是，就开始遍历链表：
-                	1. 循环判断直到链表最底部，到达底部就插入节点，
-                  然后判断是否大于链表长度是否大于8：
-                  		1. 如果大于8就转换为红黑树
-                     			2. 如果不大于8就继续下一步
-                      2. 到底部之前发现有重复的值，就覆盖。
-    4. 判断是否需要扩容，如果需要就扩容。
-    ```
-
 * HashMap为什么不直接使用hashCode()处理后的哈希值直接作为table的下标？
 
   * hashCode()返回的是int整数范围为-(2 ^ 31)~(2 ^ 31 - 1)，HashMap容量范围在16（初始化默认值）~2 ^ 30，  通常取不到最大值，设备也难以提供这么多存储空间，导致通过哈希值可能不在数组大小范围内，无法匹配存储位置； 
@@ -178,187 +196,56 @@ Hashtable 是遗留类，不建议使用，很多映射的常用功能与 HashMa
 
 
 
-
-
-
-
-
-
 ## 二 源码分析
 
 ### ArrayList
-
-#### 1.定义
 
 ``` java
 public class ArrayList<E> extends AbstractList<E>
         implements List<E>, RandomAccess, Cloneable, java.io.Serializable
 ```
 
- ArrayList 是基于数组实现的，所以支持快速随机访问。 继承了AbstractList，实现了List。它是一个数组队列，提供了相关的添加、删除、修改、遍历等功能。 
+* 基于数组实现的，支持快速随机访问。 继承AbstractList，实现List。数组的默认大小为 10。
+  * **RandomAccess** 接口标识着该类支持快速随机访问（只是一个定义了类型的接口，无作用）。  
 
-**RandomAccess** 接口标识着该类支持快速随机访问（只是一个定义了类型的接口，无作用）。  
+* 扩容机制:  核心方法 `oldCapacity + (oldCapacity >> 1)`，也就是旧容量的 1.5 , 旧数组整个复制到新数
+  * 补充: 
+  * **移位运算符简介**：移位运算符就是在二进制的基础上对数字进行平移。按照平移的方向和填充数字的规则分为三种:<<(左移)、>>(带符号右移)和>>>(无符号右移)。**作用**：**对于大数据的2进制运算,位移运算符比那些普通运算符的运算要快很多,因为程序仅仅移动一下而已,不去计算,这样提高了效率,节省了资源**  。
+* 添加和删除
+  * 在末尾添加元素：O(1)
+  * 在指定位置添加元素：O(n-x) , 让数组自己复制自己实现让index开始之后的所有成员后移一个位置。
+* 删除指定元素：O(n-x),将要删除的元素右边的元素向左移动一位，覆盖要删除的元素。调用了arraycopy，所以操作代价也很高。
 
-**Cloneable 接口**，即覆盖了函数 clone()，**能被克隆**。
-
- **java.io.Serializable 接口**，这意味着ArrayList**支持序列化**，**能通过序列化去传输**。 
-
-数组的默认大小为 10。 
-
-#### 2.扩容机制
-
-**核心方法：**
-
-```java
-private void grow(int minCapacity) {
-    // overflow-conscious code
-    int oldCapacity = elementData.length;
-    int newCapacity = oldCapacity + (oldCapacity >> 1);
-    if (newCapacity - minCapacity < 0)
-        newCapacity = minCapacity;
-    if (newCapacity - MAX_ARRAY_SIZE > 0)
-        newCapacity = hugeCapacity(minCapacity);
-    // minCapacity is usually close to size, so this is a win:
-    elementData = Arrays.copyOf(elementData, newCapacity);
-}
-```
-
- 整个流程就是对旧数组位移运算得到新数组，然后把旧数组整个复制到新数组上，操作代价很高，新容量的大小为 `oldCapacity + (oldCapacity >> 1)`，也就是旧容量的 1.5 倍 。
-
-  补充: 
-
-**移位运算符简介**：移位运算符就是在二进制的基础上对数字进行平移。按照平移的方向和填充数字的规则分为三种:<<(左移)、>>(带符号右移)和>>>(无符号右移)。**作用**：**对于大数据的2进制运算,位移运算符比那些普通运算符的运算要快很多,因为程序仅仅移动一下而已,不去计算,这样提高了效率,节省了资源**  。
-
-#### 3.添加和删除
-
-**在末尾添加元素：**
-
-```java
-public boolean add(E e) {
-        ensureCapacityInternal(size + 1);  // Increments modCount!!
-        elementData[size++] = e;
-        return true;
-    }
-```
-
-这里看到ArrayList在末尾添加元素的实质就相当于为数组赋值。
-
-**在指定位置添加元素：**
-
-```java
-public void add(int index, E element) {    
-    rangeCheckForAdd(index);   	
-    ensureCapacityInternal(size + 1);  // Increments modCount!! 
-    System.arraycopy(elementData, index, elementData, index + 1,
-                     size - index);    
-    elementData[index] = element;    size++;}
-```
-
- 让数组自己复制自己实现让index开始之后的所有成员后移一个位置。
-
-**删除指定元素：**
-
-```java
-public E remove(int index) {
-    rangeCheck(index);
-    modCount++;
-    E oldValue = elementData(index);
-    int numMoved = size - index - 1;
-    if (numMoved > 0)
-        System.arraycopy(elementData, index+1, elementData, index, numMoved);
-    elementData[--size] = null; // clear to let GC do its work
-    return oldValue;
-}
-```
-
-把需要删除的元素右边的元素向左移动一位，覆盖了需要删除的元素。调用了arraycopy，所以操作代价也很高。
 ### CopyOnWriteArrayList
 
-concurrent 并发包下的类，是ArrayList的线程安全解决方案， 通过ReentrantLock获取对象锁的方式来实现线程安全。  
+concurrent 并发包下的类，是ArrayList的线程安全解决方案，通过ReentrantLock获取对象锁来实现线程安全。  
 
-**读写分离的特点**
+* 读写分离的特点： 写操作的同时允许读操作
 
-读：
+写的操作需要加锁，防止并发写入导致数据丢失，不直接操作原数组，先copy一个数组进行操作，写完后setArray方法把新的复制数组赋值给旧数组。CopyOnWriteArrayList 在写操作的同时允许读操作，大大提高了读操作的性能，因此适合读多写少的应用场景。 
 
-```java
-@SuppressWarnings("unchecked")
-private E get(Object[] a, int index) {
-    return (E) a[index];
-}
-```
+* 缺点：
+  * 内存占用：在写操作时需要复制一个新的数组，使得内存占用为原来的两倍左右。
 
-写：
-
-```java
-public boolean add(E e) {
-    final ReentrantLock lock = this.lock;
-    lock.lock();
-    try {
-        Object[] elements = getArray();
-        int len = elements.length;
-        Object[] newElements = Arrays.copyOf(elements, len + 1);
-        newElements[len] = e;
-        setArray(newElements);
-        return true;
-    } finally {
-        lock.unlock();
-    }
-}
-
-final void setArray(Object[] a) {
-    array = a;
-}
-```
-
-写的操作需要加锁，防止并发写入导致数据丢失，不直接操作原数组，先copy一个数组进行操作，写完后setArray方法把新的复制数组赋值给旧数组。
-
- CopyOnWriteArrayList 在写操作的同时允许读操作，大大提高了读操作的性能，因此很适合读多写少的应用场景。 
-
-缺点：
-
-* 内存占用：在写操作时需要复制一个新的数组，使得内存占用为原来的两倍左右； 
-
-* 数据不一致：读操作不能读取实时性的数据，因为部分写操作的数据还未同步到读数组中。 
-
-所以 CopyOnWriteArrayList 不适合内存敏感以及对实时性要求很高的场景。 
+  * 数据不一致：读操作不能读取实时性的数据，因为部分写操作的数据还未同步到读数组中。 不适合内存敏感以及对实时性要求很高的场景。 
 
 ### LinkedList
 
 #### 1. 概览
 
-内部私有类Node：
-
-```java
-private static class Node<E> {
-    E item;
-    Node<E> next;
-    Node<E> prev;
-}
-```
-
-定义：
-
-```java
-transient Node<E> first;
-transient Node<E> last;
-```
+内部私有类Node  Node<E> next \prev  , transient Node<E> first \ last ：
 
  补充：**transient**关键字标记的成员变量不参与序列化过程。 
 
 综上可看出，LinkedList是由双向列表实现，使用Node存储节点信息，每个节点都有前节点（next），本节点（item），后节点（prev）。
 
-#### 2.与 ArrayList 的比较
 
-* ArrayList 基于动态数组实现，LinkedList 基于双向链表实现。 
-* ArrayList插入删除元素时分两种情况：①把元素添加到末尾所需的时间复杂度是O(1)，②在指定位置添加删除元素时就需要移动整个数组，操作代价就比较大了。LinkedList 对于添加删除方法只需要断链然后更改指向，所需的消耗就很小了。
-* ArrayList 支持高效的随机元素访问 而LinkedList 不支持。
-* ArrayList的空 间浪费主要体现在在list列表的结尾会预留一定的容量空间，而LinkedList的空间花费则体现在它的每一个元素都需要消耗比ArrayList更多的空间（因为要存放直接后继和直接前驱以及数据）。 
 
 ### HashMap
 
-#### 1.整体原理分析 
+#### 1.整体原理分析
 
- HashMap类中有一个非常重要的字段，就是  Node[] table，即哈希桶数组 
+* HashMap类中有一个非常重要的字段，就是  Node[] table，即哈希桶数组 
 
 ```java
 static class Node<K,V> implements Map.Entry<K,V> {
@@ -375,24 +262,12 @@ static class Node<K,V> implements Map.Entry<K,V> {
         }
 ```
 
-
-
- Node是HashMap的一个内部类，实现了Map.Entry接口，本质是就是一个映射(键值对)。 
-
-hash:hashcode经过扰动函数得到的值， 然后通过 `(n - 1) & hash` 判断当前元素存放的位置，如果当前
-
-位置存在hash和key值不相同的元素就使用拉链法解决冲突。
-
-**“拉链法”** 就是：将链表和数组相结合。也就是说创建一个链表数组，数组中每一格就是一个链表。若遇到哈希冲突，则将冲突的值加到链表中即可。 
-
-Node<K,V> next：next就是用于链表的指向。
-
-所谓**扰动函数**指的就是 HashMap 的 hash 方法。使用 hash 方法也就是扰动函数是为了防止一些实现比较差的 hashCode() 方法 换句话说使用扰动函数之后可以减少碰撞。 
-
-底层存储结构：
-
-![2.png](https://gitee.com/houyao123/my-resource/raw/master/img/2.png)
-
+* Node是HashMap的一个内部类，实现了Map.Entry接口，本质是就是一个映射(键值对)。 
+  * hash:hashcode经过扰动函数得到的值， 然后通过 `(n - 1) & hash` 判断当前元素存放的位置，如果当前位置存在hash和key值不相同的元素就使用拉链法解决冲突。
+  * **“拉链法”** 就是：将链表和数组相结合。也就是说创建一个链表数组，数组中每一格就是一个链表。若遇到哈希冲突，则将冲突的值加到链表中即可。 
+  * Node<K,V> next：next就是用于链表的指向。
+  * 所谓**扰动函数**指的就是 HashMap 的 hash 方法。使用 hash 方法也就是扰动函数是为了防止一些实现比较差的 hashCode() 方法 换句话说使用扰动函数之后可以减少碰撞。
+* tip： JDK1.7之前的put方法和现在流程不同的地方就是采用头插法插入元素。 
 
 #### 2.put方法分析
 
@@ -498,9 +373,6 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
 ![put方法流程图.png](https://gitee.com/houyao123/my-resource/raw/master/img/put%E6%96%B9%E6%B3%95%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
 
 
-
-
-tip： JDK1.7之前的put方法和现在流程不同的地方就是采用头插法插入元素。
 
 #### 3.扩容（resize方法）
 
@@ -615,48 +487,6 @@ ReentrantLock 来进行加锁，所以每次需要加锁的操作锁住的是一
 
 ![concurrentHashMap7.png](https://gitee.com/houyao123/my-resource/raw/master/img/concurrentHashMap7.png)
 
-
-
 **JDK1.8：**
 
 使用了 CAS 操作来支持更高的并发度，在 CAS 操作失败时使用内置锁 synchronized。  synchronized只锁定当前链表或红黑二叉树的首节点，这样只要hash不冲突，就不会产生并发，效率又提升N倍。 
-
-### HashSet
-
-实现原理： HashSet底层由HashMap实现 ，值存放于HashMap的key上 ，HashMap的value统一为PRESENT 。
-
-检查重复： 先对插入的元素的hashcode值和现有的元素的hashcode作比较，如果没有相符的hashcode，HashSet会假设对象没有重复出现，直接插入。但是如果发现有相同hashcode值的对象，这时会调用`equals（）`方法来检查hashcode相等的对象是否真的相同。  如果两者相同，HashSet就不会让加入操作成功 。
-###  LinkedHashMap
-
-#### LinkedHashMap 实现LRU（least recently used）
-
-- 设定最大缓存空间 MAX_ENTRIES 为 3；
-- 使用 LinkedHashMap 的构造函数将 accessOrder 设置为 true，开启 LRU 顺序；
-- 覆盖 removeEldestEntry() 方法实现，在节点多于 MAX_ENTRIES 就会将最近最久未使用的数据移除。
-
-```java
-class LRUCache<K, V> extends LinkedHashMap<K, V> {
-    private static final int MAX_ENTRIES = 3;
-    protected boolean removeEldestEntry(Map.Entry eldest) {
-        return size() > MAX_ENTRIES;
-    }
-    LRUCache() {
-        super(MAX_ENTRIES, 0.75f, true);
-    }
-}
-public static void main(String[] args) {
-    LRUCache<Integer, String> cache = new LRUCache<>();
-    cache.put(1, "a");
-    cache.put(2, "b");
-    cache.put(3, "c");
-    cache.get(1);
-    cache.put(4, "d");
-    System.out.println(cache.keySet());
-}
-```
-
-### TreeMap
-
-#### TreeMap 其 key 对象为什么必须要实现 Compare 接口
-
-通过阅读 TreeMap 的 put 方法的源码发现：TreeMap 实现元素不重复就是通过调用 compareTo 方法，而要使用 compareTo 方法就必须实现Compare接口。
